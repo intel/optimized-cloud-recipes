@@ -1,0 +1,92 @@
+---
+- name: Install pre-requisite packages
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Add apt-fast repository
+      ansible.builtin.apt_repository:
+        repo: 'ppa:apt-fast/stable'
+        state: present
+    - name: Install pre-requisite packages
+      ansible.builtin.apt:
+        pkg:
+          - vim
+          - python3-pip
+          - gcc
+          - g++
+          - make
+          - numactl
+          - ca-certificates
+          - curl
+          - gnupg
+          - apt-fast
+        state: present
+        update_cache: true
+
+- name: Install Intel AI Toolkit
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Add Intel GPG key
+      shell: wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+      changed_when: false
+    - name: Add Intel OneAPI repo
+      shell: echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+    
+    - name: Install intel base kit
+      shell: apt-fast update && DEBIAN_FRONTEND=noninteractive apt-fast install -yq intel-basekit
+    - name: Install intel AI kit
+      shell: DEBIAN_FRONTEND=noninteractive apt-fast -yq install intel-aikit
+
+- name: Install Miniconda
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Download Miniconda
+      shell: wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
+      args:
+        creates: ~/miniconda.sh
+    - name: Install Miniconda
+      shell: bash ~/miniconda.sh -b -p $HOME/miniconda
+      args:
+        creates: $HOME/miniconda
+
+- name: Set environment variables
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Add environment variable script to profile
+      copy:
+        dest: "/etc/profile.d/oneapi-env-vars.sh"
+        content: |
+          source /opt/intel/oneapi/setvars.sh
+
+- name: Install requirements to run demo to demo user
+  hosts: localhost
+  connection: local
+
+  vars:
+    repo_url: https://github.com/oneapi-src/oneAPI-samples.git
+    script_dest: /usr/local/bin
+    demo_folder: ./oneAPI-samples/AI-and-Analytics/Features-and-Functionality/IntelPyTorch_InferenceOptimizations_AMX_BF16_INT8
+  tasks:
+    - name: Add script to run demo to bin
+      copy:
+        dest: "{{ script_dest }}/run_demo.sh"
+        content: |
+          #!/bin/bash
+          git clone "{{ repo_url }}"
+          conda activate pytorch
+          python -m pip install transformers 
+          python -m pip install -r "{{ demo_folder }}/requirements.txt"
+          cd "{{ demo_folder }}"
+          python IntelPyTorch_InferenceOptimizations_AMX_BF16_INT8.py
+        mode: a+x
+
+- name: Reboot server
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Reboot server
+      shell: reboot
+
