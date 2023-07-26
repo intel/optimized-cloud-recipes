@@ -5,16 +5,16 @@
 
 # WORK IN PROGRESS - Intel® Optimized Cloud Recipes (OCRs)
 
-© Copyright 2022, Intel Corporation
+© Copyright 2023, Intel Corporation
 
 ## Overview
 
-Intel® Optimized Cloud Recipes (OCRs) are a combination of documentation(markdown) and scripted automation that enables and optimizes technologies on Intel® Architecture (IA).
+Intel® Optimized Cloud Recipes (OCRs) are:
 
-The goal of the OCRs is to provide a simple and easy way to enable and optimize technologies on Intel® Architecture (IA).
-These scripts can be use by Intel cloud optimization modules for HashiCorp Terraform via Cloud_Init integration or directly on their own.
-
-The scripts are are usually written in Ansible or PowerShell and are meant to automate operating system and above configuration.
+1. A combination of documentation(markdown) and scripted automation developed to enables/optimizes technologies on Intel® Architecture (IA)
+2. Currently focused on enabling Infrastructure-as-a-Service(IaaS) Virtual Machines(VMs) on public cloud providers
+3. Written in Ansible or PowerShell and are meant to automate operating system and above configuration
+4. Ready be use by Intel cloud optimization modules for HashiCorp Terraform via Cloud_Init integration or directly on their own
 
 Some example of technologies that can be enabled and optimized are:
 
@@ -23,7 +23,10 @@ Some example of technologies that can be enabled and optimized are:
 - MySQL Open Source Database
 - PostgreSQL Open Source Database
 
-### Examples
+### How to use it
+
+Recipes are located in the `recipes` folder. Each recipe has its own folder and contains a `README.md` file with instructions on how to use it.
+
 
 ### Deployment demo
 
@@ -36,29 +39,3 @@ Some example of technologies that can be enabled and optimized are:
 ## How to contribute
 
 ## Considerations
-
-<!-- BEGIN_TF_DOCS -->
-## Requirements
-
-No requirements.
-
-## Providers
-
-No providers.
-
-## Modules
-
-No modules.
-
-## Resources
-
-No resources.
-
-## Inputs
-
-No inputs.
-
-## Outputs
-
-No outputs.
-<!-- END_TF_DOCS -->
