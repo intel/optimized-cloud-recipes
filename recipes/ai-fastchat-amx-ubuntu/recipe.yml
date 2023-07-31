@@ -58,15 +58,3 @@
         state: present
         executable: pip3
 
-
-# --model-path 
-# python3 -m fastchat.serve.model_worker --model-path lmsys/longchat-7b-16k --device cpu --host 0.0.0.0 --controller-address http://10.128.15.193:21001
-# python3 -m fastchat.serve.gradio_web_server_multi --share
-
-
-
-#XEON 3
-# python3 -m fastchat.serve.model_worker --model-path lmsys/fastchat-t5-3b-v1.0 --device cpu --controller-address http://10.128.15.197:21001 --worker-address http://10.128.15.198:21002 --host 10.128.15.198 --model-name xeon-3
-
-#XEON 4
-# python3 -m fastchat.serve.model_worker --model-path lmsys/fastchat-t5-3b-v1.0 --device cpu --model-name xeon-4 --port 21004 --worker-address http://localhost:21004
