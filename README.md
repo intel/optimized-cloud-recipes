@@ -21,7 +21,14 @@ Intel® Optimized Cloud Recipes (OCRs) are:
 5. Ready to be Integrated into Intel® Cloud Optimization Modules for HashiCorp Terraform using Cloud Cloud-Init integration ([GCP Module example](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit))
 6. Or used directly on their own(see usage on each recipe)
 
-**Note: OCRs focus on enablement of Intel Technologies and many times they will include a small but they are not meant to be a benchmarking tool.**
+Currently out-of-scope for OCRs:
+
+1. Benchmarking
+2. Defining Tuning parameters/knobs and values that are required to optimize a workload
+3. Physical hardware configuration
+4. On-prem hardware configuration
+
+**Note: OCRs focus on the enablement of Intel Technologies and many times they will include a small but they are not meant to be a benchmarking tool.**
 
 **Intel is working on a separate benchmarking repository called [Workload Services Framework](https://github.com/intel/workload-services-framework) that will consume these recipes and provide benchmarking capabilities.**
 
