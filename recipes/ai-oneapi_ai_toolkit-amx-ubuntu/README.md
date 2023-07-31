@@ -32,53 +32,13 @@ There are two main usage options:
 
 ### Option 1 - Integration with Intel® Cloud Optimization Modules for HashiCorp Terraform via Cloud-Init
 
-1. The following demonstrates how to use the `ai-oneapi_ai_toolkit-amx-ubuntu` recipe with the Intel GCP module for Terraform. [GCP Module example link](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit).
+**Use the existing [GCP Module example link](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit).**
+
+Details:
+
+1. The following demonstrates how to use the `ai-oneapi_ai_toolkit-amx-ubuntu` recipe with the Intel GCP module for Terraform. 
 2. It uses the Terraform `user_data` argument that enables the execution on the `cloud_init.yml` file.
 3. The `cloud_init.yml` file calls the Ansible playbook that installs the recipe by calling the `recipe.yml` file directly from Github.
-
-Example:
-
-```hcl
-# main.tf Terraform file that deploys GCP VM via the GCP VM Module
-
-# Cloud-init file that calls Ansible playbook, see 'user_data' below
-data "template_file" "user_data" {
-  template = file("./cloud_init.yml")
-}
-
-# GCP VM Module
-module "linux_vm" {
-  source              = "intel/gcp-vm/intel"
-  project             = "123456789"
-  boot_image_project  = "ubuntu-os-cloud"
-  boot_image_family   = "ubuntu-2204-lts"
-  name                = "gcp-linux-with-aikit"
-  zone                = "us-central1-a" 
-  access_config = [{
-    nat_ip                 = null
-    public_ptr_domain_name = null
-    network_tier           = "PREMIUM"
-  }, ]
-  # Integration between Terraform and Cloud-init
-  user_data    = data.template_file.user_data.rendered 
-}
-```
-
-```yaml
-# Cloud-init file that calls Ansible playbook
-package_update: true
-package_upgrade: true
-
-package:
-  - git
-
-ansible:
-  install_method: distro
-  package_name: ansible
-  pull:
-    url: "https://github.com/intel/optimized-cloud-recipes.git"
-    playbook_name: "recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml"
-```
 
 ### Option 2 - Running Ansible via the Operating System command line
 
