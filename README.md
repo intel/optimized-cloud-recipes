@@ -20,6 +20,8 @@ Intel® Optimized Cloud Recipes (OCRs) are:
 4. Ready to be Integrated into Intel® Cloud Optimization Modules for HashiCorp Terraform using Cloud Cloud-Init integration ([GCP Module example](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit))
 5. Or used directly on their own(see usage on each recipe)
 
+## Value
+
 ## Examples of Recipes
 
 Some example of technologies that can be enabled and optimized are:
@@ -29,11 +31,13 @@ Some example of technologies that can be enabled and optimized are:
 - MySQL Open Source Database
 - PostgreSQL Open Source Database
 
-## Intel Cloud Optimization Modules
+## The Recipes companion,  Intel® Cloud Optimization Modules
 
-The Intel® Cloud Optimization Modules for HashiCorp Terraform are a set of modules that enable the deployment of optimized instances on public cloud providers. The modules are available on the [Terraform Registry](https://registry.terraform.io/modules/intel).
+The Intel® Cloud Optimization Modules for HashiCorp Terraform enable the deployment of optimized instances on public cloud providers. 
 
-These modules can be easily integrated with these Recipes, see **Usage** below.
+The modules are available on the [Terraform Registry](https://registry.terraform.io/modules/intel).
+
+**The Modules can be easily integrated with these Recipes, see Usage below.**
 
 ## Usage
 
