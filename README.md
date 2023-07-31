@@ -14,11 +14,17 @@
 
 Intel® Optimized Cloud Recipes (OCRs) are:
 
-1. A combination of documentation(markdown) and scripted automation developed to enable/optimize technologies on Intel® Architecture (IA)
-2. Currently focused on enabling Infrastructure-as-a-Service(IaaS) Virtual Machines(VMs) on public cloud providers (today, no hardware configuration is supported)
-3. Written in Ansible or PowerShell, meant to automate operating system and above configuration
-4. Ready to be Integrated into Intel® Cloud Optimization Modules for HashiCorp Terraform using Cloud Cloud-Init integration ([GCP Module example](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit))
-5. Or used directly on their own(see usage on each recipe)
+1. A combination of documentation(markdown) and scripted automation 
+2. Developed to enable/optimize technologies on Intel® Architecture (IA)
+3. Currently focused on enabling Infrastructure-as-a-Service(IaaS) Virtual Machines(VMs) on public cloud providers (today, no hardware configuration is supported)
+4. Written in Ansible or PowerShell, meant to automate operating system and above configuration
+5. Ready to be Integrated into Intel® Cloud Optimization Modules for HashiCorp Terraform using Cloud Cloud-Init integration ([GCP Module example](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit))
+6. Or used directly on their own(see usage on each recipe)
+
+**Note: OCRs focus on enablement of Intel Technologies and many times they will include a small but they are not meant to be a benchmarking tool.**
+
+**Intel is working on a separate benchmarking repository called [Workload Services Framework](https://github.com/intel/workload-services-framework) that will consume these recipes and provide benchmarking capabilities.**
+
 
 ## Value
 
@@ -26,16 +32,14 @@ Intel® Optimized Cloud Recipes (OCRs) are:
 
 Some example of technologies that can be enabled and optimized are:
 
-- AI Training and Inference with Intel® Advanced Matrix Extensions (Intel® AMX)
+- OneAPI AI Training and Inference with Intel® Advanced Matrix Extensions (Intel® AMX)
 - Encryption/Decryption with Intel Quick Assist Technology (Intel QAT)
 - MySQL Open Source Database
 - PostgreSQL Open Source Database
 
-## The Recipes companion,  Intel® Cloud Optimization Modules
+## The OCR companion,  Intel® Cloud Optimization Modules
 
-The Intel® Cloud Optimization Modules for HashiCorp Terraform enable the deployment of optimized instances on public cloud providers. 
-
-The modules are available on the [Terraform Registry](https://registry.terraform.io/modules/intel).
+The Intel® Cloud Optimization Modules for HashiCorp Terraform enable the deployment of optimized instances on public cloud. The modules are available on the [Terraform Registry](https://registry.terraform.io/modules/intel).
 
 **The Modules can be easily integrated with these Recipes, see Usage below.**
 
