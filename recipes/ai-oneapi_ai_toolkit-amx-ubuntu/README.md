@@ -42,24 +42,17 @@ Details:
 
 ### Option 2 - Running Ansible via the Operating System command line
 
-Follow Ansible installation procedures for your operating system
-
-<https://docs.ansible.com/ansible/latest/installation_guide/installation_distros.html>
+By using [ansible-pull](https://docs.ansible.com/ansible/latest/cli/ansible-pull.html), Ansible can run directly on the host.
 
 For example, on Ubuntu:
 
 ```bash
-# Install Ansible Key
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
-sudo apt update
-
-# Install Git and clone this repository
+# Install Git
 sudo apt install git -y
-git clone https://github.com/intel/optimized-cloud-recipes.git
 
 # Install Ansible and run the recipe
 sudo apt install ansible -y
-sudo ansible-playbook ./optimized-cloud-recipes/recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml
+sudo ansible-pull -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml
 ```
 
 ## Links
