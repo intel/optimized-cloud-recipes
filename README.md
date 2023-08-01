@@ -143,7 +143,7 @@ By using [ansible-pull](https://docs.ansible.com/ansible/latest/cli/ansible-pull
 sudo apt install git -y
 
 #Run anisble-pull
-ansible-pull -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml
+sudo ansible-pull -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml
 ```
 ## Repo Structure
 
