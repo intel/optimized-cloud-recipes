@@ -16,7 +16,7 @@ Intel® Optimized Cloud Recipes (OCRs) are:
 
 1. A combination of documentation(markdown) and scripted automation 
 2. Developed to enable/optimize technologies on Intel® Architecture (IA)
-3. Currently focused on enabling Infrastructure-as-a-Service(IaaS) Virtual Machines(VMs) on public cloud providers (today, no hardware configuration is supported)
+3. Currently focused on enabling Infrastructure-as-a-Service (IaaS) Virtual Machines (VMs) on public cloud providers (today, no hardware configuration is supported)
 4. Written in Ansible or PowerShell, meant to automate operating system and above configuration
 5. Ready to be Integrated into Intel® Cloud Optimization Modules for HashiCorp Terraform using Cloud Cloud-Init integration ([GCP Module example](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit))
 6. Or used directly on their own(see usage on each recipe)
@@ -135,6 +135,16 @@ sudo apt install ansible -y
 sudo ansible-playbook ./optimized-cloud-recipes/recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml
 ```
 
+### Option 3 - Using ansible-pull
+By using [ansible-pull](https://docs.ansible.com/ansible/latest/cli/ansible-pull.html), Ansible can run directly on the host.
+
+```
+#Install Git
+sudo apt install git -y
+
+#Run anisble-pull
+ansible-pull -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml
+```
 ## Repo Structure
 
 The repository structure is very simple. All recipes will be located under the `./recipes` folder.
