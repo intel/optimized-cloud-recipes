@@ -34,13 +34,14 @@
       args:
         creates: $HOME/miniconda
 
-##########################################################
-# Demo                                                   #
-#                                                        #
-# Run 'source /usr/local/bin/run_demo.sh' to start demo  #
-#                                                        #
-##########################################################
-- name: Install requirements to run demo to demo user
+##########################################################################
+# Demo                                                                   #
+#                                                                        #
+# Run 'source /usr/local/bin/run_demo.sh' to start demo                  #
+# Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log' #                                                        #
+#                                                                        # 
+##########################################################################
+- name: Install requirements to run demo
   hosts: localhost
   connection: local
 
@@ -60,6 +61,21 @@
           python -m pip install -r "{{ demo_folder }}/requirements.txt"
           cd "{{ demo_folder }}"
           python IntelPyTorch_InferenceOptimizations_AMX_BF16_INT8.py
+        mode: a+x
+    - name: Run "source /usr/local/bin/run_demo.sh" to start demo
+      shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
+
+- name: Complete Installation
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Create file to demonstrate recipe completion
+      copy:
+        dest: "/opt/recipe-run-completed_{{ ansible_date_time.date }}.txt"
+        content: |
+          # Run 'source /usr/local/bin/run_demo.sh' to start demo                  
+          # Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log'
         mode: a+x
     - name: Run "source /usr/local/bin/run_demo.sh" to start demo
       shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"

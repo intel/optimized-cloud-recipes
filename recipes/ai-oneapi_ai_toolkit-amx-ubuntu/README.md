@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
+</p>
+
 # OCR: OneAPI Base & AI Analytics Toolkit
 
 The OneAPI Base & AI Analytics Toolkit is a set of libraries and tools for developing, training, and deploying high-performance, data analytics, AI and machine learning applications.
@@ -6,10 +10,10 @@ The OneAPI Base & AI Analytics Toolkit is a set of libraries and tools for devel
 
 | Area                  | Description
 |:---                   |:---
-| Recipe   | **This Optimized Cloud Recipe(OCR) enables the OneAPI Base & AI Analytics Toolkit and deploys a small Bert/Restnet50 demo application**
-Demo | To run the built-in amx demo, run: `source /usr/local/bin/run_demo.sh`. The included demo is based off our OneAPI Samples and  demonstrates how to perform inference using the ResNet50 and BERT models using the Intel® Extension for PyTorch
+| Recipe   | **Enables Python, Intel PyTorch Extensions and deploys a small Bert/Restnet50 demo application**
+Demo | To run the built-in amx demo, run: `source /usr/local/bin/run_demo.sh`. The included demo is based of our OneAPI Samples and  demonstrates how to perform inference using the ResNet50 and BERT models using the Intel® Extension for PyTorch
 Demo details |  [LINK](https://github.com/oneapi-src/oneAPI-samples/blob/master/AI-and-Analytics/Features-and-Functionality/IntelPyTorch_InferenceOptimizations_AMX_BF16_INT8/README.md)
-| Install time      | 30-45 minutes
+| Install time      | 3 minutes
 | Logs | `tail -f /var/ansible-log` & `tail -f 10 /var/log/dpkg.log`
 
 ## Prerequisites
@@ -32,13 +36,8 @@ There are two main usage options:
 
 ### Option 1 - Integration with Intel® Cloud Optimization Modules for HashiCorp Terraform via Cloud-Init
 
-**Use the existing [GCP Module example link](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit).**
+[**Use the existing GCP Intel® Cloud Optimization Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit)
 
-Details:
-
-1. The following demonstrates how to use the `ai-oneapi_ai_toolkit-amx-ubuntu` recipe with the Intel GCP module for Terraform. 
-2. It uses the Terraform `user_data` argument that enables the execution on the `cloud_init.yml` file.
-3. The `cloud_init.yml` file calls the Ansible playbook that installs the recipe by calling the `recipe.yml` file directly from Github.
 
 ### Option 2 - Running Ansible via the Operating System command line
 
@@ -47,12 +46,20 @@ By using [ansible-pull](https://docs.ansible.com/ansible/latest/cli/ansible-pull
 For example, on Ubuntu:
 
 ```bash
-# Install Git
+# Install Git 
 sudo apt install git -y
 
-# Install Ansible and run the recipe
+# Install Ansible Key
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+sudo apt update
+
+# Install Ansible
 sudo apt install ansible -y
-sudo ansible-pull -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml
+
+#Run ansible-pull
+sudo ansible-pull -vvv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml
+
+# Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log'
 ```
 
 ## Links
