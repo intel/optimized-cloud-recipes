@@ -38,8 +38,22 @@
     - name: Start web controller shell
       shell: nohup python3 -m fastchat.serve.controller --host 0.0.0.0 </dev/null >/dev/null 2>&1 & 
     - name: Serve Falcon on CPU
-      #shell: sleep 10 & nohup python3 -m fastchat.serve.model_worker --model-path lmsys/fastchat-t5-3b-v1.0 --device cpu --model-name xeon_4_fastchat --port 21004 --worker-address http://localhost:21004 </dev/null >/dev/null 2>&1 & 
-      shell: sleep 10 & nohup python3 -m fastchat.serve.model_worker --model-path {{ model_path | default('lmsys/fastchat-t5-3b-v1.0') }} --device cpu --model-name {{ model_name | default('xeon_4_fastchat') }} --port 21004 --worker-address http://localhost:21004 </dev/null >/dev/null 2>&1 & 
+      shell: sleep 10 & nohup python3 -m fastchat.serve.model_worker --model-path {{ model_path | default('lmsys/fastchat-t5-3b-v1.0') }} --device cpu --model-name {{ model_name | default('xeon_4_fastchat') }} --port {{ port_number | default('21004') }} --worker-address http://localhost:{{ port_number | default('21004') }} </dev/null >/dev/null 2>&1 & 
 
+- name: Create script to run gradio frontend
+  hosts: localhost
+  connection: local
+  vars:
+    script_dest: /usr/local/bin
+  tasks:
+    - name: Add script to run demo to bin
+      copy:
+        dest: "{{ script_dest }}/run_demo.sh"
+        content: |
+          #!/bin/bash
+          pip install gradio==3.10
+          pip install gradio==3.35.2
+          python3 -m fastchat.serve.gradio_web_server_multi --share
+        mode: a+x
 
 
