@@ -66,7 +66,7 @@ There are two primary ways to use these Recipes:
 
 Overview:
 
-1. The following demonstrates how to use the `ai-oneapi_ai_toolkit-amx-ubuntu` recipe with the Intel GCP module for Terraform.
+1. The following demonstrates how to use the `ai-pytorch-amx-ubuntu` recipe with the Intel GCP module for Terraform.
 2. It uses the Terraform `user_data` argument that enables the execution on the `cloud_init.yml` file.
 3. The `cloud_init.yml` file calls the Ansible playbook that installs the recipe by calling the `recipe.yml` file directly from Github.
 
@@ -113,7 +113,7 @@ ansible:
   package_name: ansible
   pull:
     url: "https://github.com/intel/optimized-cloud-recipes.git"
-    playbook_name: "recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml"
+    playbook_name: "recipes/ai-pytorch-amx-ubuntu/recipe.yml"
 ```
 
 ### Option 2 - Running Ansible via the Operating System command line
@@ -136,7 +136,7 @@ sudo apt update
 sudo apt install ansible -y
 
 #Run ansible-pull
-sudo ansible-pull -vvv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml
+sudo ansible-pull -vvv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-pytorch-amx-ubuntu/recipe.yml
 
 # Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log'
 ```
@@ -151,7 +151,7 @@ Categories are: ai, compute, data, media, ml, networking
 
 Examples:
 
-- ai-oneapi_ai_toolkit-amx-ubuntu
+- ai-pytorch-amx-ubuntu
 - networking-java-qat-ubuntu
 - database-mysql-avx512-ubuntu
 - database-mssql-qat-windows

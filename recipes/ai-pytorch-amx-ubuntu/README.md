@@ -2,13 +2,13 @@
   <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
-# OCR: oneAPI AI Analytics Intel AMX on Ubuntu  
+# OCR: PyTorch Intel AMX on Ubuntu 
 
 ## Overview
 
 | Area                  | Description
 |:---                   |:---
-| Recipe   | **Enables Python, Intel oneAPI AI Analytics Extensions and deploys a small Bert/Restnet50 demo application**
+| Recipe   | **Enables Python, Intel PyTorch Extensions and deploys a small Bert/Restnet50 demo application**
 Demo | To run the built-in amx demo, run: `source /usr/local/bin/run_demo.sh`. The included demo is based of our OneAPI Samples and  demonstrates how to perform inference using the ResNet50 and BERT models using the Intel® Extension for PyTorch
 Demo details |  [LINK](https://github.com/oneapi-src/oneAPI-samples/blob/master/AI-and-Analytics/Features-and-Functionality/IntelPyTorch_InferenceOptimizations_AMX_BF16_INT8/README.md)
 | Install time      | 3 minutes

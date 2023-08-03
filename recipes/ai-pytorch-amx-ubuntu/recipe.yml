@@ -6,39 +6,20 @@
   hosts: localhost
   connection: local
   tasks:
-    - name: Add apt-fast repository
-      ansible.builtin.apt_repository:
-        repo: 'ppa:apt-fast/stable'
-        state: present
     - name: Install pre-requisite packages
       ansible.builtin.apt:
         pkg:
-          - vim
           - python3-pip
-          - gcc
-          - g++
-          - make
-          - numactl
-          - ca-certificates
-          - curl
-          - gnupg
-          - apt-fast
+          - python-is-python3
         state: present
         update_cache: true
 
-- name: Install Intel AI Toolkit
+- name: Install PyTorch and PyTorch Intel Extension
   hosts: localhost
   connection: local
   tasks:
-    - name: Add Intel GPG key
-      shell: wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
-      changed_when: false
-    - name: Add Intel OneAPI repo
-      shell: echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-    - name: Install intel base kit
-      shell: apt-fast update && DEBIAN_FRONTEND=noninteractive apt-fast install -yq intel-basekit
-    - name: Install intel AI kit
-      shell: DEBIAN_FRONTEND=noninteractive apt-fast -yq install intel-aikit
+    - name: Install PyTorch
+      shell: python -m pip install torch torchvision torchaudio transformers intel_extension_for_pytorch
 
 - name: Install Miniconda
   hosts: localhost
@@ -53,20 +34,14 @@
       args:
         creates: $HOME/miniconda
 
-- name: Set environment variables
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: Add environment variable script to profile
-      copy:
-        dest: "/etc/profile.d/oneapi-env-vars.sh"
-        content: |
-          source /opt/intel/oneapi/setvars.sh
-
-##########################################################
-# Demo                                                   #
-##########################################################
-- name: Install requirements to run demo to demo user
+##########################################################################
+# Demo                                                                   #
+#                                                                        #
+# Run 'source /usr/local/bin/run_demo.sh' to start demo                  #
+# Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log' #                                                        #
+#                                                                        # 
+##########################################################################
+- name: Install requirements to run demo
   hosts: localhost
   connection: local
 
@@ -87,10 +62,20 @@
           cd "{{ demo_folder }}"
           python IntelPyTorch_InferenceOptimizations_AMX_BF16_INT8.py
         mode: a+x
+    - name: Run "source /usr/local/bin/run_demo.sh" to start demo
+      shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
 
-- name: Reboot server
+- name: Complete Installation
   hosts: localhost
   connection: local
+
   tasks:
-    - name: Reboot server
-      shell: reboot
+    - name: Create file to demonstrate recipe completion
+      copy:
+        dest: "/opt/recipe-run-completed_{{ ansible_date_time.date }}.txt"
+        content: |
+          # Run 'source /usr/local/bin/run_demo.sh' to start demo                  
+          # Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log'
+        mode: a+x
+    - name: Run "source /usr/local/bin/run_demo.sh" to start demo
+      shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
