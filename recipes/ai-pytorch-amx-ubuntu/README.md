@@ -2,13 +2,13 @@
   <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
-# OCR: 4th Gen Xeon(SPR) AMX using oneAPI AI Analytics on Ubuntu  
+# OCR - 4th Gen Xeon(SPR) AMX using PyTorch on Ubuntu
 
 ## Overview
 
 | Area                  | Description
 |:---                   |:---
-| Recipe   | **Enables Python, Intel oneAPI AI Analytics libraries and deploys a small Bert/Restnet50 demo application**
+| Recipe   | **Enables Python, Intel PyTorch Extensions and deploys a small Bert/Restnet50 demo application**
 Demo | To run the built-in amx demo, run: `source /usr/local/bin/run_demo.sh`. The included demo is based of our OneAPI Samples and  demonstrates how to perform inference using the ResNet50 and BERT models using the Intel® Extension for PyTorch
 Demo details |  [LINK](https://github.com/oneapi-src/oneAPI-samples/blob/master/AI-and-Analytics/Features-and-Functionality/IntelPyTorch_InferenceOptimizations_AMX_BF16_INT8/README.md)
 | Install time      | 3 minutes
@@ -22,13 +22,13 @@ Demo details |  [LINK](https://github.com/oneapi-src/oneAPI-samples/blob/master/
 | Optimizer     | Intel® Advanced Matrix Extensions (AMX)  |
 | Hardware      | 4th Gen Intel® Xeon® Scalable Processors |
 
-**Note: GCP C3 & AWS m7i VMs are supported**
+**Note: GCP and AWS SPR VMs are supported**
 
 ## Usage
 
 There are two main usage options:
 
-### Option 1 - The simplest way to use the recipe is with Intel Cloud Modules
+### Option 1 - The simplest way to implement the recipe is with Intel Cloud Modules
 
 [**Use the existing GCP Intel® Cloud Optimization Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit)
 

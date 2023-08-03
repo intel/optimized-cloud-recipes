@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="./images/logo-classicblue-800px.png" alt="Intel Logo" width="250"/>
+  <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
 ### WORK IN PROGRESS
@@ -12,28 +12,31 @@
 ## Overview
 
 
-Intel® Optimized Cloud Recipes (OCRs) are:
+**Intel® Optimized Cloud Recipes (OCRs) are:**
 
-1. A combination of documentation(markdown) and scripted automation 
-2. Developed to enable/optimize technologies on Intel® Architecture (IA)
-3. Currently focused on enabling Infrastructure-as-a-Service (IaaS) Virtual Machines (VMs) on public cloud providers (today, no hardware configuration is supported)
-4. Written in Ansible or PowerShell, meant to automate operating system and above configuration
-5. Ready to be Integrated into Intel® Cloud Optimization Modules for HashiCorp Terraform using Cloud Cloud-Init integration ([GCP Module example](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit))
-6. Or used directly on their own(see usage on each recipe)
+1. A combination of documentation(markdown) and scripted automation.
+2. Developed to enable/optimize technologies on Intel® Architecture (IA).
+3. Currently focused on enabling Infrastructure-as-a-Service (IaaS) Virtual Machines (VMs) on public cloud providers (today, hardware configuration is supported).
+4. Written in Ansible or PowerShell, meant to automate operating system and above configuration.
+5. Ready to be Integrated into Intel® Cloud Optimization Modules for HashiCorp Terraform using Cloud Cloud-Init integration. See [GCP Module example](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit)).
+6. Can also be used directly on their own(see usage on each recipe).
 
-Currently out-of-scope for OCRs:
+**Currently out-of-scope for OCRs:**
 
-1. Benchmarking
-2. Defining Tuning parameters/knobs and values that are required to optimize a workload
-3. Physical hardware configuration
-4. On-prem hardware configuration
+1. Physical on-prem hardware configuration.
+2. Defining tuning parameters/knobs and values that are required to optimize a workload.
+3. Benchmarking.
 
-**Note: OCRs focus on the enablement of Intel Technologies and many times they will include a small but they are not meant to be a benchmarking tool.**
+
+
+**Note: OCRs focus on the enablement of Intel Technologies and many times they will include a demo but they are not meant to be a benchmarking tool.**
 
 **Intel is working on a separate benchmarking repository called [Workload Services Framework](https://github.com/intel/workload-services-framework) that will consume these recipes and provide benchmarking capabilities.**
 
 
 ## Value
+
+The primary goal of OCRs is to simplify the enablement of Intel® Technologies on public cloud VMs.
 
 ## Examples of Recipes
 
@@ -44,7 +47,7 @@ Some example of technologies that can be enabled and optimized are:
 - MySQL Open Source Database
 - PostgreSQL Open Source Database
 
-## The OCR companion,  Intel® Cloud Optimization Modules
+## Intel® Cloud Optimization Modules for HashiCorp, the OCRs companion
 
 The Intel® Cloud Optimization Modules for HashiCorp Terraform enable the deployment of optimized instances on public cloud. The modules are available on the [Terraform Registry](https://registry.terraform.io/modules/intel).
 
@@ -56,14 +59,14 @@ Recipes are located in the `./recipes` folder. Each recipe has its own folder an
 
 There are two primary ways to use these Recipes:
 
-1. Via a Cloud-init Integration with Intel® Cloud Optimization Modules for HashiCorp Terraform
-2. By running Ansible via the command line
+1. **Via a Cloud-init Integration with Intel® Cloud Optimization Modules for HashiCorp Terraform**
+2. **By running Ansible via the command line**
 
 ### Option 1 - Integration with Intel® Cloud Optimization Modules for HashiCorp Terraform via Cloud-Init
 
 Overview:
 
-1. The following demonstrates how to use the `ai-oneapi_ai_toolkit-amx-ubuntu` recipe with the Intel GCP module for Terraform.
+1. The following demonstrates how to use the `ai-pytorch-amx-ubuntu` recipe with the Intel GCP module for Terraform.
 2. It uses the Terraform `user_data` argument that enables the execution on the `cloud_init.yml` file.
 3. The `cloud_init.yml` file calls the Ansible playbook that installs the recipe by calling the `recipe.yml` file directly from Github.
 
@@ -110,7 +113,7 @@ ansible:
   package_name: ansible
   pull:
     url: "https://github.com/intel/optimized-cloud-recipes.git"
-    playbook_name: "recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml"
+    playbook_name: "recipes/ai-pytorch-amx-ubuntu/recipe.yml"
 ```
 
 ### Option 2 - Running Ansible via the Operating System command line
@@ -119,32 +122,25 @@ Follow Ansible installation procedures for your operating system
 
 <https://docs.ansible.com/ansible/latest/installation_guide/installation_distros.html>
 
-For example, on Ubuntu:
+For example, on Ubuntu by using [ansible-pull](https://docs.ansible.com/ansible/latest/cli/ansible-pull.html), Ansible can run directly on the host:
 
 ```bash
+# Install Git 
+sudo apt install git -y
+
 # Install Ansible Key
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
 sudo apt update
 
-# Install Git and clone this repository
-sudo apt install git -y
-git clone https://github.com/intel/optimized-cloud-recipes.git
-
-# Install Ansible and run the recipe
+# Install Ansible
 sudo apt install ansible -y
-sudo ansible-playbook ./optimized-cloud-recipes/recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml
+
+#Run ansible-pull
+sudo ansible-pull -vvv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-pytorch-amx-ubuntu/recipe.yml
+
+# Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log'
 ```
 
-### Option 3 - Using ansible-pull
-By using [ansible-pull](https://docs.ansible.com/ansible/latest/cli/ansible-pull.html), Ansible can run directly on the host.
-
-```
-#Install Git
-sudo apt install git -y
-
-#Run anisble-pull
-sudo ansible-pull -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-oneapi_ai_toolkit-amx-ubuntu/recipe.yml
-```
 ## Repo Structure
 
 The repository structure is very simple. All recipes will be located under the `./recipes` folder.
@@ -155,7 +151,7 @@ Categories are: ai, compute, data, media, ml, networking
 
 Examples:
 
-- ai-oneapi_ai_toolkit-amx-ubuntu
+- ai-pytorch-amx-ubuntu
 - networking-java-qat-ubuntu
 - database-mysql-avx512-ubuntu
 - database-mssql-qat-windows

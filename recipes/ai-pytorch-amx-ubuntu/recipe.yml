@@ -1,0 +1,81 @@
+---
+##########################################################
+# Host configuration                                     #
+##########################################################
+- name: Install pre-requisite packages
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install pre-requisite packages
+      ansible.builtin.apt:
+        pkg:
+          - python3-pip
+          - python-is-python3
+        state: present
+        update_cache: true
+
+- name: Install PyTorch and PyTorch Intel Extension
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install PyTorch
+      shell: python -m pip install torch torchvision torchaudio transformers intel_extension_for_pytorch
+
+- name: Install Miniconda
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Download Miniconda
+      shell: wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
+      args:
+        creates: ~/miniconda.sh
+    - name: Install Miniconda
+      shell: bash ~/miniconda.sh -b -p $HOME/miniconda
+      args:
+        creates: $HOME/miniconda
+
+##########################################################################
+# Demo                                                                   #
+#                                                                        #
+# Run 'source /usr/local/bin/run_demo.sh' to start demo                  #
+# Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log' #                                                        #
+#                                                                        # 
+##########################################################################
+- name: Install requirements to run demo
+  hosts: localhost
+  connection: local
+
+  vars:
+    repo_url: https://github.com/oneapi-src/oneAPI-samples.git
+    script_dest: /usr/local/bin
+    demo_folder: ./oneAPI-samples/AI-and-Analytics/Features-and-Functionality/IntelPyTorch_InferenceOptimizations_AMX_BF16_INT8
+  tasks:
+    - name: Add script to run demo to bin
+      copy:
+        dest: "{{ script_dest }}/run_demo.sh"
+        content: |
+          #!/bin/bash
+          git clone "{{ repo_url }}"
+          conda activate pytorch
+          python -m pip install transformers 
+          python -m pip install -r "{{ demo_folder }}/requirements.txt"
+          cd "{{ demo_folder }}"
+          python IntelPyTorch_InferenceOptimizations_AMX_BF16_INT8.py
+        mode: a+x
+    - name: Run "source /usr/local/bin/run_demo.sh" to start demo
+      shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
+
+- name: Complete Installation
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Create file to demonstrate recipe completion
+      copy:
+        dest: "/opt/recipe-run-completed_{{ ansible_date_time.date }}.txt"
+        content: |
+          # Run 'source /usr/local/bin/run_demo.sh' to start demo                  
+          # Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log'
+        mode: a+x
+    - name: Run "source /usr/local/bin/run_demo.sh" to start demo
+      shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
