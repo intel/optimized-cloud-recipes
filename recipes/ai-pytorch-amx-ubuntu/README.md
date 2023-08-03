@@ -2,7 +2,7 @@
   <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
-# OCR: PyTorch Intel AMX on Ubuntu 
+# OCR - 4th Gen Xeon(SPR) AMX using PyTorch on Ubuntu
 
 ## Overview
 
@@ -28,7 +28,7 @@ Demo details |  [LINK](https://github.com/oneapi-src/oneAPI-samples/blob/master/
 
 There are two main usage options:
 
-### Option 1 - The simplest way to use the recipe is with Intel CloudModules
+### Option 1 - The simplest way to implement the recipe is with Intel Cloud Modules
 
 [**Use the existing GCP Intel® Cloud Optimization Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit)
 
@@ -56,7 +56,7 @@ sudo ansible-pull -vvv -U https://github.com/intel/optimized-cloud-recipes.git r
 # Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log'
 ```
 
-### To run the built-in amx demo, run: `source /usr/local/bin/run_demo.sh`
+### Demo - Execute on the command line: `source /usr/local/bin/run_demo.sh`
 
 ## Links
 
