@@ -51,8 +51,8 @@
         dest: "{{ script_dest }}/run_demo.sh"
         content: |
           #!/bin/bash
-          pip install gradio==3.10 -q
-          pip install gradio==3.35.2 -q
+          pip install -qqq gradio==3.10 
+          pip install -qqq gradio==3.35.2
           python3 -m fastchat.serve.gradio_web_server_multi --share
         mode: a+x
 
