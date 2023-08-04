@@ -4,12 +4,14 @@ This demo demonstrates the speedup in Large Language Model CPU inference from 3r
 # Running the Recipe
 The easiest way to run this recipe is using [Intel® Cloud Optimization Modules for Terraform](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-fastchat)
 
+Alternatively, a single node can be running using ansible-pull with the recipe.yml, as described in the main README
+
 # Running the Demo
 SSH into your VM from the cloud console. Wait for a few minutes to ensure that the recipe has run completely. 
 
-Ssh into the c3 instance and run
+Ssh into the newly created C3 instance and run
 
-`python3 -m fastchat.serve.gradio_web_server_multi --share` 
+`source /usr/local/bin/run_demo.sh` 
 
 --- KNOWN ISSUE ---
 

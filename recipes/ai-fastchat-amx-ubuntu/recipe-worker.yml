@@ -13,7 +13,7 @@
       copy:
         dest: "/var/cmd"
         content: |
-          python3 -m fastchat.serve.model_worker --model-path lmsys/fastchat-t5-3b-v1.0 --device cpu --controller-address http://{{ c3_ip }}:21001 --worker-address http://{{ own_ip }}:21002 --host {{ own_ip }} --model-name xeon-3 </dev/null >/dev/null 2>&1 &
+          python3 -m fastchat.serve.model_worker --model-path {{ model_path | default('lmsys/fastchat-t5-3b-v1.0') }} --device cpu --controller-address http://{{ controller_ip }}:21001 --worker-address http://{{ worker_ip }}:21002 --host {{ worker_ip }} --model-name {{ model_name | default('xeon_3_fastchat') }} </dev/null >/dev/null 2>&1 &
         mode: a+x
 
 - name: Install fschat with pip
@@ -22,7 +22,7 @@
   tasks:
     - name: Install fschat
       pip:
-        name: fschat
+        name: fschat==0.2.18
         state: present
         executable: pip3
     - name: Install plotly
@@ -45,6 +45,6 @@
   hosts: localhost
   connection: local
   tasks:
-    - name: Start web controller shell
-      shell: nohup python3 -m fastchat.serve.model_worker --model-path lmsys/fastchat-t5-3b-v1.0 --device cpu --controller-address http://{{ c3_ip }}:21001 --worker-address http://{{ own_ip }}:21002 --host {{ own_ip }} --model-name xeon-3 </dev/null >/dev/null 2>&1 & 
+    - name: Start worker
+      shell: nohup python3 -m fastchat.serve.model_worker --model-path {{ model_path | default('lmsys/fastchat-t5-3b-v1.0') }} --device cpu --controller-address http://{{ controller_ip }}:21001 --worker-address http://{{ worker_ip }}:21002 --host {{ worker_ip }} --model-name {{ model_name | default('xeon_3_fastchat') }} </dev/null >/dev/null 2>&1 &
     
