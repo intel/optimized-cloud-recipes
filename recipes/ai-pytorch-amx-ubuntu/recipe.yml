@@ -38,7 +38,7 @@
 # Demo                                                                   #
 #                                                                        #
 # Run 'source /usr/local/bin/run_demo.sh' to start demo                  #
-# Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log' #                                                        #
+# Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log' #
 #                                                                        # 
 ##########################################################################
 - name: Install requirements to run demo
@@ -68,7 +68,6 @@
 - name: Complete Installation
   hosts: localhost
   connection: local
-
   tasks:
     - name: Create file to demonstrate recipe completion
       copy:
