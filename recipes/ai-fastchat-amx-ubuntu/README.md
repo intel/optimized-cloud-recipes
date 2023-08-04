@@ -56,7 +56,7 @@ sudo ansible-pull -vvv -U https://github.com/intel/optimized-cloud-recipes.git r
 # Logs at 'tail -f 10 /var/ansible-log'
 ```
 
-### Running the Demo
+## Running the Demo
 
 **NOTE: This demo requires port 7860 to be open.** If you are running this on GCP, you will need to open this port in the GCP Firewall Policies. If you are running this on AWS, you will need to open this port in the AWS security group.
 
