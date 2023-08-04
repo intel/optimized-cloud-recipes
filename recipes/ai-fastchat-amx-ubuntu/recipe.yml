@@ -1,3 +1,6 @@
+##########################################################
+# Host configuration                                     #
+##########################################################
 ---
 - name: Install pre-requisite packages
   hosts: localhost
@@ -7,10 +10,17 @@
       ansible.builtin.apt:
         pkg:
           - python3-pip
+          - python-is-python3
         state: present
         update_cache: true
 
-- name: Install fschat with pip
+######################################################################
+# Demo                                                               #
+#                                                                    #
+# Run 'python3 -m fastchat.serve.gradio_web_server_multi --share'   #
+#                                                                    #
+######################################################################
+- name: Install Fschat, Plotty and Pydantic with pip
   hosts: localhost
   connection: local
   tasks:
@@ -57,3 +67,15 @@
         mode: a+x
 
 
+- name: Complete Installation
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Create file to demonstrate recipe completion
+      copy:
+        dest: "/opt/recipe-run-completed_{{ ansible_date_time.date }}.txt"
+        content: |
+          # Run 'python3 -m fastchat.serve.gradio_web_server_multi --share'                  
+        mode: a+x
+    - name: Run 'python3 -m fastchat.serve.gradio_web_server_multi --share' to start demo
+      shell: echo "Run 'python3 -m fastchat.serve.gradio_web_server_multi --share' to start demo"
