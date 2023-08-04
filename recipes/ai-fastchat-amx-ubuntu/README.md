@@ -58,7 +58,10 @@ sudo ansible-pull -vvv -U https://github.com/intel/optimized-cloud-recipes.git r
 # Logs at 'tail -f 10 /var/ansible-log'
 ```
 
-### Demo - Execute on the command line: `source /usr/local/bin/run_demo.sh`
+### To Run Demo
+
+
+SSH into newly created GCP VM and run: `source /usr/local/bin/run_demo.sh`
 
 --- KNOWN ISSUE ---
 
