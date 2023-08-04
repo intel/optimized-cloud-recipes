@@ -2,7 +2,7 @@
   <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
-# OCR - 4th Gen Xeon(SPR) AMX using Python + Fastchat on Ubuntu
+# OCR - 4th Gen Xeon(SPR) AMX using Python + FastChat on Ubuntu
 
 ## Overview
 
@@ -10,8 +10,8 @@
 
 | Area   | Description                                                 |
 | :----- | :---------------------------------------------------------- |
-| Recipe | **4th Gen Xeon(SPR) AMX using Python + Fastchat on Ubuntu** |
-Demo | SSH and run: `python3 -m fastchat.serve.gradio_web_server_multi --share` . This demo demonstrates Large Language Model CPU inference using 4th Gen Xeon(SPR). It uses [FastChat](https://github.com/lm-sys/FastChat) to serve the 3B parameter fastchat-t5 model.
+| Recipe | **4th Gen Xeon(SPR) AMX using Python + FastChat on Ubuntu** |
+Demo | SSH and run: `source /usr/local/bin/run_demo.sh` . This demo demonstrates Large Language Model CPU inference using 4th Gen Xeon(SPR). It uses [FastChat](https://github.com/lm-sys/FastChat) to serve the 3B parameter fastchat-t5 model.
 Demo details |  [LINK](https://github.com/lm-sys/FastChat)
 | Install time | 3 minutes |
 | Logs | `tail -f /var/ansible-log`|
@@ -69,10 +69,12 @@ This may fail. In this case, run
 
 Then, run:
 
-`python3 -m fastchat.serve.gradio_web_server_multi --share`
+`source /usr/local/bin/run_demo.sh` 
 
 and go to the gradio link in your browser.
 
 ## Links
 
 [Intel® Advanced Matrix Extensions (AMX)](https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/advanced-matrix-extensions/overview.html)
+
+[FastChat](https://github.com/lm-sys/FastChat)
