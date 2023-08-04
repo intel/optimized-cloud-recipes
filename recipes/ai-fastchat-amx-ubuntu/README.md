@@ -6,8 +6,6 @@
 
 ## Overview
 
-
-
 | Area   | Description                                                 |
 | :----- | :---------------------------------------------------------- |
 | Recipe | **4th Gen Xeon(SPR) AMX using Python + FastChat on Ubuntu** |
@@ -58,10 +56,9 @@ sudo ansible-pull -vvv -U https://github.com/intel/optimized-cloud-recipes.git r
 # Logs at 'tail -f 10 /var/ansible-log'
 ```
 
-### To Run Demo
+### Running the Demo
 
-
-SSH into newly created GCP VM and run: `source /usr/local/bin/run_demo.sh`
+**SSH into newly created GCP VM and run: `source /usr/local/bin/run_demo.sh`**
 
 --- KNOWN ISSUE ---
 
