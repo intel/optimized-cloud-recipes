@@ -45,6 +45,6 @@
   hosts: localhost
   connection: local
   tasks:
-    - name: Start web controller shell
+    - name: Start worker
       shell: nohup python3 -m fastchat.serve.model_worker --model-path {{ model_path | default('lmsys/fastchat-t5-3b-v1.0') }} --device cpu --controller-address http://{{ controller_ip }}:21001 --worker-address http://{{ worker_ip }}:21002 --host {{ worker_ip }} --model-name {{ model_name | default('xeon_3_fastchat') }} </dev/null >/dev/null 2>&1 &
     
