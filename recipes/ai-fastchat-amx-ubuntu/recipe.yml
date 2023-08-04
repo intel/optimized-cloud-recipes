@@ -11,6 +11,7 @@
         pkg:
           - python3-pip
           - python-is-python3
+          - net-tools
         state: present
         update_cache: true
     - name: Install Intel's Extension for PyTorch
