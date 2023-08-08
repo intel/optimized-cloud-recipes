@@ -9,15 +9,22 @@
     - name: Install pre-requisite packages
       ansible.builtin.apt:
         pkg:
+          - python3
           - python3-pip
           - python-is-python3
+          - net-tools
         state: present
         update_cache: true
+    - name: Install Intel's Extension for PyTorch
+      pip:
+        name: intel_extension_for_pytorch
+        state: present
+        executable: pip3
 
 ######################################################################
 # Demo                                                               #
 #                                                                    #
-# Run 'python3 -m fastchat.serve.gradio_web_server_multi --share'   #
+# Run 'source /usr/local/bin/run_demo.sh'                            #
 #                                                                    #
 ######################################################################
 - name: Install Fschat, Plotty and Pydantic with pip
@@ -34,12 +41,11 @@
         name: plotly
         state: present
         executable: pip3
-    - name: Install pydantic version 1.10.10
+    - name: Install pydantic version 
       pip:
         name: pydantic==1.10.10
         state: present
         executable: pip3
-
 
 - name: Serve Falcon on CPU 
   hosts: localhost
@@ -75,7 +81,8 @@
       copy:
         dest: "/opt/recipe-run-completed_{{ ansible_date_time.date }}.txt"
         content: |
-          # Run 'python3 -m fastchat.serve.gradio_web_server_multi --share'                  
+          # Run 'source /usr/local/bin/run_demo.sh' to start the demo
+          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:7860                  
         mode: a+x
-    - name: Run 'python3 -m fastchat.serve.gradio_web_server_multi --share' to start demo
-      shell: echo "Run 'python3 -m fastchat.serve.gradio_web_server_multi --share' to start demo"
+    - name: Run 'source /usr/local/bin/run_demo.sh' to start demo
+      shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
