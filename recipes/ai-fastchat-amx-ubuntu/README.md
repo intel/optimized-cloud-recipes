@@ -9,7 +9,7 @@
 | Area   | Description                                                 |
 | :----- | :---------------------------------------------------------- |
 | Recipe | **4th Gen Xeon(SPR) AMX using Python + FastChat on Ubuntu** |
-Demo | **SSH and run: `source /usr/local/bin/run_demo.sh` then on your computer open a browser and navigate to http://<VM_PLUBLIC_IP>:7860.** This demo demonstrates Large Language Model CPU inference using 4th Gen Xeon(SPR). It uses [FastChat](https://github.com/lm-sys/FastChat) to serve the 3B parameter fastchat-t5 model. **NOTE: This demo requires port 7860 to be open for the VM.**
+Demo | **SSH and run: `source /usr/local/bin/run_demo.sh` then on your computer open a browser and navigate to a public gradio link or open port 7860 and navigate to http://<VM_PLUBLIC_IP>:7860.** This demo demonstrates Large Language Model CPU inference using 4th Gen Xeon(SPR). It uses [FastChat](https://github.com/lm-sys/FastChat) to serve the 3B parameter fastchat-t5 model. **NOTE: If you do not want to proxy data through gradio, this demo requires port 7860 to be open for the VM.**
 Demo details |  [LINK](https://github.com/lm-sys/FastChat)
 | Install time | 3 minutes |
 | Logs | `tail -f /var/ansible-log`|
