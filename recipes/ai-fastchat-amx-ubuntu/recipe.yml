@@ -9,6 +9,7 @@
     - name: Install pre-requisite packages
       ansible.builtin.apt:
         pkg:
+          - python3
           - python3-pip
           - python-is-python3
           - net-tools
