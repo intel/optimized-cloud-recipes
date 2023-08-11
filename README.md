@@ -3,8 +3,6 @@
   <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
-### WORK IN PROGRESS
-
 # Intel® Optimized Cloud Recipes (OCRs)
 
 © Copyright 2023, Intel Corporation
@@ -29,18 +27,18 @@
 
 
 
-**Note: OCRs focus on the enablement of Intel Technologies and many times they will include a demo but they are not meant to be a benchmarking tool.**
+**Note: OCRs focus on the enablement of Intel Technologies and often will include a demo but are not meant to be a benchmarking tool.**
 
 **Intel is working on a separate benchmarking repository called [Workload Services Framework](https://github.com/intel/workload-services-framework) that will consume these recipes and provide benchmarking capabilities.**
 
 
 ## Value
 
-The primary goal of OCRs is to simplify the enablement of Intel® Technologies on public cloud VMs.
+The primary goal of OCRs is to simplify and accelerate the enablement of Intel® Technologies on public cloud VMs.
 
 ## Examples of Recipes
 
-Some example of technologies that can be enabled and optimized are:
+Some examples of technologies that can be enabled and optimized are:
 
 - OneAPI AI Training and Inference with Intel® Advanced Matrix Extensions (Intel® AMX)
 - Encryption/Decryption with Intel Quick Assist Technology (Intel QAT)
@@ -136,7 +134,7 @@ sudo apt update
 sudo apt install ansible -y
 
 #Run ansible-pull
-sudo ansible-pull -vvv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-pytorch-amx-ubuntu/recipe.yml
+sudo ansible-pull -vv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-pytorch-amx-ubuntu/recipe.yml
 
 # Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log'
 ```
@@ -168,7 +166,7 @@ A diagram showcasing the integration is coming!
 
 We recommend using a Linux environment. If on Windows, we [recommend using WSL2](https://learn.microsoft.com/en-us/windows/wsl/install).
 
-You will only need git and ansible installed on your development environment. Follow Ansible installation procedures for your operating system. <https://docs.ansible.com/ansible/latest/installation_guide/installation_distros.html>
+You will only need git and Ansible installed on your development environment. Follow Ansible installation procedures for your operating system. <https://docs.ansible.com/ansible/latest/installation_guide/installation_distros.html>
 
 For example, on Ubuntu:
 
