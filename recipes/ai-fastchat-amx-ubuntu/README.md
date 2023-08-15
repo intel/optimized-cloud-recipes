@@ -94,9 +94,7 @@ Then, run:
 
 and go to the gradio link
 
- 
-=======
-`source /usr/local/bin/run_demo.sh` 
+ `source /usr/local/bin/run_demo.sh` 
 
 and navigate to the public gradio link, or open port 7860 and navigate to http://<VM_PLUBLIC_IP>:7860 on your computer.
 
