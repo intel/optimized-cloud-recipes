@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Overview
 This demo demonstrates the speedup in Large Language Model CPU inference from 3rd gen Xeon to 4th gen Xeon. It uses [FastChat](https://github.com/lm-sys/FastChat) to serve the 3B parameter fastchat-t5 model.
 
@@ -82,22 +81,15 @@ Otherwise, if you choose to open port 7860 in main.tf: on your computer, open a 
 NOTE: You can use the proxy the Gradio proxy https://xxxxxxx.gradio.live URL that is generated during the gradio run(see console output).
 
 Otherwise, this demo requires port 7860 to be open. If you are running this on GCP, you will need to open this port in the GCP Firewall Policies. If you are running this on AWS, you will need to open this port in the AWS security group.
->>>>>>> b737c72a37e058eb70f596cf8d3d6acd10b2606f
 
 --- KNOWN ISSUE ---
 
 This may fail. In this case, run
 
 `pip install gradio==3.10`
-<<<<<<< HEAD
-=======
-
->>>>>>> b737c72a37e058eb70f596cf8d3d6acd10b2606f
 `pip install gradio==3.35.2`
 
 Then, run:
-
-<<<<<<< HEAD
 `python3 -m fastchat.serve.gradio_web_server_multi --share` 
 
 and go to the gradio link
@@ -113,4 +105,3 @@ and navigate to the public gradio link, or open port 7860 and navigate to http:/
 [Intel® Advanced Matrix Extensions (AMX)](https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/advanced-matrix-extensions/overview.html)
 
 [FastChat](https://github.com/lm-sys/FastChat)
->>>>>>> b737c72a37e058eb70f596cf8d3d6acd10b2606f
