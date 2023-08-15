@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 - name: Install pre-requisite packages
   hosts: localhost
@@ -70,3 +71,93 @@
 
 #XEON 4
 # python3 -m fastchat.serve.model_worker --model-path lmsys/fastchat-t5-3b-v1.0 --device cpu --model-name xeon-4 --port 21004 --worker-address http://localhost:21004
+=======
+##########################################################
+# Host configuration                                     #
+##########################################################
+---
+- name: Install pre-requisite packages
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install pre-requisite packages
+      ansible.builtin.apt:
+        pkg:
+          - python3
+          - python3-pip
+          - python-is-python3
+          - net-tools
+        state: present
+        update_cache: true
+    - name: Install Intel's Extension for PyTorch
+      pip:
+        name: intel_extension_for_pytorch
+        state: present
+        executable: pip3
+
+######################################################################
+# Demo                                                               #
+#                                                                    #
+# Run 'source /usr/local/bin/run_demo.sh'                            #
+#                                                                    #
+######################################################################
+- name: Install Fschat, Plotty and Pydantic with pip
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install fschat
+      pip:
+        name: fschat==0.2.18
+        state: present
+        executable: pip3
+    - name: Install plotly
+      pip:
+        name: plotly
+        state: present
+        executable: pip3
+    - name: Install pydantic version 
+      pip:
+        name: pydantic==1.10.10
+        state: present
+        executable: pip3
+
+- name: Serve Falcon on CPU 
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Start web controller shell
+      shell: nohup python3 -m fastchat.serve.controller --host 0.0.0.0 </dev/null >/dev/null 2>&1 & 
+    - name: Serve Falcon on CPU
+      shell: sleep 10 & nohup python3 -m fastchat.serve.model_worker --model-path {{ model_path | default('lmsys/fastchat-t5-3b-v1.0') }} --device {{ device_type | default('cpu') }} --model-name {{ model_name | default('xeon_4_fastchat') }} --port {{ port | default('21004') }} --worker-address http://localhost:{{ port | default('21004') }} </dev/null >/dev/null 2>&1 & 
+
+- name: Create script to run gradio frontend
+  hosts: localhost
+  connection: local
+  vars:
+    script_dest: /usr/local/bin
+  tasks:
+    - name: Add script to run demo to bin
+      copy:
+        dest: "{{ script_dest }}/run_demo.sh"
+        content: |
+          #!/bin/bash
+          pip install -qqq gradio==3.10 > /dev/null
+          pip install -qqq gradio==3.35.2 > /dev/null
+          python3 -m fastchat.serve.gradio_web_server_multi --share
+        mode: a+x
+
+
+- name: Complete Installation
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Create file to demonstrate recipe completion
+      copy:
+        dest: "/opt/recipe-run-completed_{{ ansible_date_time.date }}.txt"
+        content: |
+          # Run 'source /usr/local/bin/run_demo.sh' to start the demo
+          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:7860                  
+        mode: a+x
+    - name: Run 'source /usr/local/bin/run_demo.sh' to start demo
+      shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
+>>>>>>> b737c72a37e058eb70f596cf8d3d6acd10b2606f
