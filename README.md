@@ -14,7 +14,7 @@
 
 1. A combination of documentation(markdown) and scripted automation.
 2. Developed to enable/optimize technologies on Intel® Architecture (IA).
-3. Currently focused on enabling Infrastructure-as-a-Service (IaaS) Virtual Machines (VMs) on public cloud providers (today, hardware configuration is not supported).
+3. Currently focused on enabling Infrastructure-as-a-Service (IaaS) Virtual Machines (VMs) on public cloud providers (today, on-prem hardware configuration is not supported).
 4. Written in Ansible or PowerShell, meant to automate operating system and above configuration.
 5. Ready to be Integrated into Intel® Cloud Optimization Modules for HashiCorp Terraform using Cloud Cloud-Init integration. See [GCP Module example](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit)).
 6. Can also be used directly on their own(see usage on each recipe).
