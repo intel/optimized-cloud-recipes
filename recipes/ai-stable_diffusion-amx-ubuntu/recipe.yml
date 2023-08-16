@@ -1,0 +1,41 @@
+##########################################################
+# Host configuration                                     #
+##########################################################
+---
+- name: Install pre-requisite packages
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install pre-requisite packages
+      ansible.builtin.apt:
+        pkg:
+          - python3
+          - python3-pip
+          - python-is-python3
+          - unzip
+        state: present
+        update_cache: true
+    - name: Install Intel's Extension for PyTorch
+      pip:
+        name: intel_extension_for_pytorch
+        state: present
+        executable: pip3
+    - name: Unarchive Easy-Diffusion-Linux.zip
+      ansible.builtin.unarchive:
+        src:  https://github.com/easydiffusion/easydiffusion/releases/download/v2.5.41a/Easy-Diffusion-Linux.zip
+        dest: /usr/local/bin
+        remote_src: yes
+    - name: Add config file for Easy-Diffusion
+      copy:
+        dest: "/usr/local/bin/easy-diffusion/scripts/config.json"
+        content: |
+          {
+            "net": {
+              "listen_port": 9000,
+              "listen_to_network": true
+            }
+          }
+        mode: 0644       
+    - name: Install Easy-Diffusion
+      shell: /usr/local/bin/easy-diffusion/start.sh
+
