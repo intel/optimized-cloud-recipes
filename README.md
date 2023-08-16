@@ -189,4 +189,4 @@ We are glad to review and accept contributions.
 
 Today, the scope is limited to enabling/optimizing VMs on public cloud providers.
 
-We are currently not managing physical hardware configurations.
+The OCRs are currently not managing on-prem physical hardware configurations.
