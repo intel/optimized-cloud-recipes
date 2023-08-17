@@ -2,16 +2,16 @@
   <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
-# OCR - 4th Gen Xeon(SPR) AMX using oneAPI AI Analytics on Ubuntu  
+# OCR - 4th Gen Xeon(SPR) AMX on Ubuntu  
 
 ## Overview
 
 | Area                  | Description
 |:---                   |:---
-| Recipe   | **Enables Python, Intel oneAPI AI Analytics libraries and deploys a small Bert/Restnet50 demo application**
-Demo | To run the built-in amx demo, run: `source /usr/local/bin/run_demo.sh`. The included demo is based of our OneAPI Samples and  demonstrates how to perform inference using the ResNet50 and BERT models using the Intel® Extension for PyTorch
-Demo details |  [LINK](https://github.com/oneapi-src/oneAPI-samples/blob/master/AI-and-Analytics/Features-and-Functionality/IntelPyTorch_InferenceOptimizations_AMX_BF16_INT8/README.md)
-| Install time      | 3 minutes
+| Recipe   | **Runs Stable Diffusion with the Easy Diffusion Web UI**
+Demo | Simply run the ansible playbook and ensure port 9000 is open
+Demo details |  [Easy Diffusion](https://github.com/easydiffusion/easydiffusion)
+| Install time      | 5 - 10 minutes
 | Logs | `tail -f /var/ansible-log` & `tail -f 10 /var/log/dpkg.log`
 
 ## Prerequisites
@@ -30,8 +30,9 @@ There are two main usage options:
 
 ### Option 1 - The simplest way to use the recipe is with Intel Cloud Modules
 
-[**Use the existing GCP Intel® Cloud Optimization Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit)
+[**Use the existing GCP Intel® Cloud Optimization Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-stable-diffusion/)
 
+This automatically provisions the correct VM, OS and firewall rules on GCP
 
 ### Option 2 - Running Ansible manually via the Operating System command line
 
@@ -56,7 +57,7 @@ sudo ansible-pull -vvv -U https://github.com/intel/optimized-cloud-recipes.git r
 # Logs at 'tail -f 10 /var/ansible-log' & 'tail -f 10 /var/log/dpkg.log'
 ```
 
-### Demo - Execute on the command line: `source /usr/local/bin/run_demo.sh`
+### Demo - The demo will be accessible at <HOST IP>:9000, e.g. 99.999.999.999:9000
 
 ## Links
 
