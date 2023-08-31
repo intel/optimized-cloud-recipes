@@ -33,7 +33,7 @@
   tasks:
     - name: Install fschat
       pip:
-        name: fschat==0.2.18
+        name: fschat==0.2.26
         state: present
         executable: pip3
     - name: Install plotly
