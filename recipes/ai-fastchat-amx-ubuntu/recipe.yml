@@ -68,12 +68,9 @@
   tasks:
     - name: Start web controller shell
       shell: nohup python3 -m fastchat.serve.controller --host 0.0.0.0 </dev/null >/dev/null 2>&1 & 
-    
-    #Export environment variable for 4th Generation Xeon CPU_ISA=amx
-    - name: Export environment variable for 4th Generation Xeon
-      shell: export CPU_ISA=amx
-
     - name: Serve Falcon on CPU
+      environment:
+        CPU_ISA: amx
       shell: sleep 10 & nohup python -m fastchat.serve.model_worker --model-path lmsys/vicuna-7b-v1.3 --device cpu --model-name 4th_GenXeon_Vicuna_7b --port 21004 --worker-address http://localhost:21004 </dev/null >/dev/null 2>&1 &
 
 - name: Create script to run gradio frontend
