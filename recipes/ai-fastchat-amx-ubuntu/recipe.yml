@@ -40,7 +40,17 @@
       pip:
         name: transformers
         state: present
-        executable: pip3 
+        executable: pip3
+    - name: Install Protobuf
+      pip:
+        name: protobuf
+        state: present
+        executable: pip3  
+    - name: Install Frpc
+      pip:
+        name: frpc
+        state: present
+        executable: pip3  
     - name: Install plotly
       pip:
         name: plotly
@@ -77,6 +87,8 @@
         dest: "{{ script_dest }}/run_demo.sh"
         content: |
           #!/bin/bash
+          pip install -qqq gradio==3.10 > /dev/null
+          pip install -qqq gradio==3.35.2 > /dev/null          
           python3 -m fastchat.serve.gradio_web_server_multi --share
         mode: a+x
 
