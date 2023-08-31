@@ -69,7 +69,7 @@
     - name: Start web controller shell
       shell: nohup python3 -m fastchat.serve.controller --host 0.0.0.0 </dev/null >/dev/null 2>&1 & 
     - name: Serve Falcon on CPU
-      shell: sleep 10 & nohup python -m fastchat.serve.model_worker --model-path lmsys/vicuna-7b-v1.3 --device cpu --model-name Non_AMX_Vicuna_7b --port 21005 --worker-address http://localhost:21005 </dev/null >/dev/null 2>&1 &
+      shell: sleep 10 & nohup python -m fastchat.serve.model_worker --model-path lmsys/vicuna-7b-v1.3 --device cpu --model-name No_AMX_Acceleration_Vicuna_7b --port 21005 --worker-address http://localhost:21005 </dev/null >/dev/null 2>&1 &
 
 - name: Create script to run gradio frontend
   hosts: localhost
