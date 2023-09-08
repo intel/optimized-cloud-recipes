@@ -27,38 +27,13 @@
 # Run 'source /usr/local/bin/run_demo.sh'                            #
 #                                                                    #
 ######################################################################
-- name: Install Fschat, Plotty and Pydantic with pip
+- name: Install Fschat
   hosts: localhost
   connection: local
   tasks:
     - name: Install fschat
       pip:
         name: fschat[model_worker,webui]
-        state: present
-        executable: pip3
-    - name: Install Transformers
-      pip:
-        name: transformers
-        state: present
-        executable: pip3
-    - name: Install Protobuf
-      pip:
-        name: protobuf
-        state: present
-        executable: pip3  
-    - name: Install Frpc
-      pip:
-        name: frpc
-        state: present
-        executable: pip3  
-    - name: Install plotly
-      pip:
-        name: plotly
-        state: present
-        executable: pip3
-    - name: Install pydantic version 
-      pip:
-        name: pydantic
         state: present
         executable: pip3
 
@@ -69,7 +44,8 @@
     - name: Start web controller shell
       shell: nohup python3 -m fastchat.serve.controller --host 0.0.0.0 </dev/null >/dev/null 2>&1 & 
     - name: Serve Falcon on CPU
-      shell: sleep 10 & nohup python -m fastchat.serve.model_worker --model-path lmsys/vicuna-7b-v1.3 --device cpu --model-name No_AMX_Vicuna_7b --port 21005 --worker-address http://localhost:21005 </dev/null >/dev/null 2>&1 &
+      environment:
+      shell: sleep 10 & nohup python -m fastchat.serve.model_worker --model-path lmsys/vicuna-7b-v1.3 --device cpu --model-name 4th_GenXeon_Vicuna_7b --port 21004 --worker-address http://localhost:21004 </dev/null >/dev/null 2>&1 &
 
 - name: Create script to run gradio frontend
   hosts: localhost
@@ -82,11 +58,8 @@
         dest: "{{ script_dest }}/run_demo.sh"
         content: |
           #!/bin/bash
-          pip install -qqq gradio==3.10 > /dev/null
-          pip install -qqq gradio==3.35.2 > /dev/null          
-          python3 -m fastchat.serve.gradio_web_server_multi --share
+          sudo python3 -m fastchat.serve.gradio_web_server --share
         mode: a+x
-
 
 - name: Complete Installation
   hosts: localhost
@@ -97,7 +70,7 @@
         dest: "/opt/recipe-run-completed_{{ ansible_date_time.date }}.txt"
         content: |
           # Run 'source /usr/local/bin/run_demo.sh' to start the demo
-          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:7860                  
+          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:7860         
         mode: a+x
     - name: Run 'source /usr/local/bin/run_demo.sh' to start demo
       shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
