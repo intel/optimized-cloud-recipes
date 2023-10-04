@@ -30,9 +30,9 @@ There are two main usage options:
 
 ### Option 1 - The simplest way to implement the recipe is with Intel Cloud Modules
 
-[**GCP - Intel® Cloud Optimization Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-fastchat)
+[**GCP - Intel® Optimized Cloud Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-fastchat)
 
-[**AWS - Intel® Cloud Optimization Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-fastchat)
+[**AWS - Intel® Optimized Cloud Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-fastchat)
 
 
 ### Option 2 - Running Ansible manually via the Operating System command line
