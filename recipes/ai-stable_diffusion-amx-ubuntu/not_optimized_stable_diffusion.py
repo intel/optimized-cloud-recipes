@@ -12,7 +12,7 @@ def inference_loop(pipe, prompt, num_inference_steps, num_images, output_folder,
     print(f'Starting inference')
     start = time.time()
     for i in range(num_images):
-        output = pipe(prompt,num_inference_steps = num_inference_steps, output_type="pil").images[0]
+        output = pipe(prompt,num_inference_steps = num_inference_steps, width=512, height=512, output_type="pil").images[0]
         t1 = time.strftime("%Y%m%d_%H%M%S")
         save_path = f"{output_folder}/{t1}_SD_image.png"
         pathlib.Path(output_folder).mkdir(parents=True, exist_ok=True)

@@ -38,9 +38,9 @@ def create_pipe(model_id):
     print(f'################################ Completed saving model ################################')  
     
     # Define the shapes related to the inputs and desired outputs
-    #batch_size, num_images, height, width = 1, 1, 512, 512
+    batch_size, num_images, height, width = 1, 1, 512, 512
     # Statically reshape the model
-    #pipe.reshape(batch_size, height, width, num_images)
+    pipe.reshape(batch_size, height, width, num_images)
     # Compile the model before inference
     pipe.compile()
     
