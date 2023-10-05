@@ -60,6 +60,8 @@ sudo ansible-pull -vv -U https://github.com/intel/optimized-cloud-recipes.git re
 
 ## Run the Intel® OpenVino Optimized Demo
 
+**NOTE - Wait ~5 minutes for the software to install**
+
 **1-SSH into newly created GCP VM and run `source /usr/local/bin/run_demo.sh`**
 
 **2-On your computer open a browser and navigate to http://<VM_PLUBLIC_IP>:5000**
