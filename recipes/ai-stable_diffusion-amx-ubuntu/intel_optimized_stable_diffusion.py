@@ -1,7 +1,6 @@
 import time
 from optimum.intel import OVStableDiffusionPipeline 
 import torch
-import intel_extension_for_pytorch as ipex
 from diffusers import StableDiffusionPipeline
 from typing import List, Dict, Tuple
 import pathlib
