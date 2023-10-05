@@ -65,7 +65,7 @@ sudo ansible-pull -vv -U https://github.com/intel/optimized-cloud-recipes.git re
 **2-On your computer open a browser and navigate to http://<VM_PLUBLIC_IP>:5000**
 
 
-## Optional- Run the default not-optimized demo
+## OPTIONAL - Run the default not-optimized demo
 
 **1-SSH into VM and run `source /usr/local/bin/not_optimized_run_demo.sh`**
 
