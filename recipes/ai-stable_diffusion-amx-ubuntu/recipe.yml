@@ -35,6 +35,12 @@
         name: openvino
         state: present
         executable: pip3
+    - name: Install blinker version1.6.2
+      pip:
+        name: blinker==1.6.2
+        state: forcereinstall
+        executable: pip3
+        extra_args: --ignore-installed
     - name: Install diffusers
       pip:
         name: diffusers
@@ -52,7 +58,7 @@
         executable: pip3
     - name: Install flask
       pip:
-        name: flask
+        name: flask==3.0.0
         state: present
         executable: pip3
     - name: Install torch
@@ -79,7 +85,7 @@
 ######################################################################
 # Stable Diffusion                                                   #
 #                                                                    #
-# Run 'source /usr/local/bin/run-demo.sh'                            #
+# Run 'source /usr/local/bin/run_demo.sh'                            #
 #                                                                    #
 ######################################################################
 
@@ -101,11 +107,11 @@
   tasks:
     - name: Add script to run demo to bin
       copy:
-        dest: "{{ script_dest }}/run-demo.sh"
+        dest: "{{ script_dest }}/run_demo.sh"
         content: |
           #!/bin/bash
           cd /usr/local/bin/optimized-cloud-recipes/recipes/ai-stable_diffusion-amx-ubuntu/
-          sudo python3 intel-optimized-app.py
+          sudo python3 intel_optimized_app.py
         mode: a+x
 
 - name: Create script for Non-optimized Stable Difussion 
@@ -116,11 +122,11 @@
   tasks:
     - name: Add script to run demo to bin
       copy:
-        dest: "{{ script_dest }}/run_non_optimized_demo.sh"
+        dest: "{{ script_dest }}/non_optimized_demo.sh"
         content: |
           #!/bin/bash
           cd /usr/local/bin/optimized-cloud-recipes/recipes/ai-stable_diffusion-amx-ubuntu/
-          sudo python3 not-optimized-app.py
+          sudo python3 not_optimized_app.py
         mode: a+x
 
 
@@ -132,8 +138,18 @@
       copy:
         dest: "/opt/recipe-run-completed_{{ ansible_date_time.date }}.txt"
         content: |
-          # Run 'source /usr/local/bin/run-demo.sh' to start the demo
-          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:5000         
+          # ###############################################################################
+          #
+          # Intel Optimized -> Run 'source /usr/local/bin/run_demo.sh' to start the demo
+          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:5000
+          #
+          # ###############################################################################
+          # ###############################################################################
+          #
+          # For Non-optimized -> Run 'source /usr/local/bin/non_optimized_demo.sh' to start the demo 
+          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:6000
+          #
+          # ###############################################################################        
         mode: a+x
-    - name: Run 'source /usr/local/bin/run-demo.sh' to start demo
-      shell: echo "Run 'source /usr/local/bin/run-demo.sh' to start demo"
+    - name: Run 'source /usr/local/bin/run_demo.sh' to start demo
+      shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
