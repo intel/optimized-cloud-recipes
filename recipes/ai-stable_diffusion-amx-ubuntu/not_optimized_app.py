@@ -21,8 +21,8 @@ def index():
         print(f'inference_time = {inference_time}')
         
         
-    return render_template('index.html', generated_image_url=generated_image_url, inference_time=inference_time)
+    return render_template('non_optimized_index.html', generated_image_url=generated_image_url, inference_time=inference_time)
 
 
 if __name__ == '__main__':
-    app.run(port=6000, host='0.0.0.0')
+    app.run(port=5001, host='0.0.0.0')

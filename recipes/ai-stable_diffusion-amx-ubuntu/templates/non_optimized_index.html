@@ -9,7 +9,7 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            color: #1d74d1
+            color: #c93232;
         }
         #prompt-input {
             width: 80%;
@@ -17,7 +17,7 @@
         }
         #generate-button {
             padding: 10px 20px;
-            background-color: #1d74d1;
+            background-color: #007bff;
             color: #fff;
             border: none;
             cursor: pointer;
@@ -30,7 +30,7 @@
     </style>
 </head>
 <body>
-    <h1>Intel® OpenVino Optimized Stable Diffusion on 4th Gen Xeon CPU with AMX</h1>
+    <h1>Default Stock Stable Diffusion</h1>
     <form method="POST" action="/">
         <p>Enter a prompt:</p>
         <input type="text" id="prompt-input" name="prompt" placeholder="Enter your prompt here" value="{{ prompt|default('') }}">
@@ -42,7 +42,7 @@
         <img src="{{ generated_image_url }}" alt="{{ inference_time }}" title="{{ inference_time }}">
         {% endif %}
     </div>
-    <p style="color: #1d74d1;">
+    <p style="color: green;">
         {% if generated_image_url %}
         Inference time in seconds: {{ inference_time }}
         {% endif %}

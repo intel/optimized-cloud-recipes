@@ -86,6 +86,7 @@
 # Stable Diffusion                                                   #
 #                                                                    #
 # Run 'source /usr/local/bin/run_demo.sh'                            #
+# Or 'source /usr/local/bin/not_optimized_run_demo.sh'               #
 #                                                                    #
 ######################################################################
 
@@ -122,7 +123,7 @@
   tasks:
     - name: Add script to run demo to bin
       copy:
-        dest: "{{ script_dest }}/non_optimized_demo.sh"
+        dest: "{{ script_dest }}/not_optimized_run_demo.sh"
         content: |
           #!/bin/bash
           cd /usr/local/bin/optimized-cloud-recipes/recipes/ai-stable_diffusion-amx-ubuntu/
@@ -146,8 +147,8 @@
           # ###############################################################################
           # ###############################################################################
           #
-          # For Non-optimized -> Run 'source /usr/local/bin/non_optimized_demo.sh' to start the demo 
-          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:6000
+          # For Non-optimized -> Run 'source /usr/local/bin/not_optimized_run_demo.sh' to start the demo 
+          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:5001
           #
           # ###############################################################################        
         mode: a+x
