@@ -12,30 +12,145 @@
           - python3
           - python3-pip
           - python-is-python3
-          - unzip
+          - net-tools
         state: present
         update_cache: true
-    - name: Install Intel's Extension for PyTorch
+    - name: Upgrade pip
+      pip:
+        name: pip
+        state: latest
+        executable: pip3
+    - name: Install Intel Extension for PyTorch
       pip:
         name: intel_extension_for_pytorch
         state: present
+        executable: pip3            
+    - name: Install Intel Optimum packages
+      pip:
+        name: "optimum[openvino,nncf]"
+        state: latest
         executable: pip3
-    - name: Unarchive Easy-Diffusion-Linux.zip
-      ansible.builtin.unarchive:
-        src:  https://github.com/easydiffusion/easydiffusion/releases/download/v2.5.41a/Easy-Diffusion-Linux.zip
-        dest: /usr/local/bin
-        remote_src: yes
-    - name: Add config file for Easy-Diffusion
-      copy:
-        dest: "/usr/local/bin/easy-diffusion/scripts/config.json"
-        content: |
-          {
-            "net": {
-              "listen_port": 9000,
-              "listen_to_network": true
-            }
-          }
-        mode: 0644       
-    - name: Install Easy-Diffusion
-      shell: /usr/local/bin/easy-diffusion/start.sh
+    - name: Install Intel OpenVino
+      pip:
+        name: openvino
+        state: present
+        executable: pip3
+    - name: Install blinker version1.6.2
+      pip:
+        name: blinker==1.6.2
+        state: forcereinstall
+        executable: pip3
+        extra_args: --ignore-installed
+    - name: Install diffusers
+      pip:
+        name: diffusers
+        state: present
+        executable: pip3
+    - name: Install typing 
+      pip:
+        name: typing
+        state: present
+        executable: pip3
+    - name: Install pathlib
+      pip:
+        name: pathlib
+        state: present
+        executable: pip3
+    - name: Install flask
+      pip:
+        name: flask==3.0.0
+        state: present
+        executable: pip3
+    - name: Install torch
+      pip:
+        name: torch
+        state: present
+        executable: pip3
+    - name: Install torchvision
+      pip:
+        name: torchvision
+        state: present
+        executable: pip3
+    - name: Install torchaudio version
+      pip:
+        name: torchaudio
+        state: present
+        executable: pip3
+    - name: Install transformers
+      pip:
+        name: transformers
+        state: present
+        executable: pip3
 
+######################################################################
+# Stable Diffusion                                                   #
+#                                                                    #
+# Run 'source /usr/local/bin/run_demo.sh'                            #
+# Or 'source /usr/local/bin/not_optimized_run_demo.sh'               #
+#                                                                    #
+######################################################################
+
+- name: Install Stable Difussion Demo
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Clone GitHub Repository https://github.com/intel/optimized-cloud-recipes.git
+    ansible.builtin.git:
+      repo: https://github.com/intel/optimized-cloud-recipes.git
+      dest: /usr/local/bin/optimized-cloud-recipes
+      version: lmelo-sd-refactor
+
+- name: Create script to run Stable Difussion 
+  hosts: localhost
+  connection: local
+  vars:
+    script_dest: /usr/local/bin
+  tasks:
+    - name: Add script to run demo to bin
+      copy:
+        dest: "{{ script_dest }}/run_demo.sh"
+        content: |
+          #!/bin/bash
+          cd /usr/local/bin/optimized-cloud-recipes/recipes/ai-stable_diffusion-amx-ubuntu/
+          sudo python3 intel_optimized_app.py
+        mode: a+x
+
+- name: Create script for Non-optimized Stable Difussion 
+  hosts: localhost
+  connection: local
+  vars:
+    script_dest: /usr/local/bin
+  tasks:
+    - name: Add script to run demo to bin
+      copy:
+        dest: "{{ script_dest }}/not_optimized_run_demo.sh"
+        content: |
+          #!/bin/bash
+          cd /usr/local/bin/optimized-cloud-recipes/recipes/ai-stable_diffusion-amx-ubuntu/
+          sudo python3 not_optimized_app.py
+        mode: a+x
+
+
+- name: Complete Installation
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Create file to demonstrate recipe completion
+      copy:
+        dest: "/opt/recipe-run-completed_{{ ansible_date_time.date }}.txt"
+        content: |
+          # ###############################################################################
+          #
+          # Intel Optimized -> Run 'source /usr/local/bin/run_demo.sh' to start the demo
+          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:5000
+          #
+          # ###############################################################################
+          # ###############################################################################
+          #
+          # For Non-optimized -> Run 'source /usr/local/bin/not_optimized_run_demo.sh' to start the demo 
+          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:5001
+          #
+          # ###############################################################################        
+        mode: a+x
+    - name: Run 'source /usr/local/bin/run_demo.sh' to start demo
+      shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
