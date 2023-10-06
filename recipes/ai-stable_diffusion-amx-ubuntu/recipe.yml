@@ -98,7 +98,7 @@
     ansible.builtin.git:
       repo: https://github.com/intel/optimized-cloud-recipes.git
       dest: /usr/local/bin/optimized-cloud-recipes
-      version: lmelo-sd-refactor
+      version: main
 
 - name: Create script to run Stable Difussion 
   hosts: localhost
