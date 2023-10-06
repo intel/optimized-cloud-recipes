@@ -6,6 +6,9 @@ from typing import List, Dict, Tuple
 import pathlib
 from flask import Flask
 
+# Intel® Corporation Copyright
+# Contributors: Annatam Dey, William Fowler, Benjamin Consolvo, Lucas Melo
+
 pipe_created = False
 pipe = None
 

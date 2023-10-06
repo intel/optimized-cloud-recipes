@@ -5,6 +5,9 @@ from typing import List, Dict, Tuple
 import pathlib
 from flask import Flask
 
+# Intel® Corporation Copyright
+# Contributors: Annatam Dey, William Fowler, Benjamin Consolvo, Lucas Melo
+
 def inference_loop(pipe, prompt, num_inference_steps, num_images, output_folder, output_type = "pil" ):
     '''
     Loop to run inference

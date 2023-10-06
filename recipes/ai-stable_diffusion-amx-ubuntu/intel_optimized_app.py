@@ -1,6 +1,9 @@
 from intel_optimized_stable_diffusion import run_stable_diffusion
 from flask import Flask, render_template, request, jsonify
 
+# Intel® Corporation Copyright
+# Contributors: Annatam Dey, William Fowler, Benjamin Consolvo, Lucas Melo
+
 app = Flask(__name__, static_folder = 'output_images')
 
 model_optimized = False
