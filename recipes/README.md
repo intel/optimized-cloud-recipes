@@ -4,6 +4,8 @@
 
 # Intel® Optimized Cloud Recipes (OCRs)
 
+**Contributors: Annatam Dey, William Fowler, Benjamin Consolvo, Lucas Melo**
+
 © Copyright 2023, Intel Corporation
 
 ## Overview
