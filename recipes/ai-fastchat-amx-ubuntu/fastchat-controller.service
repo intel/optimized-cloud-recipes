@@ -1,0 +1,31 @@
+[Unit]
+Description=FastChat Controller Service
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/usr/local/lib/python3.10/dist-packages/fastchat/serve
+ExecStart=/usr/bin/python3 /usr/local/lib/python3.10/dist-packages/fastchat/serve/controller.py --host 0.0.0.0
+Restart=always
+RestartSec=10
+Environment="CPU_ISA=amx"
+Environment="PYTHONUNBUFFERED=1"
+StandardOutput=append:/var/log/fastchat-controller.log
+StandardError=append:/var/log/fastchat-controller.log
+
+[Install]
+WantedBy=multi-user.target
+
+#[HealthCheck]
+#Type=exec
+#ExecStart=/bin/bash -c "curl --fail http://localhost:21004 || exit 1"
+#TimeoutStartSec=30s
+
+ INFO | controller | args: Namespace(host='0.0.0.0', port=21001, dispatch_method='shortest_queue', ssl=False)
+2023-10-18 21:12:45 | ERROR | stderr | INFO:     Started server process [16476]
+2023-10-18 21:12:45 | ERROR | stderr | INFO:     Waiting for application startup.
+2023-10-18 21:12:45 | ERROR | stderr | INFO:     Application startup complete.
+2023-10-18 21:12:45 | ERROR | stderr | INFO:     Uvicorn running on http://0.0.0.0:21001 (Press CTRL+C to quit)
+2023-10-18 21:13:16 | INFO | controller | Register a new worker: http://localhost:21004
+2023-10-18 21:13:16 | INFO | controller | Register done: http://localhost:21004,

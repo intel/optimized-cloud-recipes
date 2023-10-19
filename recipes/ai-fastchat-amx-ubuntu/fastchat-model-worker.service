@@ -1,0 +1,31 @@
+[Unit]
+Description=FastChat Model Worker Service
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/usr/local/lib/python3.10/dist-packages/fastchat/serve
+ExecStart=/usr/bin/python3 /usr/local/lib/python3.10/dist-packages/fastchat/serve/model_worker.py --model-path lmsys/vicuna-7b-v1.3 --device cpu --model-name 4th_GenXeon_Vicuna_7b --port 21004 --worker-address http://localhost:21004
+Restart=always
+RestartSec=10
+Environment="CPU_ISA=amx"
+Environment="PYTHONUNBUFFERED=1"
+StandardOutput=append:/var/log/fastchat-model-worker.log
+StandardError=append:/var/log/fastchat-model-worker.log
+
+[Install]
+WantedBy=multi-user.target
+
+#[HealthCheck]
+#Type=exec
+#ExecStart=/bin/bash -c "curl --fail http://localhost:21004 || exit 1"
+#TimeoutStartSec=30s
+
+"POST /worker_generate_stream HTTP/1.1" 200 OK
+
+root@ip-172-31-81-212:/etc/systemd/system# netstat -a | grep 21004 | wc -l
+1
+root@ip-172-31-81-212:/etc/systemd/system# netstat -a | grep 2104 | wc -l
+0
+root@ip-172-31-81-212:/etc/systemd/system#
