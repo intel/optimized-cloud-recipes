@@ -48,6 +48,7 @@
     - name: Copy the FastChat Controller services file from Github to the VM
       ansible.builtin.get_url:
         url: https://github.com/intel/optimized-cloud-recipes/blob/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-controller.service
+        dest: /etc/systemd/system/fastchat-controller.service
         mode: '0644'
     - name: Add the fastchat-model.service to systemd
       systemd:
