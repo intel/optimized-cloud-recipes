@@ -50,11 +50,11 @@
         url: https://raw.githubusercontent.com/intel/optimized-cloud-recipes/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-controller.service
         dest: /etc/systemd/system/fastchat-controller.service
         mode: '0644'
-    - name: Add the fastchat-model.service to systemd
+    - name: Add the fastchat-model-worker.service to systemd
       systemd:
         daemon_reload: yes
         enabled: yes
-        name: fastchat-model.service
+        name: fastchat-model-worker.service
         state: started
     - name: Add the fastchat-controller.service to systemd
       systemd:
