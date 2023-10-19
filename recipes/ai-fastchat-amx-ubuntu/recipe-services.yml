@@ -42,15 +42,35 @@
 ######################################################################
 # Copy the services files from Github to the VM                      #
 ######################################################################
-- name: Copy FastChat services files from Github to the VM
-  git:
-    repo: https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-fastchat-amx-ubuntu
-      dest: /etc/systemd/system
-      files:
-        - fastchat-web.service
-        - fastchat-model.service
-        - fastchat-controller.service
-      checkout: wfowler-contributing
+# - name: Copy FastChat services files from Github to the VM
+#   git:
+#     repo: https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-fastchat-amx-ubuntu
+#       dest: /etc/systemd/system
+#       files:
+#         - fastchat-web.service
+#         - fastchat-model.service
+#         - fastchat-controller.service
+#       checkout: wfowler-contributing
+
+# Copy the FastChat Web services file from Github to the VM
+- name: Copy FastChat Web services files from Github to the VM
+  ansible.builtin.get_url:
+    url: https://github.com/intel/optimized-cloud-recipes/blob/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-web.service
+    dest: /etc/systemd/system/fastchat-web.service
+    mode: '0644'
+
+# Copy the FastChat Model services file from Github to the VM
+- name: Copy the FastChat Model services file from Github to the VM
+  ansible.builtin.get_url:
+    url: https://github.com/intel/optimized-cloud-recipes/blob/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-model-worker.service
+    dest: /etc/systemd/system/fastchat-model-worker.service
+    mode: '0644'
+
+# Copy the FastChat Controller services file from Github to the VM
+- name: Copy the FastChat Controller services file from Github to the VM
+  ansible.builtin.get_url:
+    url: https://github.com/intel/optimized-cloud-recipes/blob/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-controller.service
+    mode: '0644'
 
 ######################################################################
 # Enable the services                                                #
