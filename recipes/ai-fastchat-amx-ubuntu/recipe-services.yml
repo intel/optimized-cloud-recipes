@@ -35,47 +35,32 @@
         name: fschat[model_worker,webui]==0.2.30
         state: present
         ex'0644'
-
-- name: Download the FastChat services files from Github to the VM
-  hosts: localhost
-  connection: local
-  tasks:
     - name: Copy FastChat Web services files from Github to the VM
       ansible.builtin.get_url:
         url: https://github.com/intel/optimized-cloud-recipes/blob/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-web.service
         dest: /etc/systemd/system/fastchat-web.service
         mode: '0644'
-
-    # Copy the FastChat Model services file from Github to the VM
     - name: Copy the FastChat Model services file from Github to the VM
       ansible.builtin.get_url:
         url: https://github.com/intel/optimized-cloud-recipes/blob/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-model-worker.service
         dest: /etc/systemd/system/fastchat-model-worker.service
         mode: '0644'
-
-    # Copy the FastChat Controller services file from Github to the VM
     - name: Copy the FastChat Controller services file from Github to the VM
       ansible.builtin.get_url:
         url: https://github.com/intel/optimized-cloud-recipes/blob/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-controller.service
         mode: '0644'
-
-    # Add the fastchat-model.service to systemd
     - name: Add the fastchat-model.service to systemd
       systemd:
         daemon_reload: yes
         enabled: yes
         name: fastchat-model.service
         state: started
-
-    # Add the fastchat-controller.service to systemd
     - name: Add the fastchat-controller.service to systemd
       systemd:
         daemon_reload: yes
         enabled: yes
         name: fastchat-controller.service
         state: started
-
-    # Add the fastchat-web.service to systemd
     - name: Add the fastchat-web.service to systemd
       systemd:
         daemon_reload: yes
