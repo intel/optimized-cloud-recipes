@@ -1,6 +1,6 @@
-##########################################################
-# Host configuration                                     #
-##########################################################
+######################################################################
+# Host configuration and pre-requisites                              #
+######################################################################
 ---
 - name: Install pre-requisite packages
   hosts: localhost
@@ -27,10 +27,7 @@
         executable: pip3
 
 ######################################################################
-# Demo                                                               #
-#                                                                    #
-# Run 'source /usr/local/bin/run_demo.sh'                            #
-#                                                                    #
+# Install FastChat                                                   #
 ######################################################################
 - name: Install Fschat
   hosts: localhost
@@ -51,45 +48,38 @@
   tasks:
     - name: Copy FastChat services files from Github to the VM
       git:
-        repo:
+        repo: https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-fastchat-amx-ubuntu
+        dest: /etc/systemd/system
+        files:
+          - fastchat-web.service
+          - fastchat-model.service
+          - fastchat-controller.service
+        checkout: wfowler-contributing
 
+######################################################################
+# Enable the services                                                #
+######################################################################
 
+# Add the fastchat-model.service to systemd
+- name: Add the fastchat-model.service to systemd
+  systemd:
+    daemon_reload: yes
+    enabled: yes
+    name: fastchat-model.service
+    state: started
 
-- name: Serve Falcon on CPU 
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: Start web controller shell
-      shell: nohup python3 -m fastchat.serve.controller --host 0.0.0.0 </dev/null >/dev/null 2>&1 & 
-    - name: Serve Falcon on CPU
-      environment:
-        CPU_ISA: amx
-      shell: sleep 10 & nohup python -m fastchat.serve.model_worker --model-path lmsys/vicuna-7b-v1.3 --device cpu --model-name 4th_GenXeon_Vicuna_7b --port 21004 --worker-address http://localhost:21004 </dev/null >/dev/null 2>&1 &
+# Add the fastchat-controller.service to systemd
+- name: Add the fastchat-controller.service to systemd
+  systemd:
+    daemon_reload: yes
+    enabled: yes
+    name: fastchat-controller.service
+    state: started
 
-- name: Create script to run gradio frontend
-  hosts: localhost
-  connection: local
-  vars:
-    script_dest: /usr/local/bin
-  tasks:
-    - name: Add script to run demo to bin
-      copy:
-        dest: "{{ script_dest }}/run_demo.sh"
-        content: |
-          #!/bin/bash
-          sudo python3 -m fastchat.serve.gradio_web_server --share
-        mode: a+x
-
-- name: Complete Installation
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: Create file to demonstrate recipe completion
-      copy:
-        dest: "/opt/recipe-run-completed_{{ ansible_date_time.date }}.txt"
-        content: |
-          # Run 'source /usr/local/bin/run_demo.sh' to start the demo
-          # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:7860         
-        mode: a+x
-    - name: Run 'source /usr/local/bin/run_demo.sh' to start demo
-      shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
+# Add the fastchat-web.service to systemd
+- name: Add the fastchat-web.service to systemd
+  systemd:
+    daemon_reload: yes
+    enabled: yes
+    name: fastchat-web.service
+    state: started
