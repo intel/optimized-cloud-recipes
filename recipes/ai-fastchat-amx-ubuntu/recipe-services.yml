@@ -36,17 +36,6 @@
         state: present
         ex'0644'
 
-
-# Copy the services files from Github to the VM
-# - name: Copy FastChat services files from Github to the VM
-#   git:
-#     repo: https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-fastchat-amx-ubuntu
-#       dest: /etc/systemd/system
-#       files:
-#         - fastchat-web.service
-#         - fastchat-model.service
-#         - fastchat-controller.service
-#       checkout: wfowler-contributing
 - name: Download the FastChat services files from Github to the VM
   hosts: localhost
   connection: local
