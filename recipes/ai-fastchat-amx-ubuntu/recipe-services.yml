@@ -43,18 +43,14 @@
 # Copy the services files from Github to the VM                      #
 ######################################################################
 - name: Copy FastChat services files from Github to the VM
-  git: 
-    repo: 
-  tasks:
-    - name: Copy FastChat services files from Github to the VM
-      git:
-        repo: https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-fastchat-amx-ubuntu
-        dest: /etc/systemd/system
-        files:
-          - fastchat-web.service
-          - fastchat-model.service
-          - fastchat-controller.service
-        checkout: wfowler-contributing
+  git:
+    repo: https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-fastchat-amx-ubuntu
+      dest: /etc/systemd/system
+      files:
+        - fastchat-web.service
+        - fastchat-model.service
+        - fastchat-controller.service
+      checkout: wfowler-contributing
 
 ######################################################################
 # Enable the services                                                #
