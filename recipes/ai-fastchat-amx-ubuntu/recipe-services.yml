@@ -34,7 +34,7 @@
       pip:
         name: fschat[model_worker,webui]==0.2.30
         state: present
-        ex'0644'
+        executable: pip3
     - name: Copy FastChat Web services files from Github to the VM
       ansible.builtin.get_url:
         url: https://github.com/intel/optimized-cloud-recipes/blob/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-web.service
