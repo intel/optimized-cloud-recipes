@@ -7,6 +7,7 @@ PartOf=fastchat-model-worker.service
 User=root
 Group=root
 WorkingDirectory=/usr/local/lib/python3.10/dist-packages/fastchat/serve
+ExecStartPre=/bin/sleep 10
 ExecStart=/usr/bin/python3 /usr/local/lib/python3.10/dist-packages/fastchat/serve/gradio_web_server.py
 Restart=always
 RestartSec=10
