@@ -1,7 +1,7 @@
 [Unit]
 Description=FastChat Web Service
-After=network.target
-Requires=fastchat-model-worker.service
+After=network.target fastchat-model-worker.service
+PartOf=fastchat-model-worker.service
 
 [Service]
 User=root
