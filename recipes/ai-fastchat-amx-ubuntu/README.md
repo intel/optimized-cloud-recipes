@@ -60,9 +60,42 @@ sudo ansible-pull -vv -U https://github.com/intel/optimized-cloud-recipes.git re
 
 ## Running the Demo
 
-**1-SSH into newly created GCP VM and run `source /usr/local/bin/run_demo.sh`**
+1. SSH into newly created GCP VM and run `source /usr/local/bin/run_demo.sh`
 
-**2-On your computer open a browser and navigate to http://<VM_PLUBLIC_IP>:7860**
+2. On your computer open a browser and navigate to **http://<VM_PLUBLIC_IP>:7860**
+
+## *Alternative - Run the demo as services*
+
+By default the demo starts in user sessions, if you want to have them run as services you have the options below. Note that since these steps start the demo as services, the demo will start automatically after deployment, though it may take about 15 minutes for it to fully start after deployment.
+
+### Option 1 - The Intel Cloud Modules
+
+[**AWS - Intel® Optimized Cloud Modules for HashiCorp Terraform services example**](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-demo)
+
+### Option 2 - Running Ansible manually
+
+By using [ansible-pull](https://docs.ansible.com/ansible/latest/cli/ansible-pull.html), Ansible can run directly on the host.
+
+For example, on Ubuntu:
+
+```bash
+# Install Git 
+sudo apt install git -y
+
+# Install Ansible Key
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+sudo apt update
+
+# Install Ansible
+sudo apt install ansible -y
+
+#Run ansible-pull
+sudo ansible-pull -vv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-fastchat-amx-ubuntu/recipe-services.yml
+
+# Logs at 'tail -f 10 /var/ansible-log'
+```
+
+After waiting for approximately 15 minutes, on your computer open a browser and navigate to **http://<VM_PLUBLIC_IP>:7860**
 
 ## Links
 
