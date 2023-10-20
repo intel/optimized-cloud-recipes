@@ -62,7 +62,7 @@
         enabled: yes
         name: fastchat-controller.service
         state: started
-    - name: Pause for 5 minutes to build app cache
+    - name: Pause for 15 minutes to wait for the model to load
       ansible.builtin.pause:
         minutes: 15
     - name: Add the fastchat-web.service to systemd
