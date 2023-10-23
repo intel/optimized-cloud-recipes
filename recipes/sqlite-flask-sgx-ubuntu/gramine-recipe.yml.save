@@ -17,6 +17,16 @@
             dest: /tmp/intel-sgx-deb.key
         - apt_key:
             file: /tmp/intel-sgx-deb.key
+	  register: key_result
+    - name: Ensure the key was added successfully
+      fail:
+        msg: "Failed to add Intel SGX APT GPG key"
+      when: key_result.failed
+
+    - name: Remove the downloaded key
+      file:
+        path: /tmp/intel-sgx-deb.key
+        state: absent			
         - apt:
             name: ['libsgx-epid', 'libsgx-quote-ex', 'libsgx-dcap-ql']
             update_cache: yes
@@ -80,27 +90,27 @@
             name: ['docker', 'jinja2', 'tomli', 'tomli-w', 'pyyaml']
             executable: pip3
         - user:
-            name: "{{ ansible_user_id }}"
+            name: "{{ ansible_user }}"
             groups: docker
             append: yes
         - file:
             path: /var/run/docker.sock
-            owner: "{{ ansible_user_id }}"
+            owner: "{{ ansible_user }}"
 
     - name: Install PSW
       block:
         - git:
             repo: 'https://github.com/intel/linux-sgx.git'
-            dest: /tmp/linux-sgx
+            dest: ~/linux-sgx
         - command:
             cmd: make preparation
-            chdir: /tmp/linux-sgx
+            chdir: ~/linux-sgx
+        - copy:
+            src: ~/linux-sgx/external/toolset/ubuntu20.04/
+            dest: /usr/local/bin
         - command:
             cmd: make psw
-            chdir: /tmp/linux-sgx
-        - copy:
-            src: /tmp/linux-sgx/external/toolset/ubuntu20.04/
-            dest: /usr/local/bin/
+            chdir: ~/linux-sgx
 
     - name: Install Gramine
       block:
@@ -108,13 +118,13 @@
             url: https://packages.gramineproject.io/gramine-keyring.gpg
             dest: /usr/share/keyrings/gramine-keyring.gpg
         - copy:
-            content: "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ {{ ansible_distribution_release }} main"
+            content: "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ $(lsb_release -sc) main"
             dest: /etc/apt/sources.list.d/gramine.list
         - get_url:
             url: https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
             dest: /usr/share/keyrings/intel-sgx-deb.asc
         - copy:
-            content: "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu {{ ansible_distribution_release }} main"
+            content: "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu $(lsb_release -sc) main"
             dest: /etc/apt/sources.list.d/intel-sgx.list
         - replace:
             path: /etc/sgx_default_qcnl.conf
@@ -123,7 +133,6 @@
         - apt:
             name: gramine
             update_cache: yes
-            force: yes
 
     - name: Generate a signing key for gramine
       command:
