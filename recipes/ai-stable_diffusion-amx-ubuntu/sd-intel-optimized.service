@@ -1,0 +1,22 @@
+[Unit]
+Description=Intel Optimized Stable Diffusion
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/usr/local/bin/optimized-cloud-recipes/recipes/ai-stable_diffusion-amx-ubuntu/
+ExecStart=/usr/bin/python3 /usr/local/bin/optimized-cloud-recipes/recipes/ai-stable_diffusion-amx-ubuntu/intel_optimized_app.py
+Restart=always
+RestartSec=10
+Environment="PYTHONUNBUFFERED=1"
+StandardOutput=append:/var/log/sd-intel-optimized.log
+StandardError=append:/var/log/sd-intel-optimized.log
+
+[Install]
+WantedBy=multi-user.target
+
+[HealthCheck]
+Type=exec
+ExecStart=/bin/bash -c "curl --fail http://localhost:5000 || exit 1"
+TimeoutStartSec=30s

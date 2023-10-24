@@ -1,0 +1,73 @@
+# Host configuration and pre-requisites
+---
+- name: Install pre-requisite packages
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install pre-requisite packages
+      ansible.builtin.apt:
+        pkg:
+          - python3
+          - python3-pip
+          - python-is-python3
+          - net-tools
+        state: present
+        update_cache: true
+    - name: Install Intel's Extension for PyTorch
+      pip:
+        name: intel_extension_for_pytorch
+        state: present
+        executable: pip3
+    - name: Install Jinja2 version 3.1.2
+      pip:
+        name: jinja2==3.1.2
+        state: present
+        executable: pip3
+
+# Install FastChat
+
+- name: Install Fschat
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install fschat
+      pip:
+        name: fschat[model_worker,webui]==0.2.30
+        state: present
+        executable: pip3
+    - name: Copy FastChat Web services files from Github to the VM
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/intel/optimized-cloud-recipes/main/recipes/ai-fastchat-amx-ubuntu/fastchat-web.service
+        dest: /etc/systemd/system/fastchat-web.service
+        mode: '0644'
+    - name: Copy the FastChat Model services file from Github to the VM
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/intel/optimized-cloud-recipes/main/recipes/ai-fastchat-amx-ubuntu/fastchat-model-worker.service
+        dest: /etc/systemd/system/fastchat-model-worker.service
+        mode: '0644'
+    - name: Copy the FastChat Controller services file from Github to the VM
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/intel/optimized-cloud-recipes/main/recipes/ai-fastchat-amx-ubuntu/fastchat-controller.service
+        dest: /etc/systemd/system/fastchat-controller.service
+        mode: '0644'
+    - name: Add the fastchat-model-worker.service to systemd
+      systemd:
+        daemon_reload: yes
+        enabled: yes
+        name: fastchat-model-worker.service
+        state: started
+    - name: Add the fastchat-controller.service to systemd
+      systemd:
+        daemon_reload: yes
+        enabled: yes
+        name: fastchat-controller.service
+        state: started
+    - name: Pause for 15 minutes to wait for the model to load
+      ansible.builtin.pause:
+        minutes: 15
+    - name: Add the fastchat-web.service to systemd
+      systemd:
+        daemon_reload: yes
+        enabled: yes
+        name: fastchat-web.service
+        state: started

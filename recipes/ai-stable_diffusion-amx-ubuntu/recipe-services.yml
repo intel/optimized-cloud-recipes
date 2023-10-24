@@ -1,0 +1,137 @@
+##########################################################
+# Host configuration                                     #
+##########################################################
+---
+- name: Install pre-requisite packages
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install pre-requisite packages
+      ansible.builtin.apt:
+        pkg:
+          - python3
+          - python3-pip
+          - python-is-python3
+          - net-tools
+        state: present
+        update_cache: true
+    - name: Upgrade pip
+      pip:
+        name: pip
+        state: latest
+        executable: pip3
+    - name: Install Intel Extension for PyTorch
+      pip:
+        name: intel_extension_for_pytorch
+        state: present
+        executable: pip3            
+    - name: Install Intel Optimum packages
+      pip:
+        name: "optimum[openvino,nncf]"
+        state: latest
+        executable: pip3
+    - name: Install Intel OpenVino
+      pip:
+        name: openvino
+        state: present
+        executable: pip3
+    - name: Install blinker version1.6.2
+      pip:
+        name: blinker==1.6.2
+        state: forcereinstall
+        executable: pip3
+        extra_args: --ignore-installed
+    - name: Install diffusers
+      pip:
+        name: diffusers
+        state: present
+        executable: pip3
+    - name: Install typing 
+      pip:
+        name: typing
+        state: present
+        executable: pip3
+    - name: Install pathlib
+      pip:
+        name: pathlib
+        state: present
+        executable: pip3
+    - name: Install flask
+      pip:
+        name: flask==3.0.0
+        state: present
+        executable: pip3
+    - name: Install torch
+      pip:
+        name: torch
+        state: present
+        executable: pip3
+    - name: Install torchvision
+      pip:
+        name: torchvision
+        state: present
+        executable: pip3
+    - name: Install torchaudio version
+      pip:
+        name: torchaudio
+        state: present
+        executable: pip3
+    - name: Install transformers
+      pip:
+        name: transformers
+        state: present
+        executable: pip3
+
+######################################################################
+# Stable Diffusion                                                   #
+#                                                                    #
+# Run 'source /usr/local/bin/run_demo.sh'                            #
+# Or 'source /usr/local/bin/not_optimized_run_demo.sh'               #
+#                                                                    #
+######################################################################
+
+- name: Install Stable Difussion Demo
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Clone GitHub Repository https://github.com/intel/optimized-cloud-recipes.git
+    ansible.builtin.git:
+      repo: https://github.com/intel/optimized-cloud-recipes.git
+      dest: /usr/local/bin/optimized-cloud-recipes
+      version: main
+
+- name: Copy service files
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Copy Intel Optimized Stable Diffusion service file
+      copy:
+        dest: /etc/systemd/system
+        src: /usr/local/bin/optimized-cloud-recipes/recipes/ai-stable_diffusion-amx-ubuntu/sd-intel-optimized.service
+        mode: '0644'
+        owner: root
+        group: root
+    - name: Copy Non-optimized Stable Diffusion service file
+      copy:
+        dest: /etc/systemd/system
+        src: /usr/local/bin/optimized-cloud-recipes/recipes/ai-stable_diffusion-amx-ubuntu/sd-non-optimized.service
+        mode: '0644'
+        owner: root
+        group: root
+
+- name: Enable services
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Add the Intel Optimized Stable Diffussion service
+      systemd:
+        daemon_reload: yes
+        enabled: yes
+        name: sd-intel-optimized.service
+        state: started
+    - name: Add the non-optimized Stable Diffussion service
+      systemd:
+        daemon_reload: yes
+        enabled: yes
+        name: sd-non-optimized.service
+        state: started

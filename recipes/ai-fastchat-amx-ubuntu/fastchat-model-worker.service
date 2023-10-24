@@ -1,0 +1,24 @@
+[Unit]
+Description=FastChat Model Worker Service
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/usr/local/lib/python3.10/dist-packages/fastchat/serve
+ExecStart=/usr/bin/python3 /usr/local/lib/python3.10/dist-packages/fastchat/serve/model_worker.py --model-path lmsys/vicuna-7b-v1.3 --device cpu --model-name 4th_GenXeon_Vicuna_7b --port 21004 --worker-address http://localhost:21004
+Restart=always
+RestartSec=10
+Environment="CPU_ISA=amx"
+Environment="PYTHONUNBUFFERED=1"
+StandardOutput=append:/var/log/fastchat-model-worker.log
+StandardError=append:/var/log/fastchat-model-worker.log
+
+[Install]
+WantedBy=multi-user.target
+
+[HealthCheck]
+Type=exec
+ExecStart=netstat -an | grep -w :21004
+Interval=10s
+TimeoutStartSec=5s
