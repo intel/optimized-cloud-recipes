@@ -37,17 +37,17 @@
         executable: pip3
     - name: Copy FastChat Web services files from Github to the VM
       ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/intel/optimized-cloud-recipes/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-web.service
+        url: https://raw.githubusercontent.com/intel/optimized-cloud-recipes/main/recipes/ai-fastchat-amx-ubuntu/fastchat-web.service
         dest: /etc/systemd/system/fastchat-web.service
         mode: '0644'
     - name: Copy the FastChat Model services file from Github to the VM
       ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/intel/optimized-cloud-recipes/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-model-worker.service
+        url: https://raw.githubusercontent.com/intel/optimized-cloud-recipes/main/recipes/ai-fastchat-amx-ubuntu/fastchat-model-worker.service
         dest: /etc/systemd/system/fastchat-model-worker.service
         mode: '0644'
     - name: Copy the FastChat Controller services file from Github to the VM
       ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/intel/optimized-cloud-recipes/wfowler-contributing/recipes/ai-fastchat-amx-ubuntu/fastchat-controller.service
+        url: https://raw.githubusercontent.com/intel/optimized-cloud-recipes/main/recipes/ai-fastchat-amx-ubuntu/fastchat-controller.service
         dest: /etc/systemd/system/fastchat-controller.service
         mode: '0644'
     - name: Add the fastchat-model-worker.service to systemd

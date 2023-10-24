@@ -98,7 +98,7 @@
     ansible.builtin.git:
       repo: https://github.com/intel/optimized-cloud-recipes.git
       dest: /usr/local/bin/optimized-cloud-recipes
-      version: wfowler-contributing
+      version: main
 
 - name: Copy service files
   hosts: localhost
