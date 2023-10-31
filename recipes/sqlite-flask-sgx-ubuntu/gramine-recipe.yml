@@ -134,10 +134,7 @@
         repo: "{{ item.repo }}"
         dest: "{{ item.dest }}"
       loop:
-        - { repo: 'https://github.com/gramineproject/contrib.git', dest: '~/contrib' }
-        - { repo: 'https://github.com/shreejam21/sgx-demo.git', dest: '~/sgx-demo' }
+        - { repo: 'https://github.com/gramineproject/contrib.git', dest: '/tmp/contrib' }
+        - { repo: 'https://github.com/shreejam21/sgx-demo.git', dest: '/tmp/sgx-demo' }
 
-    - name: Create db directory in sgx-demo folder
-      file:
-        path: ~/sgx-demo/db
-        state: directory
+
