@@ -137,26 +137,23 @@
         - { repo: 'https://github.com/shreejam21/contrib.git', dest: '/tmp/contrib' }
         - { repo: 'https://github.com/shreejam21/sgx-demo.git', dest: '/tmp/sgx-demo' }
 
-    - name: Execute commands as root
-      hosts: your_target_host
-      become: yes
-      tasks:
-        - name: Change to the root user
-          command: sudo su
-          args:
-            warn: no
-            executable: /bin/bash  # Specify the shell if needed
 
-        - name: Change directory to SGX Example
-          command: cd /tmp/sgx-demo
-          args:
-            warn: no
-            executable: /bin/bash  # Specify the shell if needed
+    - name: Change to the root user
+      command: sudo su
+      args:
+        warn: no
+        executable: /bin/bash  # Specify the shell if needed
 
-        - name: Build Docker image for SGX-APP
-          command: docker build -t sgx-app .
-          args:
-            chdir: /tmp/sgx-demo  # Change the working directory for this command
-            warn: no
-            executable: /bin/bash  # Specify the shell if needed
+    - name: Change directory to SGX Example
+      command: cd /tmp/sgx-demo
+      args:
+        warn: no
+        executable: /bin/bash  # Specify the shell if needed
+
+    - name: Build Docker image for SGX-APP
+      command: docker build -t sgx-app .
+      args:
+        chdir: /tmp/sgx-demo  # Change the working directory for this command
+        warn: no
+        executable: /bin/bash  # Specify the shell if needed
 
