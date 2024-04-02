@@ -27,9 +27,9 @@
         state: present
         executable: pip3
     # Install Langchain via pip3
-    - name: Install Langchain
+    - name: Install Langchain from community
       pip:
-        name: langchain
+        name: langchain-community
         state: present
         executable: pip3
     # Install Datasets via pip3
