@@ -13,14 +13,29 @@
           - python3-pip
           - python-is-python3
           - net-tools
-          - flask
-          - langchain
-          - datasets
         state: present
         update_cache: true
     - name: Install Intel's Extension for PyTorch
       pip:
         name: intel_extension_for_pytorch
+        state: present
+        executable: pip3
+    # Install Flask via pip3
+    - name: Install Flask
+      pip:
+        name: Flask
+        state: present
+        executable: pip3
+    # Install Langchain via pip3
+    - name: Install Langchain
+      pip:
+        name: langchain
+        state: present
+        executable: pip3
+    # Install Datasets via pip3
+    - name: Install Datasets
+      pip:
+        name: datasets
         state: present
         executable: pip3
     # - name: Install Jinja2 version 3.1.2
