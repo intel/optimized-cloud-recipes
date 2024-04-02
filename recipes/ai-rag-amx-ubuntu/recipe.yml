@@ -26,8 +26,14 @@
         name: Flask
         state: present
         executable: pip3
+    # Instal Langchain via pip3
+    - name: Install Langchain
+      pip:
+        name: langchain
+        state: present
+        executable: pip3
     # Install Langchain via pip3
-    - name: Install Langchain from community
+    - name: Install Langchain community
       pip:
         name: langchain-community
         state: present

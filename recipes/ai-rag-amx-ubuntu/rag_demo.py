@@ -10,15 +10,15 @@ import time
 import io
 
 from tqdm import tqdm
-from langchain.llms import GPT4All
+from langchain_community.llms import GPT4All
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
-from langchain.document_loaders import TextLoader
+from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.indexes import VectorstoreIndexCreator
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from datasets import load_dataset
 
 
