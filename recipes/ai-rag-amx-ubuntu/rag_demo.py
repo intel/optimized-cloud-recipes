@@ -83,22 +83,22 @@ class RAGBot:
         if self.model == "Falcon":
             # self.model_path = "/home/common/data/Big_Data/GenAI/llm_models/nomic-ai--gpt4all-falcon-ggml/ggml-model-gpt4all-falcon-q4_0.bin"
             self.model_path = model_hf
-        elif model == "More Models Coming Soon!":
+        else:
             print("More models coming soon, defaulting to Falcon for now!")
             # self.model_path = "/home/common/data/Big_Data/GenAI/llm_models/nomic-ai--gpt4all-falcon-ggml/ggml-model-gpt4all-falcon-q4_0.bin"
             self.model_path = model_hf
 
-        if not os.path.isfile(self.model_path):
-            # send a GET request to the URL to download the file. Stream since it's large
-            response = requests.get(url, stream=True)
-            # open the file in binary mode and write the contents of the response to it in chunks
-            # This is a large file, so be prepared to wait.
-            with open(self.model_path, 'wb') as f:
-                for chunk in tqdm(response.iter_content(chunk_size=10000)):
-                    if chunk:
-                        f.write(chunk)
-        else:
-            print('model already exists in path.')
+        # if not os.path.isfile(self.model_path):
+        #     # send a GET request to the URL to download the file. Stream since it's large
+        #     response = requests.get(url, stream=True)
+        #     # open the file in binary mode and write the contents of the response to it in chunks
+        #     # This is a large file, so be prepared to wait.
+        #     with open(self.model_path, 'wb') as f:
+        #         for chunk in tqdm(response.iter_content(chunk_size=10000)):
+        #             if chunk:
+        #                 f.write(chunk)
+        # else:
+        #     print('model already exists in path.')
 
     def download_dataset(self, dataset):
         """
