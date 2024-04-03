@@ -44,6 +44,18 @@
         name: datasets
         state: present
         executable: pip3
+    # Install PyTorch via pip3
+    - name: Install PyTorch
+      pip:
+        name: torch
+        state: present
+        executable: pip3
+    # Install Transformers via pip3
+    - name: Install Transformers
+      pip:
+        name: transformers
+        state: present
+        executable: pip3
     # - name: Install Jinja2 version 3.1.2
     #   pip:
     #     name: jinja2==3.1.2

@@ -24,7 +24,7 @@ from datasets import load_dataset
 # Import the required libraries
 import torch
 import transformers
-from transformers import AutoTokenizer, AutoModelForCasualLM
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # Initialize previous value variables
 previous_threads = None
@@ -77,7 +77,7 @@ class RAGBot:
             The size of each chunk of data to download at a time, by default 10000.
         """
 
-        model_hf = AutoModelForCasualLM.from_pretrained("togethercomputer/RedPajama-INCITE-Chat-3B-v1", torch_dtype=torch.bfloat16)
+        model_hf = AutoModelForCausalLM.from_pretrained("togethercomputer/RedPajama-INCITE-Chat-3B-v1", torch_dtype=torch.bfloat16)
         self.model = model
 
         if self.model == "Falcon":
