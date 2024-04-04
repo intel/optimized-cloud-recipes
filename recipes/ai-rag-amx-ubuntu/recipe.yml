@@ -56,6 +56,12 @@
         name: transformers
         state: present
         executable: pip3
+    # Install gpt4all via pip3
+    - name: Install gpt4all
+      pip:
+        name: gpt4all
+        state: present
+        executable: pip3
     # - name: Install Jinja2 version 3.1.2
     #   pip:
     #     name: jinja2==3.1.2
