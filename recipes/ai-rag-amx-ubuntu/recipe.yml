@@ -86,7 +86,7 @@
   tasks:
     - name: Install Falcon Model
       get_url:
-        url: "https://huggingface.co/nomic-ai/gpt4all-falcon-ggml/blob/main/ggml-model-gpt4all-falcon-q4_0.bin"
+        url: "https://huggingface.co/nomic-ai/gpt4all-falcon-ggml/resolve/main/ggml-model-gpt4all-falcon-q4_0.bin?download=true"
         dest: "/data/models"
         timeout: 10000
       retries: 10
@@ -95,7 +95,7 @@
       no_log: false
       ignore_errors: True
       with_items:
-        - https://huggingface.co/nomic-ai/gpt4all-falcon-ggml/blob/main/ggml-model-gpt4all-falcon-q4_0.bin
+        - "https://huggingface.co/nomic-ai/gpt4all-falcon-ggml/resolve/main/ggml-model-gpt4all-falcon-q4_0.bin?download=true"
 
 #testing git push Chris 
 ######################################################################
