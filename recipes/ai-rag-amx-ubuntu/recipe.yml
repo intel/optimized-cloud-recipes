@@ -88,8 +88,14 @@
       get_url:
         url: "https://huggingface.co/nomic-ai/gpt4all-falcon-ggml/blob/main/ggml-model-gpt4all-falcon-q4_0.bin"
         dest: "/data/models"
-        timeout: 5000
+        timeout: 10000
+      retries: 10
+      register: result
       until: result is succeeded
+      no_log: false
+      ignore_errors: True
+      with_items:
+        - https://huggingface.co/nomic-ai/gpt4all-falcon-ggml/blob/main/ggml-model-gpt4all-falcon-q4_0.bin
 
 #testing git push Chris 
 ######################################################################
