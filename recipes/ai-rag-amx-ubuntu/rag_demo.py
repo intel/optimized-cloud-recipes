@@ -83,12 +83,14 @@ class RAGBot:
         #self.model = model
 
         if self.model == "Falcon":
-            self.model_path = "/data/models"
+            self.model_path = "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
+            print("Model path found: ", self.model_path)
             #self.model_path = model_hf
         else:
             print("More models coming soon, defaulting to Falcon for now!")
-            self.model_path = "/data/models"
+            self.model_path = "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
             #self.model_path = model_hf
+
 
         # if not os.path.isfile(self.model_path):
         #     # send a GET request to the URL to download the file. Stream since it's large
@@ -156,9 +158,13 @@ class RAGBot:
         callbacks = [StreamingStdOutCallbackHandler()]
         # Verbose is required to pass to the callback manager
 
+        print("")
+
         self.llm = GPT4All(model=self.model_path, callbacks=callbacks, verbose=False,
                            n_threads=n_threads, n_predict=max_tokens, repeat_penalty=repeat_penalty, 
                            n_batch=n_batch, top_k=top_k, temp=temp)
+        
+        print("MODEL LOADED! MODEL TYPE: ", type(self.llm))
 
     def build_vectordb(self, chunk_size, overlap):
         """
