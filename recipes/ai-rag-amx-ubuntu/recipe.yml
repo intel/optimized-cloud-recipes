@@ -87,7 +87,7 @@
     - name: Install Falcon Model
       get_url:
         url: "https://huggingface.co/nomic-ai/gpt4all-falcon-ggml/resolve/main/ggml-model-gpt4all-falcon-q4_0.bin?download=true"
-        dest: "/data/models"
+        dest: "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
         timeout: 10000
       retries: 10
       register: result
