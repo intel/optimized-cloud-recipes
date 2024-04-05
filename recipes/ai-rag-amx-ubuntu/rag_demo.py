@@ -79,16 +79,16 @@ class RAGBot:
             The size of each chunk of data to download at a time, by default 10000.
         """
 
-        model_hf = AutoModelForCausalLM.from_pretrained("togethercomputer/RedPajama-INCITE-Chat-3B-v1", torch_dtype=torch.bfloat16)
-        self.model = model
+        #model_hf = AutoModelForCausalLM.from_pretrained("togethercomputer/RedPajama-INCITE-Chat-3B-v1", torch_dtype=torch.bfloat16)
+        #self.model = model
 
         if self.model == "Falcon":
-            # self.model_path = "/home/common/data/Big_Data/GenAI/llm_models/nomic-ai--gpt4all-falcon-ggml/ggml-model-gpt4all-falcon-q4_0.bin"
-            self.model_path = model_hf
+            self.model_path = "/data/models"
+            #self.model_path = model_hf
         else:
             print("More models coming soon, defaulting to Falcon for now!")
-            # self.model_path = "/home/common/data/Big_Data/GenAI/llm_models/nomic-ai--gpt4all-falcon-ggml/ggml-model-gpt4all-falcon-q4_0.bin"
-            self.model_path = model_hf
+            self.model_path = "/data/models"
+            #self.model_path = model_hf
 
         # if not os.path.isfile(self.model_path):
         #     # send a GET request to the URL to download the file. Stream since it's large

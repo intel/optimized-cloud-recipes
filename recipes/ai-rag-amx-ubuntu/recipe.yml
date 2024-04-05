@@ -73,6 +73,22 @@
     #     state: present
     #     executable: pip3
 
+
+######################################################################
+# MODEL DOWNLOAD                                                     #
+#                                                                    #
+# Downloaded nomic-ai/gpt4all-falcon-ggml from HuggingFace           #
+#                                                                    #
+######################################################################
+- name: Install gpt4all Falcon
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install Falcon Model
+        get_url:
+        url: "https://huggingface.co/nomic-ai/gpt4all-falcon-ggml/blob/main/ggml-model-gpt4all-falcon-q4_0.bin"
+        dest: "/data/models"
+
 #testing git push Chris 
 ######################################################################
 # Demo                                                               #
