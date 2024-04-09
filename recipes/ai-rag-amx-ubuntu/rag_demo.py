@@ -86,6 +86,10 @@ class RAGBot:
             self.model_path = "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
             print("Model path found: ", self.model_path)
             #self.model_path = model_hf
+            #"Mistral"
+        if self.model == "Mistral":
+            self.model_path = "/data/models/mistral_model"
+            print("Model path found: ", self.model_path)
         else:
             print("More models coming soon, defaulting to Falcon for now!")
             self.model_path = "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
