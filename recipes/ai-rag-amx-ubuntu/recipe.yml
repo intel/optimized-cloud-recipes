@@ -56,6 +56,12 @@
         name: transformers
         state: present
         executable: pip3
+    # Install Sentence Transformers
+    - name: Install Sentence-Transformers
+      pip:
+        name: sentence-transformers
+        state: present
+        executable: pip3
     # Install gpt4all via pip3
     - name: Install gpt4all
       pip:
@@ -72,6 +78,7 @@
     #     name: jinja2==3.1.2
     #     state: present
     #     executable: pip3
+
 
 
 ######################################################################
