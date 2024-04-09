@@ -263,7 +263,7 @@ def prep_model(model, dataset, top_k):
     bot.load_model(n_threads=64, max_tokens=100, repeat_penalty=1.50, n_batch=64, top_k=top_k, temp=0.7) #max_tokens used to be 50, testing 100
     bot.build_vectordb(chunk_size=500, overlap=50)
     #bot.retrieval_mechanism(user_input="What is the best way to maintain a robot?", top_k=2, rag_off=rag_off)
-    return "True", bot
+    return dataset, "True", bot
 
 # Run the RAG model 
 def run_rag(question, bot):

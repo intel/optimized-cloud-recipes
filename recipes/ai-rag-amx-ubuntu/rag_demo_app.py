@@ -40,8 +40,8 @@ def index():
         top_k = request.form['top-k-slider']
         # useRag = request.form['useRag']
         print("Got variables from form: ", model, dataset, top_k)
-        model_ready, bot = prep_model(model, dataset, top_k)
-        return render_template('index.html', model_ready=model_ready,bot=bot)
+        vector_dataset, model_ready, bot = prep_model(model, dataset, top_k)
+        return render_template('index.html', dataset = vector_dataset, model_ready=model_ready,bot=bot)
 
 
 # App route for Query
