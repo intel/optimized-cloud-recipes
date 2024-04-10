@@ -10,6 +10,7 @@ model_ready = False
 bot = RAGBot()
 
 # Prepare the model on the first load
+'''
 def int_load_model():
     global model_ready
 
@@ -22,6 +23,7 @@ def int_load_model():
         model_ready = prep_model(model,dataset,top_k)
         #model_ready = True
     return model_ready
+'''
 
 @app.route('/', methods=['GET','POST'])
 def index():
