@@ -87,7 +87,7 @@ class RAGBot:
             print("Model path found: ", self.model_path)
             print("FALCON MODEL SELECTED AND SET TO VARIABLE SELF.MODEL_PATH! SELF.MODEL_PATH = ", self.model_path )
             #self.model_path = model_hf
-            #"Mistral"
+
         if self.model == "Mistral":
             self.model_path = "/data/models/mistral_model"
             print("Model path found: ", self.model_path)
