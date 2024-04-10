@@ -85,14 +85,17 @@ class RAGBot:
         if self.model == "Falcon":
             self.model_path = "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
             print("Model path found: ", self.model_path)
+            print("FALCON MODEL SELECTED AND SET TO VARIABLE SELF.MODEL_PATH! SELF.MODEL_PATH = ", self.model_path )
             #self.model_path = model_hf
             #"Mistral"
         if self.model == "Mistral":
             self.model_path = "/data/models/mistral_model"
             print("Model path found: ", self.model_path)
+            print("MISTRAL MODEL SELECTED AND SET TO VARIABLE SELF.MODEL_PATH! SELF.MODEL_PATH = ", self.model_path )
         else:
             print("More models coming soon, defaulting to Falcon for now!")
             self.model_path = "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
+            print("FALCON DEFAULTED! MODEL SELECTED AND SET TO VARIABLE SELF.MODEL_PATH! SELF.MODEL_PATH = ", self.model_path )
             #self.model_path = model_hf
 
 
@@ -169,6 +172,7 @@ class RAGBot:
                            n_batch=n_batch, top_k=top_k, temp=temp)
         
         print("MODEL LOADED! MODEL TYPE: ", type(self.llm))
+        print("MODEL PATH/TYPE:", self.model_path)
 
     def build_vectordb(self, chunk_size, overlap):
         """
@@ -263,6 +267,7 @@ def prep_model(model, dataset, top_k):
     """
     bot = RAGBot()
     bot.get_model(model)
+    print("inside prep model function, model = ", model)
     bot.download_dataset(dataset)
     bot.load_model(n_threads=64, max_tokens=100, repeat_penalty=1.50, n_batch=64, top_k=top_k, temp=0.7) #max_tokens used to be 50, testing 100
     bot.build_vectordb(chunk_size=500, overlap=50)
@@ -285,7 +290,7 @@ def run_rag(question, bot):
 
     # Print out the default values
 #     print(model)
-    print(question)
+    print(" INSIDE RUN RAG! User question: ", question)
 # #    print(top_k_slider)
 #     print(temp_slider)
 #     print(rag_off_checkbox)

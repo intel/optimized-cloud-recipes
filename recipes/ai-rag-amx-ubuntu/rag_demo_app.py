@@ -2,7 +2,7 @@
 # Contributors: William Fowler
 
 from rag_demo import prep_model, run_rag, RAGBot
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request #session
 
 app = Flask(__name__)
 
