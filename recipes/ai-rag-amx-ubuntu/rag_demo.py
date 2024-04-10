@@ -274,12 +274,14 @@ def run_rag(question, bot):
 
 
  #   top_k_slider = 2 # Range: 1-4
-    temp_slider = 0.7 # Range: 0.1-1.4
-    rag_off_checkbox = False
-    chunk_size_input = 500 # Range: 5-5000 (in increments of 1)
-    overlap_input = 50 # Range: 0-1000
-    threads_slider = 64 # Range: 2-200 (in increments of 1)
-    max_token_input = 50 # Range: 5-500 (in increments of 5)
+ 
+    #commented these out because not accessed
+    #temp_slider = 0.7 # Range: 0.1-1.4
+    #rag_off_checkbox = False
+    #chunk_size_input = 500 # Range: 5-5000 (in increments of 1)
+    #overlap_input = 50 # Range: 0-1000
+    #threads_slider = 64 # Range: 2-200 (in increments of 1)
+    #max_token_input = 50 # Range: 5-500 (in increments of 5)
 
     # Print out the default values
 #     print(model)
