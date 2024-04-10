@@ -1,17 +1,17 @@
 # Intel® Corporation Copyright
-# Contributors: William Fowler
+# Contributors: William Fowler, Chris Ah-Siong, Joshua Segovia
 
 #test push for Josh
 #test push 2 for JOSH
-import sys
+#import sys
 import os
-import requests
-import contextlib
+#import requests
+#import contextlib
 import pandas as pd
-import time
-import io
+#import time
+#import io
 
-from tqdm import tqdm
+#from tqdm import tqdm
 from langchain_community.llms import GPT4All
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
@@ -24,9 +24,9 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from datasets import load_dataset
 
 # Import the required libraries
-import torch
-import transformers
-from transformers import AutoTokenizer, AutoModelForCausalLM
+# import torch
+# import transformers
+# from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # Initialize previous value variables
 previous_threads = None
