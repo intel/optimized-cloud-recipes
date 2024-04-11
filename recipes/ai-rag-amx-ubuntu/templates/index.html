@@ -117,6 +117,10 @@ Contributors: William Fowler, Chris Ah-Siong, Joshua Segovia -->
             const topK = document.querySelector('input[name="top-k-slider"]').value;
             //const useRag = document.querySelector('input[name="useRag"]').checked;
 
+             // Store the selected model and dataset in local storage
+            localStorage.setItem('selectedModel', model);
+            localStorage.setItem('selectedDataset', dataset);
+
             // Create a URL-encoced string from the form data
             const formData = new URLSearchParams();
             formData.append('model', model);
@@ -135,6 +139,23 @@ Contributors: William Fowler, Chris Ah-Siong, Joshua Segovia -->
 
             // Reload the page to load the new model
             location.reload();
+        });
+
+        // JavaScript to handle the page load event
+        window.addEventListener('load', () => {
+            // Retrieve the selected model and dataset from local storage
+            const selectedModel = localStorage.getItem('selectedModel');
+            const selectedDataset = localStorage.getItem('selectedDataset');
+
+            // Set the selected model and dataset in the dropdown menus
+            const modelDropdown = document.querySelector('select[name="model"]');
+            const datasetDropdown = document.querySelector('select[name="dataset"]');
+            if (selectedModel) {
+                modelDropdown.value = selectedModel;
+            }
+            if (selectedDataset) {
+                datasetDropdown.value = selectedDataset;
+            }
         });
 
     </script>
