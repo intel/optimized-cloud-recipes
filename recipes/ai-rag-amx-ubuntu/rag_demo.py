@@ -85,12 +85,12 @@ class RAGBot:
         if self.model == "Falcon":
             self.model_path = "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
             print("Model path found: ", self.model_path)
-            print("FALCON MODEL SELECTED AND SET TO VARIABLE SELF.MODEL_PATH! SELF.MODEL_PATH = ", self.model_path )
+            print("FALCON MODEL SELECTED AND SET TO VARIABLE SELF.MODEL_PATH! SELF.MODEL_PATH = ", self.model_path)
             #self.model_path = model_hf
         elif self.model == "Mistral":
             self.model_path = "/data/models/mistral_model"
             print("Model path found: ", self.model_path)
-            print("MISTRAL MODEL SELECTED AND SET TO VARIABLE SELF.MODEL_PATH! SELF.MODEL_PATH = ", self.model_path )
+            print("MISTRAL MODEL SELECTED AND SET TO VARIABLE SELF.MODEL_PATH! SELF.MODEL_PATH = ", self.model_path)
         else:
             print("More models coming soon, defaulting to Falcon for now!")
             self.model_path = "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
@@ -126,10 +126,13 @@ class RAGBot:
             datasets = {"robot maintenance": "FunDialogues/customer-service-robot-support", 
                         "basketball coach": "FunDialogues/sports-basketball-coach", 
                         "physics professor": "FunDialogues/academia-physics-office-hours",
-                        "grocery cashier" : "FunDialogues/customer-service-grocery-cashier"}
+                        "grocery cashier" : "FunDialogues/customer-service-grocery-cashier",
+                        "Doctor": "FunDialogues/healthcare-minor-consultation"}
             print(dataset)
+            print("DATASET SELECTED:" , dataset)
             # Download the dialogue from hugging face
             dataset = load_dataset(f"{datasets[dataset]}")
+            print("DATASET AFTER LOAD_DATASET FUNCTION:" , dataset)
             # Convert the dataset to a pandas dataframe
             dialogues = dataset['train']
             df = pd.DataFrame(dialogues, columns=['id', 'description', 'dialogue'])
@@ -165,7 +168,7 @@ class RAGBot:
         # Verbose is required to pass to the callback manager
 
         print("")
-
+        print("Model path selected for loading into GPT4ALL FUNCTION: ", self.model_path)
         self.llm = GPT4All(model=self.model_path, callbacks=callbacks, verbose=False,
                            n_threads=n_threads, n_predict=max_tokens, repeat_penalty=repeat_penalty, 
                            n_batch=n_batch, top_k=top_k, temp=temp)
@@ -266,7 +269,8 @@ def prep_model(model, dataset, top_k):
     """
     bot = RAGBot()
     bot.get_model(model)
-    print("inside prep model function, model = ", model)
+    #print("inside prep model function, model = ", model)
+    print("inside prep model function, dataset passed into download_dataset function: ", dataset)
     bot.download_dataset(dataset)
     bot.load_model(n_threads=64, max_tokens=100, repeat_penalty=1.50, n_batch=64, top_k=top_k, temp=0.7) #max_tokens used to be 50, testing 100
     bot.build_vectordb(chunk_size=500, overlap=50)

@@ -1,5 +1,5 @@
 # Intel® Corporation Copyright
-# Contributors: William Fowler
+# Contributors: William Fowler, Chris Ah-Siong, Joshua Segovia
 
 from rag_demo import prep_model, run_rag, RAGBot
 from flask import Flask, render_template, request, session
