@@ -68,6 +68,12 @@
         name: gpt4all
         state: present
         executable: pip3
+    # Install gpt4all via pip3
+    - name: Install gradio
+      pip:
+        name: gradio
+        state: present
+        executable: pip3
     # Create directory for model
     - name: Create directory for model
       file:
