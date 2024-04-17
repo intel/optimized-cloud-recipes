@@ -68,7 +68,7 @@
         name: gpt4all
         state: present
         executable: pip3
-    # Install gpt4all via pip3
+    # Install gradio via pip3
     - name: Install gradio
       pip:
         name: gradio

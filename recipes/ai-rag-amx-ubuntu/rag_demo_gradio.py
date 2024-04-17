@@ -1,15 +1,8 @@
 # Intel® Corporation Copyright
 # Contributors: William Fowler, Chris Ah-Siong, Joshua Segovia
 
-#test push for Josh
-#test push 2 for JOSH
-#import sys
 import os
-#import requests
-#import contextlib
 import pandas as pd
-#import time
-#import io
 import gradio as gr
 
 #from tqdm import tqdm
@@ -24,11 +17,6 @@ from langchain.indexes import VectorstoreIndexCreator
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from datasets import load_dataset
 
-# Import the required libraries
-# import torch
-# import transformers
-# from transformers import AutoTokenizer, AutoModelForCausalLM
-
 # Initialize previous value variables
 previous_threads = None
 previous_max_tokens = None
@@ -37,6 +25,15 @@ previous_dataset = None
 previous_chunk_size = None
 previous_overlap = None
 previous_temp = None
+
+
+#Adding gradio global variables
+# Initialize RAGBot and prepare the model, dataset, and vector database
+ 
+# Define model and dataset dropdowns
+model_dropdown = gr.inputs.Dropdown(["Falcon", "Mistral"], label="Model")
+dataset_dropdown = gr.inputs.Dropdown(["robot maintenance", "basketball coach", "physics professor", "grocery cashier", "Doctor"], label="Dataset")
+
 
 class RAGBot:
     """
@@ -97,19 +94,6 @@ class RAGBot:
             self.model_path = "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
             print("FALCON DEFAULTED! MODEL SELECTED AND SET TO VARIABLE SELF.MODEL_PATH! SELF.MODEL_PATH = ", self.model_path )
             #self.model_path = model_hf
-
-
-        # if not os.path.isfile(self.model_path):
-        #     # send a GET request to the URL to download the file. Stream since it's large
-        #     response = requests.get(url, stream=True)
-        #     # open the file in binary mode and write the contents of the response to it in chunks
-        #     # This is a large file, so be prepared to wait.
-        #     with open(self.model_path, 'wb') as f:
-        #         for chunk in tqdm(response.iter_content(chunk_size=10000)):
-        #             if chunk:
-        #                 f.write(chunk)
-        # else:
-        #     print('model already exists in path.')
 
     def download_dataset(self, dataset):
         """
@@ -251,26 +235,17 @@ class RAGBot:
         response = llm_chain.run(self.user_input)
 
         return  response  
-    
 
-def prep_model(model, dataset, top_k):
-    """
-    Prepares the model for inference by downloading the model, dataset, and building the vector database.
+#Initialize RAGBot for gradio
 
-    Parameters
-    ----------
-    model : str
-        The name of the model to be used.
-    dataset : str
-        The name of the dataset to be used.
-    top_k : int
-        The number of top k tokens to be considered in sampling.
-    rag_off : bool
-        If True, disables the retrieval-augmented generation.
-    """
-    bot = RAGBot()
-    model_dropdown = gr.inputs.Dropdown(["Falcon", "Mistral"], label="Model")
-    dataset_dropdown = gr.inputs.Dropdown(["robot maintenance", "basketball coach", "physics professor", "grocery cashier", "Doctor"], label="Dataset")
+bot = RAGBot()
+model_dropdown = gr.inputs.Dropdown(["Falcon", "Mistral"], label="Model")
+dataset_dropdown = gr.inputs.Dropdown(["robot maintenance", "basketball coach", "physics professor", "grocery cashier", "Doctor"], label="Dataset")
+
+def run_rag(question, bot):
+    bot.retrieval_mechanism(user_input = question, top_k=2, rag_off=False)
+    result = bot.inference()
+    return result
 
 def handle_query(model, dataset, question):
     """
@@ -285,42 +260,3 @@ def handle_query(model, dataset, question):
 
 iface = gr.Interface(fn=handle_query, inputs=[model_dropdown, dataset_dropdown, "text"], outputs="text", title="Question Answering System")
 iface.launch()
-    #print("inside prep model function, model = ", model)
-    #print("inside prep model function, dataset passed into download_dataset function: ", dataset)
-    #bot.download_dataset(dataset)
-    #bot.load_model(n_threads=64, max_tokens=100, repeat_penalty=1.50, n_batch=64, top_k=top_k, temp=0.7) #max_tokens used to be 50, testing 100
-    #bot.build_vectordb(chunk_size=500, overlap=50)
-    #bot.retrieval_mechanism(user_input="What is the best way to maintain a robot?", top_k=2, rag_off=rag_off)
-    #return dataset, "True", bot
-
-# Run the RAG model 
-#def run_rag(question, bot):
-
-
- #   top_k_slider = 2 # Range: 1-4
- 
-    #commented these out because not accessed
-    #temp_slider = 0.7 # Range: 0.1-1.4
-    #rag_off_checkbox = False
-    #chunk_size_input = 500 # Range: 5-5000 (in increments of 1)
-    #overlap_input = 50 # Range: 0-1000
-    #threads_slider = 64 # Range: 2-200 (in increments of 1)
-    #max_token_input = 50 # Range: 5-500 (in increments of 5)
-
-    # Print out the default values
-#     print(model)
-    #print(" INSIDE RUN RAG! User question: ", question)
-# #    print(top_k_slider)
-#     print(temp_slider)
-#     print(rag_off_checkbox)
-#     print(chunk_size_input)
-#     print(overlap_input)
-#     print(dataset)
-#     print(threads_slider)
-#     print(max_token_input)
-        
-    # Call the process_inputs function when the script is run
-#    result = process_inputs(model, question, top_k_slider, temp_slider, rag_off_checkbox, chunk_size_input, overlap_input, dataset, threads_slider, max_token_input)
-    #bot.retrieval_mechanism(user_input = question, top_k=2, rag_off=False)
-    #result = bot.inference()
-    #return result
