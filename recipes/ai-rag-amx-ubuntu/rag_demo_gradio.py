@@ -30,10 +30,6 @@ previous_temp = None
 #Adding gradio global variables
 # Initialize RAGBot and prepare the model, dataset, and vector database
  
-# Define model and dataset dropdowns
-model_dropdown = gr.inputs.Dropdown(["Falcon", "Mistral"], label="Model")
-dataset_dropdown = gr.inputs.Dropdown(["robot maintenance", "basketball coach", "physics professor", "grocery cashier", "Doctor"], label="Dataset")
-
 
 class RAGBot:
     """
