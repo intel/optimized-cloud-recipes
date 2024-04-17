@@ -235,8 +235,8 @@ class RAGBot:
 #Initialize RAGBot for gradio
 
 bot = RAGBot()
-model_dropdown = gr.Interface.Dropdown(["Falcon", "Mistral"], label="Model")
-dataset_dropdown = gr.Interface.Dropdown(["robot maintenance", "basketball coach", "physics professor", "grocery cashier", "Doctor"], label="Dataset")
+model_dropdown = gr.inputs.Dropdown(["Falcon", "Mistral"], label="Model")
+dataset_dropdown = gr.inputs.Dropdown(["robot maintenance", "basketball coach", "physics professor", "grocery cashier", "Doctor"], label="Dataset")
 
 def run_rag(question, bot):
     bot.retrieval_mechanism(user_input = question, top_k=2, rag_off=False)

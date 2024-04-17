@@ -72,7 +72,7 @@
     - name: Install gradio
       pip:
         name: gradio
-        state: present
+        state: latest
         executable: pip3
     # Create directory for model
     - name: Create directory for model
