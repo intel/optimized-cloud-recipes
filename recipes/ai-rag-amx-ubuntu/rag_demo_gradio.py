@@ -253,7 +253,7 @@ with gr.Blocks() as demo:
         
     d2.input(print_results, [d1, d2], outputs)
 
-demo.launch()
+demo.launch(share=True)
 
 '''
 def run_rag(question, bot):
