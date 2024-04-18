@@ -235,9 +235,27 @@ class RAGBot:
 #Initialize RAGBot for gradio
 
 bot = RAGBot()
-model_dropdown = gr.inputs.Dropdown(["Falcon", "Mistral"], label="Model")
-dataset_dropdown = gr.inputs.Dropdown(["robot maintenance", "basketball coach", "physics professor", "grocery cashier", "Doctor"], label="Dataset")
+#model_dropdown = gr.inputs.Dropdown(, label="Model")
+#dataset_dropdown = gr.inputs.Dropdown(["robot maintenance", "basketball coach", "physics professor", "grocery cashier", "Doctor"], label="Dataset")
 
+model_dropdown = ["Falcon", "Mistral"]
+dataset_dropdown = ["robot maintenance", "basketball coach", "physics professor", "grocery cashier", "Doctor"]
+
+#Attepting to check textboxes
+with gr.Blocks() as demo:
+    d1 = gr.Dropdown(choices = model_dropdown, label="Choose Model")
+    d2 = gr.Dropdown(choices = dataset_dropdown, label = "Choose dataset")        
+
+    outputs = gr.Textbox()
+
+    def print_results(d1, d2):
+        return f"You selected '{d1}' in the first dropdown and '{d2}' in the second dropdown."
+        
+    d2.input(print_results, [d1, d2], outputs)
+
+demo.launch()
+
+'''
 def run_rag(question, bot):
     bot.retrieval_mechanism(user_input = question, top_k=2, rag_off=False)
     result = bot.inference()
@@ -256,3 +274,4 @@ def handle_query(model, dataset, question):
 
 iface = gr.Interface(fn=handle_query, inputs=[model_dropdown, dataset_dropdown, "text"], outputs="text", title="Question Answering System")
 iface.launch()
+'''
