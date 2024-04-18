@@ -1,7 +1,8 @@
 import gradio as gr
 
-def echo(message, history):
-    return message
+def greet(name):
+    return "Hello " + name + "!"
 
-demo = gr.ChatInterface(fn=echo, examples=["hello", "hola", "merhaba"], title="Echo Bot")
-demo.launch()
+demo = gr.Interface(fn=greet, inputs="textbox", outputs="textbox")
+    
+demo.launch(share=True)  # Share your demo with just 1 extra parameter
