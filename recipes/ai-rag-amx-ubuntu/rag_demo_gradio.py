@@ -245,7 +245,7 @@ dataset_dropdown = ["robot maintenance", "basketball coach", "physics professor"
 with gr.Blocks() as demo:
     d1 = gr.Dropdown(choices = model_dropdown, label="Choose Model")
     d2 = gr.Dropdown(choices = dataset_dropdown, label = "Choose dataset")        
-
+'''
     outputs = gr.Textbox()
 
     def print_results(d1, d2):
@@ -254,8 +254,8 @@ with gr.Blocks() as demo:
     d2.input(print_results, [d1, d2], outputs)
 
 demo.launch(share=True)
-
 '''
+
 def run_rag(question, bot):
     bot.retrieval_mechanism(user_input = question, top_k=2, rag_off=False)
     result = bot.inference()
@@ -265,8 +265,8 @@ def handle_query(model, dataset, question):
     """
     Handles a user query by running the RAG model and returning the response.
     """
-    bot.get_model(model)
-    bot.download_dataset(dataset)
+    bot.get_model(d1)
+    bot.download_dataset(d2)
     bot.load_model(n_threads=64, max_tokens=100, repeat_penalty=1.50, n_batch=64, top_k=2, temp=0.7)
     bot.build_vectordb(chunk_size=500, overlap=50)
     result = run_rag(question, bot)
@@ -274,4 +274,3 @@ def handle_query(model, dataset, question):
 
 iface = gr.Interface(fn=handle_query, inputs=[model_dropdown, dataset_dropdown, "text"], outputs="text", title="Question Answering System")
 iface.launch()
-'''
