@@ -36,7 +36,16 @@ prompt = PromptTemplate(template=template, input_variables=["question"])
 
 llm_chain = LLMChain(prompt=prompt, llm=llm)
 
+#question = "What NFL team won the Super Bowl in the year Justin Bieber was born?"
+def predict(question):
+    answer = llm_chain.run(question)
+    return answer
 
-question = "What NFL team won the Super Bowl in the year Justin Bieber was born?"
-
-llm_chain.run(question)
+iface = gr.Interface(
+    fn=predict,
+    inputs="text",
+    outputs="text",
+    title="Question-Answer Chatbot",
+    description="Enter your question below:",
+)
+iface.launch(share=True)
