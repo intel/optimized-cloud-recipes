@@ -14,8 +14,8 @@ import gradio as gr
 
 # Defining paths to the different models 
 model_paths = {
-    "Model 1" : "/data/models/ggml-model-gpt4all-falcon-q4_0.bin",
-    "Model 2" : "/data/models/mistral_model"
+    "Falcon" : "/data/models/ggml-model-gpt4all-falcon-q4_0.bin",
+    "Mistral" : "/data/models/mistral_model"
 }
 n_threads=64
 max_tokens=100
@@ -23,6 +23,8 @@ repeat_penalty=1.50
 n_batch=64
 top_k=2
 temp=0.7
+
+
 
 
 callbacks = [StreamingStdOutCallbackHandler()]
@@ -65,7 +67,7 @@ iface = gr.Interface(
     fn=predict,
     inputs=[gr.Text("text"), gr.Dropdown(choices=model_choices, label="Select Model")],
     outputs="text",
-    title="Question-Answer Chatbot",
+    title="RAG Demo",
     description="Enter your question below:",
 )
 iface.launch(share=True)
