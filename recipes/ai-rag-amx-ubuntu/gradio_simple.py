@@ -63,7 +63,7 @@ def predict(question):
 '''
 iface = gr.Interface(
     fn=predict,
-    inputs=["text", gr.inputs.Dropdown(model_choices, label="Select Model")],
+    inputs=[gr.Text("text"), gr.Dropdown(choices=model_choices, label="Select Model")],
     outputs="text",
     title="Question-Answer Chatbot",
     description="Enter your question below:",
