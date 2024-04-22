@@ -25,6 +25,27 @@ top_k=2
 temp=0.7
 
 
+datasets = {"robot maintenance": "FunDialogues/customer-service-robot-support", 
+                "basketball coach": "FunDialogues/sports-basketball-coach", 
+                "physics professor": "FunDialogues/academia-physics-office-hours",
+                "grocery cashier" : "FunDialogues/customer-service-grocery-cashier",
+                "Doctor": "FunDialogues/healthcare-minor-consultation"}
+
+#setting and loading the default dataset
+selected_data_path = datasets["robot maintenance"]
+# Download the dialogue from hugging face
+dataset = load_dataset(f"{datasets[dataset]}")
+print("DATASET AFTER LOAD_DATASET FUNCTION:" , dataset)
+# Convert the dataset to a pandas dataframe
+dialogues = dataset['train']
+df = pd.DataFrame(dialogues, columns=['id', 'description', 'dialogue'])
+# Print the first 5 rows of the dataframe
+df.head()
+# only keep the dialogue column
+dialog_df = df['dialogue']
+# save the data to txt file
+dialog_df.to_csv(self.data_path, sep=' ', index=False)
+
 
 
 callbacks = [StreamingStdOutCallbackHandler()]
@@ -43,8 +64,9 @@ prompt = PromptTemplate(template=template, input_variables=["question"])
 llm_chain = LLMChain(prompt=prompt, llm=llm)
 
 
-def predict(question, selected_model):
+def predict(question, selected_model, selected_dataset):
     # Load the selected model
+    selected_data_path = datasets[selected_dataset]
     selected_model_path = model_paths[selected_model]
     llm = GPT4All(model=selected_model_path, callbacks=callbacks, verbose=False,
                    n_threads=n_threads, n_predict=max_tokens, repeat_penalty=repeat_penalty,
