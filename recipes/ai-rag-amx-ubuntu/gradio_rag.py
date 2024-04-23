@@ -145,7 +145,11 @@ def predict(question, selected_model, selected_dataset):
     data_path = selected_dataset + '_dialogues.txt'
 
     if not os.path.isfile(data_path):
-        datasets = datasets
+        datasets = {"robot maintenance": "FunDialogues/customer-service-robot-support", 
+                "basketball coach": "FunDialogues/sports-basketball-coach", 
+                "physics professor": "FunDialogues/academia-physics-office-hours",
+                "grocery cashier" : "FunDialogues/customer-service-grocery-cashier",
+                "Doctor": "FunDialogues/healthcare-minor-consultation"}
         # Download the dialogue from hugging face
         dataset = load_dataset(f"{datasets[selected_dataset]}")
         # Convert the dataset to a pandas dataframe
