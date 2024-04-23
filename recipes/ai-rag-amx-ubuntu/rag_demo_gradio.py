@@ -26,9 +26,9 @@ temp=0.7
 chunk_size=500
 overlap=50
 
-global data_path
-global index 
-global prompt
+data_path = ""
+index = ""
+prompt = ""
 
 
 datasets = {"robot maintenance": "FunDialogues/customer-service-robot-support", 
@@ -133,7 +133,7 @@ llm = GPT4All(model=selected_model_path, callbacks=callbacks, verbose=False,
 template = """Question: {question}
             Answer: This is the response: """
 
-#prompt = PromptTemplate(template=template, input_variables=["question"])
+prompt = PromptTemplate(template=template, input_variables=["question"])
 #prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
 
 llm_chain = LLMChain(prompt=prompt, llm=llm)
