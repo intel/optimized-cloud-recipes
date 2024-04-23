@@ -195,6 +195,8 @@ def predict(question, selected_model, selected_dataset):
         """
         prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
 
+    print("This is the Type returned from PromptTemplate:", type(prompt))
+    print("This is the Prompt returned from PromptTemplate:", prompt)
     #selected_data_path = datasets[selected_dataset]
     # Load the selected model
     selected_model_path = model_paths[selected_model]
