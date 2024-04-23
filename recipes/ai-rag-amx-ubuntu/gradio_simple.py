@@ -79,6 +79,7 @@ def predict(question, selected_model, selected_dataset):
 
 # Create a list of models for the dropdown
 model_choices = list(model_paths.keys())
+dataset_choices = list(datasets.keys())
 '''
 #question = "What NFL team won the Super Bowl in the year Justin Bieber was born?"
 def predict(question):
@@ -87,7 +88,7 @@ def predict(question):
 '''
 iface = gr.Interface(
     fn=predict,
-    inputs=[gr.Text("text"), gr.Dropdown(choices=model_choices, label="Select Model")],
+    inputs=[gr.Text("text"), gr.Dropdown(choices=model_choices, label="Select Model"), gr.Dropdown(choices=dataset_choices, label="Select RAG Dataset")],
     outputs="text",
     title="RAG Demo",
     description="Enter your question below:",
