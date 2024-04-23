@@ -135,14 +135,14 @@ llm = GPT4All(model=selected_model_path, callbacks=callbacks, verbose=False,
 template = """Question: {question}
             Answer: This is the response: """
 
-prompt = PromptTemplate(template=template, input_variables=["question"])
+#prompt = PromptTemplate(template=template, input_variables=["question"])
 
 llm_chain = LLMChain(prompt=prompt, llm=llm)
 
 
 def predict(question, selected_model, selected_dataset):
     # Load the selected dataset and build vectors
-    download_dataset(selected_dataset)
+    download_dataset(datasets, selected_dataset)
     build_vectordb(chunk_size, overlap)
     retrieval_mechanism(user_input = question, top_k=2, rag_off=False)
 
