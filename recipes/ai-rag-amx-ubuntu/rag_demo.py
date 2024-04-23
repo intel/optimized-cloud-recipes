@@ -250,7 +250,8 @@ class RAGBot:
         response = llm_chain.run(self.user_input)
 
         return  response  
-    
+
+########################################################################### RAGBOT CLASS ENDS #########################################################################################
 
 def prep_model(model, dataset, top_k):
     """
