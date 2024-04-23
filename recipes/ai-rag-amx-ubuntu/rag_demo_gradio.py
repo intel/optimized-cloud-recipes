@@ -26,9 +26,9 @@ temp=0.7
 chunk_size=500
 overlap=50
 
-data_path = ''
-index = '' 
-prompt = ''
+global data_path
+global index 
+global prompt
 
 
 datasets = {"robot maintenance": "FunDialogues/customer-service-robot-support", 
@@ -122,8 +122,6 @@ def retrieval_mechanism(self, user_input, top_k=1, context_verbosity = False, ra
         prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
 
 
-
-
 callbacks = [StreamingStdOutCallbackHandler()]
 
 #Setting and loading the default model
@@ -136,6 +134,7 @@ template = """Question: {question}
             Answer: This is the response: """
 
 #prompt = PromptTemplate(template=template, input_variables=["question"])
+#prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
 
 llm_chain = LLMChain(prompt=prompt, llm=llm)
 
@@ -144,6 +143,9 @@ def predict(question, selected_model, selected_dataset):
     # Load the selected dataset and build vectors
     download_dataset(datasets, selected_dataset)
     build_vectordb(chunk_size, overlap)
+
+    
+
     retrieval_mechanism(user_input = question, top_k=2, rag_off=False)
 
     #selected_data_path = datasets[selected_dataset]
