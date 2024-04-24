@@ -2,16 +2,6 @@
 # Host configuration                                     #
 ##########################################################
 ---
-# Restart the host after cloud-init updates the packages
-- name: Restart the host
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: Restart the host
-      ansible.builtin.reboot:
-        reboot_timeout: 300
-        reboot_timeout: 300
-        test_command: whoami
 - name: Install pre-requisite packages
   hosts: localhost
   connection: local
