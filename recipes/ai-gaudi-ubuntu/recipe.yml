@@ -104,5 +104,10 @@
   hosts: localhost
   connection: local
   tasks:
-    - name: Remove crontab entry
-      ansible.builtin.shell: crontab -l | grep -v 'ai-gaudi-ubuntu' | crontab -
+    - name: Remove the cron job
+      ansible.builtin.cron:
+        name: "@reboot ansible-playbook /opt/optimized-cloud-recipes/recipes/ai-gaudi-ubuntu/recipe.yml"
+        state: absent
+
+    # - name: Remove crontab entry
+    #   ansible.builtin.shell: crontab -l | grep -v 'ai-gaudi-ubuntu' | crontab -
