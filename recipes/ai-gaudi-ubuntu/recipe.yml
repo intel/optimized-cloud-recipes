@@ -111,3 +111,13 @@
 
     # - name: Remove crontab entry
     #   ansible.builtin.shell: crontab -l | grep -v 'ai-gaudi-ubuntu' | crontab -
+
+# Restart the docker service
+- name: Restart docker service
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Restart docker service
+      ansible.builtin.service:
+        name: docker
+        state: restarted
