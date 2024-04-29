@@ -188,11 +188,14 @@ def predict(question, selected_model, selected_dataset):
         template = """Question: {question}
         Answer: This is the response: """
         prompt = PromptTemplate(template=template, input_variables=["question"])
-    else:     
+    else:
+        '''     
         template = """ Don't just repeat the following context, use it in combination with your knowledge to improve your answer to the question:{context}
-
         Question: {question}
         """
+        '''
+        template = "Answer the question in a short and direct manner without including any unecessary information."    
+
         prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
 
     print("\nThis is the Type returned from PromptTemplate:", type(prompt))
