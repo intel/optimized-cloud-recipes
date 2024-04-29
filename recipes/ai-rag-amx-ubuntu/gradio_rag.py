@@ -109,7 +109,7 @@ def retrieval_mechanism(self, user_input, top_k=1, context_verbosity = False, ra
     context = "\n".join([document.page_content for document in results])
     if context_verbosity:
         print(f"Retrieving information related to your question...")
-        print(f"Found this content which is most similar to your question: {context}")
+        print(f"\nFound this content which is most similar to your question: {context}")
 
     if rag_off:
         template = """Question: {question}
@@ -159,7 +159,7 @@ def predict(question, selected_model, selected_dataset):
         df.head()
         # only keep the dialogue column
         dialog_df = df['dialogue']
-        
+        print("\nHead of Dialog_DF = ", dialog_df.head())
         # save the data to txt file
         dialog_df.to_csv(data_path, sep=' ', index=False)
     else:
@@ -182,7 +182,7 @@ def predict(question, selected_model, selected_dataset):
     context = "\n".join([document.page_content for document in results])
     if context_verbosity:
         print(f"Retrieving information related to your question...")
-        print(f"Found this content which is most similar to your question: {context}")
+        print(f"\nFound this content which is most similar to your question: {context}")
 
     if rag_off:
         template = """Question: {question}
@@ -195,8 +195,8 @@ def predict(question, selected_model, selected_dataset):
         """
         prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
 
-    print("This is the Type returned from PromptTemplate:", type(prompt))
-    print("This is the Prompt returned from PromptTemplate:", prompt)
+    print("\nThis is the Type returned from PromptTemplate:", type(prompt))
+    print("\nThis is the Prompt returned from PromptTemplate:", prompt)
     #selected_data_path = datasets[selected_dataset]
     # Load the selected model
     selected_model_path = model_paths[selected_model]
@@ -209,6 +209,7 @@ def predict(question, selected_model, selected_dataset):
 
     # Get the answer using the updated model
     answer = llm_chain.run(prompt)
+    print("\n This is the answer returned by the LLM: ", answer)
     return answer
 
 # Create a list of models for the dropdown
