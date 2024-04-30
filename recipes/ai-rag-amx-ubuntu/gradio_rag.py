@@ -190,8 +190,7 @@ def predict(question, selected_model, selected_dataset):
         prompt = PromptTemplate(template=template, input_variables=["question"])
     else:
           
-        template = """ Don't just repeat the following context, use it in combination with your knowledge to give a succinct and direct answer to to the question:
-        Question: {question} with the context {context}. Do not include extraneous or unecessary information in your answer. 
+        template = """ You are to act as an intelligent chatbot assistant. The responses should be conversational. Answer the following question:{question} with the context {context}. Do not just repeat the context, develop a succinct answer without extraneous or unecessary information. 
         """
         
        #template = "Answer the question in a short and direct manner without including any unecessary information. You can remove quotes and information like [Agent/Person/Contact]:"   
