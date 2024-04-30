@@ -18,7 +18,7 @@ model_paths = {
     "Mistral" : "/data/models/mistral_model"
 }
 n_threads=64
-max_tokens=100
+max_tokens=200
 repeat_penalty=1.50
 n_batch=64
 top_k=2
