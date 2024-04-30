@@ -199,7 +199,27 @@ def predict(question, selected_model, selected_dataset):
         #template = "Answer the question in a short and direct manner without including any unecessary information. You can remove quotes and information like [Agent/Person/Contact]:"   
         #template = "Using the context, develop an answer to the question in a short and direct manner without including any unecessary information. Only incude the answer in the response and nothing extraneous"  
         template = """You are an intelligent chatbot given the following information: {context}. You should answer the following question: {question}. 
-        Do not repeat the context. Develop a response using both the context and your knowledge. The response should be conversational and casual, and not include extranious conversational information from the context."""
+        Using both the context and your own knowledge, craft a response that is unique, short and direct. 
+        
+        For example, a context might include the following: 
+        "Coach: We need you to be more aggressive, Josh. Look for your shot and attack the basket. We believe in your scoring ability."
+        "Coach: When closing out on shooters, remember to stay low and have active hands. Force them into tough shots."
+        "Coach: They\'re struggling to guard our pick-and-roll. Let\'s keep running it and exploit their defensive weaknesses.
+        "Coach: Good shot, Mike! You had an open look and took it with confidence. Keep shooting when you\'re open."
+        "Coach: Free throws win games, so let\'s focus and knock them down. Take your time, follow through, and trust your form."
+        "Coach: They\'re shutting down our inside game. Let\'s spread them out and attack from the perimeter. Look for open shooters and drive to the basket when available.
+        "Coach: We need to step up our defense, team! Get in their faces, contest every shot, and force turnovers."
+        
+        An example response using the above context would be: 
+        Players should be aggressive, especially those with scoring abilities, always looking for opportunities to shoot and attack the basket. 
+        Defensive tactics are also crucial, with players advised to stay low and have active hands when closing out on shooters, forcing them into tough shots. 
+        If the opposing team shows weaknesses, such as difficulty guarding pick-and-rolls, these should be exploited. 
+        Confidence in shooting is key, with players encouraged to take open shots. 
+        Free throws can often be game-changers, so players should focus on these, taking their time, following through, and trusting their form. 
+        If the opposing team is shutting down the inside game, players should adapt their offense, spreading out, attacking from the perimeter, looking for open shooters, and driving to the basket when available. 
+        Finally, a strong defense is essential, with the team contesting every shot, forcing turnovers, and getting in the faces of their opponents.
+        
+        """
 
         prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
 
