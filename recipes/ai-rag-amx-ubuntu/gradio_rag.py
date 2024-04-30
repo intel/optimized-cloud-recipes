@@ -189,12 +189,18 @@ def predict(question, selected_model, selected_dataset):
         Answer: This is the response: """
         prompt = PromptTemplate(template=template, input_variables=["question"])
     else:
-          
-        template = """ You are to act as an intelligent chatbot assistant. The responses should be conversational. Answer the following question:{question} with the context {context}. Do not just repeat the context, develop a succinct answer without extraneous or unecessary information. 
+        '''
+        template = """ You are to act as an intelligent chatbot assistant. The responses should be conversational. Answer the following question:{question} with the context {context}. 
+        Do not just repeat the context, develop a succinct answer without extraneous or unecessary information. 
         """
-        
-       #template = "Answer the question in a short and direct manner without including any unecessary information. You can remove quotes and information like [Agent/Person/Contact]:"   
+        '''
+
+
+        #template = "Answer the question in a short and direct manner without including any unecessary information. You can remove quotes and information like [Agent/Person/Contact]:"   
         #template = "Using the context, develop an answer to the question in a short and direct manner without including any unecessary information. Only incude the answer in the response and nothing extraneous"  
+        template = """You are an intelligent chatbot given the following information: {context}. You should answer the following question: {question}. 
+        Do not repeat the context. Develop a response using both the context and your knowledge. The response should be conversational and casual, and not include extranious conversational information from the context."""
+
         prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
 
     print("\nThis is the Type returned from PromptTemplate:", type(prompt))
