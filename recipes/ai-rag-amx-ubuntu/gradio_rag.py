@@ -195,7 +195,7 @@ def predict(question, selected_model, selected_dataset):
         """
         '''
        #template = "Answer the question in a short and direct manner without including any unecessary information. You can remove quotes and information like [Agent/Person/Contact]:"   
-        template = "Answer the question in a short and direct manner without including any unecessary information. Only incude the answer in the response, not the question. If the context does not match the question, respond with \" Based on the dataset chosen, I do not have a good answer\" "  
+        template = "Using the context, develop an answer to the question in a short and direct manner without including any unecessary information. Only incude the answer in the response and nothing extraneous"  
         prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
 
     print("\nThis is the Type returned from PromptTemplate:", type(prompt))
