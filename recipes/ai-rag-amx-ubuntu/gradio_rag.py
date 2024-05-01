@@ -16,9 +16,9 @@ import gradio as gr
 model_paths = {
     "Falcon" : "/data/models/ggml-model-gpt4all-falcon-q4_0.bin",
     "Mistral" : "/data/models/mistral_model",
-    "Orca" : "/data/models/orca_model.gguf",
+    "Snoozy" : "/data/models/snoozy_model.gguf",
     "Llama" : "/data/models/llama_model.gguf", 
-    "Mosaic" : "/data/models/mosaic_model.gguf"
+    "Wizard" : "data/models/wizard_model.gguf"
 }
 n_threads=64
 max_tokens=200
