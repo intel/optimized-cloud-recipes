@@ -149,6 +149,23 @@
       with_items:
         - "https://gpt4all.io/models/gguf/mistral-7b-openorca.gguf2.Q4_0.gguf"
 
+- name: Install orca #INSTRUCTION BASED 3.56GB SIZE
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install orca Model
+      get_url:
+        url: "https://gpt4all.io/models/gguf/orca-2-7b.Q4_0.gguf"
+        dest: "/data/models/orca_model.gguf"
+        timeout: 10000
+      retries: 10
+      register: result
+      until: result is succeeded
+      no_log: false
+      ignore_errors: True
+      with_items:
+        - "https://gpt4all.io/models/gguf/orca-2-7b.Q4_0.gguf"
+
 - name: Install hermes llama #INSTRUCTION BASED 6.86GB 16GB RAM
   hosts: localhost
   connection: local
@@ -166,14 +183,14 @@
       with_items:
         - "https://gpt4all.io/models/gguf/nous-hermes-llama2-13b.Q4_0.gguf"
 
-- name: Install wizardlm #instruction based
+- name: Install mosaic mpt #CHAT BASED 8GB RAM 3.64 SIZE
   hosts: localhost
   connection: local
   tasks:
-    - name: Install wizardlm Model
+    - name: Install mosaic mpt Model
       get_url:
-        url: "https://gpt4all.io/models/gguf/wizardlm-13b-v1.2.Q4_0.gguf"
-        dest: "/data/models/wizard_model.gguf"
+        url: "https://gpt4all.io/models/gguf/mpt-7b-chat-newbpe-q4_0.gguf"
+        dest: "/data/models/mosaic_model.gguf"
         timeout: 10000
       retries: 10
       register: result
@@ -181,25 +198,7 @@
       no_log: false
       ignore_errors: True
       with_items:
-        - "https://gpt4all.io/models/gguf/wizardlm-13b-v1.2.Q4_0.gguf"
-
-- name: Install snoozy #instruction based
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: Install snoozy Model
-      get_url:
-        url: "https://gpt4all.io/models/gguf/gpt4all-13b-snoozy-q4_0.gguf"
-        dest: "/data/models/snoozy_model.gguf"
-        timeout: 10000
-      retries: 10
-      register: result
-      until: result is succeeded
-      no_log: false
-      ignore_errors: True
-      with_items:
-        - "https://gpt4all.io/models/gguf/gpt4all-13b-snoozy-q4_0.gguf"
-
+        - "https://gpt4all.io/models/gguf/mpt-7b-chat-newbpe-q4_0.gguf"
 
 
 
