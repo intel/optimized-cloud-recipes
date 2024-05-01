@@ -216,10 +216,13 @@ def predict(question, selected_model, selected_dataset):
     # Load the selected model
     selected_model_path = model_paths[selected_model]
 
+    print("\n MODEL SELECTED: ", selected_model_path)
 
     llm = GPT4All(model=selected_model_path, callbacks=callbacks, verbose=False,
                    n_threads=n_threads, n_predict=max_tokens, repeat_penalty=repeat_penalty,
                    n_batch=n_batch, top_k=top_k, temp=temp)
+    
+    print("\n MODEL SELECTED: ", selected_model_path)
     llm_chain.llm = llm  # Update the llm in the LLMChain
 
     # Get the answer using the updated model
