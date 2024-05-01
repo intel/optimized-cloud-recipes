@@ -15,9 +15,9 @@ import gradio as gr
 # Defining paths to the different models 
 model_paths = {
     #"Falcon" : "/data/models/ggml-model-gpt4all-falcon-q4_0.bin",
-    "Mistral OpenOrca FineTune - Chat Based | 7B Parameters | MistralAI Trained | 3.38GB Total Size " : "/data/models/mistral_model",
+    "Mistral OpenOrca FineTune - Chat Based | 7B Parameters | MistralAI Trained | 3.38GB Total Size" : "/data/models/mistral_model",
     "Orca2 - Instruction Based | 13B Parameters | Microsoft Trained | 6.86GB Total Size" : "/data/models/orca_model.gguf",
-    "Llama2 - Instruction Based | 13B Parameters | Nous Research Trained | 6.86GB Total Size " : "/data/models/llama_model.gguf", 
+    "Llama2 - Instruction Based | 13B Parameters | Nous Research Trained | 6.86GB Total Size" : "/data/models/llama_model.gguf", 
     "GPT4ALL Snoozy - Instruction Based | 13B Parameters | NomicAI Trained | 6.86GB Total Size" : "/data/models/snoozy_model.gguf"
 }
 n_threads=64
@@ -129,7 +129,7 @@ def retrieval_mechanism(self, user_input, top_k=1, context_verbosity = False, ra
 callbacks = [StreamingStdOutCallbackHandler()]
 
 #Setting and loading the default model
-selected_model_path = model_paths["Falcon"]
+selected_model_path = model_paths["Mistral OpenOrca FineTune - Chat Based | 7B Parameters | MistralAI Trained | 3.38GB Total Size"]
 llm = GPT4All(model=selected_model_path, callbacks=callbacks, verbose=False,
                     n_threads=n_threads, n_predict=max_tokens, repeat_penalty=repeat_penalty, 
                     n_batch=n_batch, top_k=top_k, temp=temp)
