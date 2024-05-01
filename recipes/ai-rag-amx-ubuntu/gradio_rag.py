@@ -14,11 +14,11 @@ import gradio as gr
 
 # Defining paths to the different models 
 model_paths = {
-    "Falcon" : "/data/models/ggml-model-gpt4all-falcon-q4_0.bin",
-    "Mistral" : "/data/models/mistral_model",
-    "Orca" : "/data/models/orca_model.gguf",
-    "Llama" : "/data/models/llama_model.gguf", 
-    "Mosaic" : "/data/models/mosaic_model.gguf"
+    #"Falcon" : "/data/models/ggml-model-gpt4all-falcon-q4_0.bin",
+    "Mistral OpenOrca FineTune - Chat Based | 7B Parameters | MistralAI Trained | 3.38GB Total Size " : "/data/models/mistral_model",
+    "Orca2 - Instruction Based | 13B Parameters | Microsoft Trained | 6.86GB Total Size" : "/data/models/orca_model.gguf",
+    "Llama2 - Instruction Based | 13B Parameters | Nous Research Trained | 6.86GB Total Size " : "/data/models/llama_model.gguf", 
+    "GPT4ALL Snoozy - Instruction Based | 13B Parameters | NomicAI Trained | 6.86GB Total Size" : "/data/models/snoozy_model.gguf"
 }
 n_threads=64
 max_tokens=200
@@ -244,3 +244,5 @@ iface = gr.Interface(
     description="Enter your question below:",
 )
 iface.launch(share=True, server_port=8080)
+
+

@@ -115,22 +115,22 @@
 # Downloaded nomic-ai/gpt4all-falcon-ggml from HuggingFace           #
 #                                                                    #
 ######################################################################
-- name: Install gpt4all Falcon #INSTRUCTION BASED
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: Install Falcon Model
-      get_url:
-        url: "https://gpt4all.io/models/gguf/gpt4all-falcon-newbpe-q4_0.gguf"
-        dest: "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
-        timeout: 10000
-      retries: 10
-      register: result
-      until: result is succeeded
-      no_log: false
-      ignore_errors: True
-      with_items:
-        - "https://gpt4all.io/models/gguf/gpt4all-falcon-newbpe-q4_0.gguf"
+# - name: Install gpt4all Falcon #INSTRUCTION BASED
+#   hosts: localhost
+#   connection: local
+#   tasks:
+#     - name: Install Falcon Model
+#       get_url:
+#         url: "https://gpt4all.io/models/gguf/gpt4all-falcon-newbpe-q4_0.gguf"
+#         dest: "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
+#         timeout: 10000
+#       retries: 10
+#       register: result
+#       until: result is succeeded
+#       no_log: false
+#       ignore_errors: True
+#       with_items:
+#         - "https://gpt4all.io/models/gguf/gpt4all-falcon-newbpe-q4_0.gguf"
 
 - name: Install gpt4all mistral #CHAT BASED
   hosts: localhost
@@ -183,14 +183,14 @@
       with_items:
         - "https://gpt4all.io/models/gguf/nous-hermes-llama2-13b.Q4_0.gguf"
 
-- name: Install mosaic mpt #CHAT BASED 8GB RAM 3.64 SIZE
+- name: Install snoozy #CHAT BASED 8GB RAM 3.64 SIZE
   hosts: localhost
   connection: local
   tasks:
-    - name: Install mosaic mpt Model
+    - name: Install snoozy model
       get_url:
-        url: "https://gpt4all.io/models/gguf/mpt-7b-chat-newbpe-q4_0.gguf"
-        dest: "/data/models/mosaic_model.gguf"
+        url: "https://gpt4all.io/models/gguf/gpt4all-13b-snoozy-q4_0.gguf"
+        dest: "/data/models/snoozy_model.gguf"
         timeout: 10000
       retries: 10
       register: result
@@ -198,10 +198,7 @@
       no_log: false
       ignore_errors: True
       with_items:
-        - "https://gpt4all.io/models/gguf/mpt-7b-chat-newbpe-q4_0.gguf"
-
-
-
+        - "https://gpt4all.io/models/gguf/gpt4all-13b-snoozy-q4_0.gguf"
 
 
 #testing git push Chris 
