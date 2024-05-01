@@ -202,7 +202,8 @@ def predict(question, selected_model, selected_dataset):
         #You are asked {question}. Using both the context and your own knowledge, craft a response that is unique, short and direct. Do not quote the conversation, but add learned insights from the context.  
         #"""
 
-        template = "Based on the following conversation, answer the question {question}. Avoid direct quotations and focus on generating original content based on your understanding. This is the conversation {context}"
+        #template = "Based on the following conversation, answer the question: {question}. Avoid direct quotations and focus on generating original content based on your understanding. This is the conversation: {context}"
+        template = "You are an expert recommender. Based on the following conversation, answer the question: {question}. Avoid direct quotations and focus on generating an original recommendation. This is the conversation: {context}"
 
         prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
 
