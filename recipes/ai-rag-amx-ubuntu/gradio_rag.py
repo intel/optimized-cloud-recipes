@@ -243,8 +243,13 @@ iface = gr.Interface(
     fn=predict,
     inputs=[gr.Text("text"), gr.Dropdown(choices=model_choices, label="Select Model"), gr.Dropdown(choices=dataset_choices, label="Select RAG Dataset")],
     outputs="text",
-    title="RAG Demo",
-    description="Enter your question below:",
+    title="Intel RAG AMX Demo",
+    description="This demo showcases the performance of four RAG based LLMs on Intel XEON using AMX. Please enter your question below, select a model, and choose a RAG Dataset:",
+    thumbnail = None,
+    theme = None, 
+    css = None, 
+    js = None,
+    allow_flagging = "never"
 )
 iface.launch(share=True, server_port=8080)
 
