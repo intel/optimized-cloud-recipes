@@ -198,8 +198,8 @@ def predict(question, selected_model, selected_dataset):
 
         #template = "Answer the question in a short and direct manner without including any unecessary information. You can remove quotes and information like [Agent/Person/Contact]:"   
         #template = "Using the context, develop an answer to the question in a short and direct manner without including any unecessary information. Only incude the answer in the response and nothing extraneous"  
-        template = """You are an intelligent assistant that is meant to give advice. You are given the following information: {context}. You should answer the following question: {question}. 
-        Using both the context and your own knowledge, craft a response that is unique, short and direct. Do not just repeat the context. 
+        template = """You are an intelligent assistant that is meant to give advice. In addition to your own knowledge, you should also extract information from the following conversation: {context}. 
+        You are asked {question}. Using both the context and your own knowledge, craft a response that is unique, short and direct. Do not quote the conversation, but add learned insights from the context.  
         """
 
         prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
