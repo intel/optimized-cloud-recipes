@@ -2,6 +2,8 @@
   <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
+# Intel® Corporation Copyright
+
 **Contributors: William Fowler, Joshua Segovia, Chris Ah-Siong**
 
 # Intel® Gen AI RAG DEMO using Xeon AMX
@@ -37,5 +39,5 @@ Note: Wait around 10-15 minutes for the models to be downloaded before running t
 
 ## Help
 
-# Intel® Corporation Copyright
+
 
