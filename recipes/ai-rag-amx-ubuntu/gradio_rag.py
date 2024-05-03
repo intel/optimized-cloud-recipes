@@ -1,3 +1,7 @@
+# Intel® Corporation Copyright
+# Contributors: William Fowler, Chris Ah-Siong, Joshua Segovia
+
+
 import os
 import pandas as pd
 from langchain_community.llms import GPT4All

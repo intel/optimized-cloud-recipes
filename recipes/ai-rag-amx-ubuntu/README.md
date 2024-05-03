@@ -37,5 +37,5 @@ Note: Wait around 10-15 minutes for the models to be downloaded before running t
 
 ## Help
 
-
+# Intel® Corporation Copyright
 
