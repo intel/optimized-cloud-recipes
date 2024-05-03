@@ -1,4 +1,10 @@
-# Gen AI RAG DEMO using Xeon AMX
+<p align="center">
+  <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
+</p>
+
+**Contributors: William Fowler, Joshua Segovia, Chris Ah-Siong**
+
+# Intel® Gen AI RAG DEMO using Xeon AMX
 
 ## Description 
 
@@ -15,13 +21,21 @@ This application allows users to select a popular large language model, a specif
 
 To enhance efficiency, the application leverages Intel Advanced Matrix Extensions Technology (AMX). AMX provides specialized instructions for matrix multiplication, convolution, and linear algebra operations to reduce latency, a crucial aspect for chat based LLMs.
 
+## Usage
+
+[**AWS - Intel® Optimized Cloud Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-aws-vm/tree/fast-rag/examples/gen-ai-rag-demo) 
+
 ### Dependencies
 
+## Running the Demo
 
+1. SSH into newly created GCP VM and run `source /usr/local/tmp/optimized-cloud-recipes/recipes/ai-rag-ubuntu/gradio_rag.py`
 
-### Installing
+2. On your computer open a browser and navigate to the Gradio link that is provided on your terminal
+
+Note: Wait around 10-15 minutes for the models to be downloaded before running the demo
 
 ## Help
 
-## Authors
+
 
