@@ -90,6 +90,10 @@
             }
           }
         dest: /etc/docker/daemon.json
+    - name: Restart docker service
+      ansible.builtin.service:
+        name: docker
+        state: restarted
 
 # Install the Gaudi pytorch container from Habana Labs 
 - name: Install Gaudi pytorch container
@@ -99,25 +103,13 @@
     - name: Pull the Gaudi pytorch container
       ansible.builtin.shell: docker pull hdocker pull vault.habana.ai/gaudi-docker/1.15.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.0:latest
 
-# Restart the docker service
-- name: Restart docker service
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: Restart docker service
-      ansible.builtin.service:
-        name: docker
-        state: restarted
-
 # Remove the crontab entry used to run the ansible playbook after reboot
 - name: Remove crontab entry
   hosts: localhost
   connection: local
   tasks:
     - name: Remove the cron job
-      ansible.builtin.cron:
-        name: "@reboot ansible-playbook /opt/optimized-cloud-recipes/recipes/ai-gaudi-ubuntu/recipe.yml"
-        state: absent
+      ansible.builtin.shell: crontab -r
 
     # - name: Remove crontab entry
     #   ansible.builtin.shell: crontab -l | grep -v 'ai-gaudi-ubuntu' | crontab -
