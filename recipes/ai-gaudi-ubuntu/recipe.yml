@@ -109,10 +109,4 @@
   connection: local
   tasks:
     - name: Remove the cron job
-      ansible.builtin.shell: crontab -r
-      become_user: root
-      become: true
-
-    # - name: Remove crontab entry
-    #   ansible.builtin.shell: crontab -l | grep -v 'ai-gaudi-ubuntu' | crontab -
-
+      ansible.builtin.shell: sudo crontab -r
