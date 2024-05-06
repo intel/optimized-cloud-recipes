@@ -251,9 +251,22 @@ iface = gr.Interface(
     description="This demo showcases the performance of four RAG based LLMs on Intel XEON using AMX. Please enter your question below, select a model, and choose a RAG Dataset:",
     thumbnail = None,
     theme = None, 
-    css = None, 
     js = None,
-    allow_flagging = "never"
+    allow_flagging = "never",
+    css = 
+    """.gradio-app header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+     }
+
+    .gradio-app header img {
+    margin-right: 1rem;
+    width: 100px; 
+    height: auto;
+    content: url("/data/intel-logo.svg");
+     }"""
+     
 )
 iface.launch(share=True, server_port=8080)
 

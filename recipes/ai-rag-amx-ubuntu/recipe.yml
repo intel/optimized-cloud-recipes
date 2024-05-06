@@ -200,8 +200,16 @@
       with_items:
         - "https://gpt4all.io/models/gguf/gpt4all-13b-snoozy-q4_0.gguf"
 
+- name: Download Image 
+  hosts: all  
+  become: true 
+  tasks:
+    - name: Download image
+      get_url:
+        url: https://upload.wikimedia.org/wikipedia/commons/8/85/Intel_logo_2023.svg
+        dest: "/data/intel-logo.svg"  
+        mode: 0644  
 
-#testing git push Chris 
 ######################################################################
 # Demo                                                               #
 #                                                                    #
