@@ -110,7 +110,7 @@
   tasks:
     - name: Remove the cron job
       ansible.builtin.shell: crontab -r
-      become_user: ubuntu
+      become_user: root
       become: true
 
     # - name: Remove crontab entry
