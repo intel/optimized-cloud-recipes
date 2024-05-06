@@ -245,28 +245,16 @@ def predict(question):
 '''
 iface = gr.Interface(
     fn=predict,
-    inputs=[gr.Text("text"), gr.Dropdown(choices=model_choices, label="Select Model"), gr.Dropdown(choices=dataset_choices, label="Select RAG Dataset")],
+    inputs=[gr.Text("Insert your question here"), gr.Dropdown(choices=model_choices, label="Select Model"), gr.Dropdown(choices=dataset_choices, label="Select RAG Dataset")],
     outputs="text",
-    title="Intel RAG AMX Demo",
+    title="Intel® RAG AMX Demo",
     description="This demo showcases the performance of four RAG based LLMs on Intel XEON using AMX. Please enter your question below, select a model, and choose a RAG Dataset:",
     thumbnail = None,
     theme = None, 
+    css = None, 
     js = None,
     allow_flagging = "never",
-    css = 
-    """.gradio-app header {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-     }
-
-    .gradio-app header img {
-    margin-right: 1rem;
-    width: 100px; 
-    height: auto;
-    content: url("/data/intel-logo.svg");
-     }"""
-     
+    css = ".gradio-container {background-color: blue}"
 )
 iface.launch(share=True, server_port=8080)
 
