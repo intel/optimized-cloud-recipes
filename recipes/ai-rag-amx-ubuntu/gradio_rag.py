@@ -196,13 +196,15 @@ def predict(question, selected_model, selected_dataset):
         Answer: This is the response: """
         prompt = PromptTemplate(template=template, input_variables=["question"])
     else:
+
+        #User can change these prompts to elicit different responses from the LLM
+
         '''
         template = """ You are to act as an intelligent chatbot assistant. The responses should be conversational. Answer the following question:{question} with the context {context}. 
         Do not just repeat the context, develop a succinct answer without extraneous or unecessary information. 
         """
         '''
-
-
+        
         #template = "Answer the question in a short and direct manner without including any unecessary information. You can remove quotes and information like [Agent/Person/Contact]:"   
         #template = "Using the context, develop an answer to the question in a short and direct manner without including any unecessary information. Only incude the answer in the response and nothing extraneous"  
         #template = """You are an intelligent assistant that is meant to give advice. In addition to your own knowledge, you should also extract information from the following conversation: {context}. 
@@ -216,12 +218,11 @@ def predict(question, selected_model, selected_dataset):
 
     print("\nThis is the Type returned from PromptTemplate:", type(prompt))
     print("\nThis is the Prompt returned from PromptTemplate:", prompt)
-    #selected_data_path = datasets[selected_dataset]
-    # Load the selected model
+
     selected_model_path = model_paths[selected_model]
-
+    print("\n")
     print("\n MODEL SELECTED: ", selected_model_path)
-
+    print("\n")
     llm = GPT4All(model=selected_model_path, callbacks=callbacks, verbose=False,
                    n_threads=n_threads, n_predict=max_tokens, repeat_penalty=repeat_penalty,
                    n_batch=n_batch, top_k=top_k, temp=temp)
@@ -231,18 +232,15 @@ def predict(question, selected_model, selected_dataset):
 
     # Get the answer using the updated model
     answer = llm_chain.run(prompt)
+    print("\n")
     print("\n This is the answer returned by the LLM: ", answer)
+    print("\n")
     return answer
 
 # Create a list of models for the dropdown
 model_choices = list(model_paths.keys())
 dataset_choices = list(datasets.keys())
-'''
-#question = "What NFL team won the Super Bowl in the year Justin Bieber was born?"
-def predict(question):
-    answer = llm_chain.run(question)
-    return answer
-'''
+
 iface = gr.Interface(
     fn=predict,
     inputs=[gr.Text("Insert your question here"), gr.Dropdown(choices=model_choices, label="Select Model"), gr.Dropdown(choices=dataset_choices, label="Select RAG Dataset")],
@@ -251,10 +249,9 @@ iface = gr.Interface(
     description="This demo showcases the performance of four RAG based LLMs on Intel XEON using AMX. Please enter your question below, select a model, and choose a RAG Dataset:",
     thumbnail = None,
     theme = None, 
-    css = None, 
+    css = ".gradio-container {background-color: blue}", 
     js = None,
-    allow_flagging = "never",
-    css = ".gradio-container {background-color: blue}"
+    allow_flagging = "never"
 )
 iface.launch(share=True, server_port=8080)
 
