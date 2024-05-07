@@ -10,8 +10,8 @@
 | :----- | :---------------------------------------------------------- |
 | Recipe | **Gaudi on Ubuntu** |
 Demo | Setups environment to run Gaudi Demos |  [LINK](TBD)
-| Install time | 12 minutes |
-| Logs | `tail -f /var/ansible-log`|
+| Install time | 15 minutes |
+| Logs | `tail -f /var/log/syslog`|
 
 ## Prerequisites
 
@@ -29,7 +29,6 @@ There are two main usage options:
 ### Option 1 - The simplest way to implement the recipe is with Intel Cloud Modules
 
 [**AWS - Intel® Optimized Cloud Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-gaudi-demo)
-
 
 ### Option 2 - Running Ansible manually via the Operating System command line
 
@@ -51,7 +50,7 @@ sudo apt install ansible -y
 #Run ansible-pull
 sudo ansible-pull -vv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-gaudi-ubuntu/recipe.yml
 
-# Logs at 'tail -f 10 /var/ansible-log'
+# Logs at 'tail -f 10 /var/log/syslog'
 ```
 
 ## Running the Demo
