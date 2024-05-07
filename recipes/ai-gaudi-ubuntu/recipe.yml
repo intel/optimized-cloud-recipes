@@ -20,51 +20,33 @@
       ansible.builtin.pip:
         name: jupyterlab
         state: present
-# Remove the crontab entry used to run the ansible playbook after reboot
-    - name: Remove crontab entry
-      hosts: localhost
-      connection: local
-      tasks:
-        - name: Remove the cron job
-          ansible.builtin.shell: crontab -u root -r
-#############################################################################################################################################
-# Setup Habana Software Stack                                                                                                                    #
-#                                                                                                                                           #
-# Following the instructions here: https://docs.habana.ai/en/latest/Installation_Guide/Bare_Metal_Fresh_OS.html#sw-stack-installation-bare  #
-#                                                                                                                                           #
-# Run the Habana setup script                                                                                                               #
-# - /tmp/habanalabs-installer.sh install -t base -y                                                                                         #
-# - /tmp/habanalabs-installer.sh install -t dependencies -y                                                                                 #
-# - /tmp/habanalabs-installer.sh install -t pytorch -y                                                                                      #
-#############################################################################################################################################
-- name: Install Habana Software Stack
-  hosts: localhost
-  connection: local
-  tasks:
+    # Remove the crontab entry used to run the ansible playbook after reboot, skip this if not using cloud-init
+    - name: Remove the cron job
+      ansible.builtin.shell: crontab -u root -r
+    #############################################################################################################################################
+    # Setup Habana Software Stack                                                                                                                    #
+    #                                                                                                                                           #
+    # Following the instructions here: https://docs.habana.ai/en/latest/Installation_Guide/Bare_Metal_Fresh_OS.html#sw-stack-installation-bare  #
+    #                                                                                                                                           #
+    # Run the Habana setup script                                                                                                               #
+    # - /tmp/habanalabs-installer.sh install -t base -y                                                                                         #
+    # - /tmp/habanalabs-installer.sh install -t dependencies -y                                                                                 #
+    # - /tmp/habanalabs-installer.sh install -t pytorch -y                                                                                      #
+    #############################################################################################################################################
+    - name: Download Habana installer
+      ansible.builtin.get_url:
+        url: https://vault.habana.ai/artifactory/gaudi-installer/1.15.1/habanalabs-installer.sh
+        dest: /tmp/habanalabs-installer.sh
+        mode: '0755'
     - name: Install Habana base
-      tasks:
-        - name: Download Habana installer
-          ansible.builtin.get_url:
-            url: https://vault.habana.ai/artifactory/gaudi-installer/1.15.1/habanalabs-installer.sh
-            dest: /tmp/habanalabs-installer.sh
-            mode: '0755'
-        - name: Install Habana base
-          ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t base -y
-    - name: Install Habana dependencies
-      tasks:
-        - name: Install Habana dependencies using script
-          ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t dependencies -y
-          become_user: ubuntu
-          become: true
+      ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t base -y
+    - name: Install Habana dependencies using script
+      ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t dependencies -y
+      become_user: ubuntu
+      become: true
     - name: Install Habana pytorch
-      tasks:
-        - name: Install Habana pytorch
-          ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t pytorch --venv -y
-# Install the Habana Container Runtime by dowloading the habana artifactory key, adding the artifactory repository to the sources list, and installing the habanalabs-container-runtime package
-- name: Install Habana Container Runtime
-  hosts: localhost
-  connection: local
-  tasks:
+      ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t pytorch --venv -y
+    # Install the Habana Container Runtime by dowloading the habana artifactory key, adding the artifactory repository to the sources list, and installing the habanalabs-container-runtime package
     - name: Download Habana artifactory key
       ansible.builtin.get_url:
         url: https://vault.habana.ai/artifactory/api/gpg/key/public
@@ -97,10 +79,6 @@
       ansible.builtin.service:
         name: docker
         state: restarted
-# Install the Gaudi pytorch container from Habana Labs 
-- name: Install Gaudi pytorch container
-  hosts: localhost
-  connection: local
-  tasks:
+    # Install the Gaudi pytorch container from Habana Labs 
     - name: Pull the Gaudi pytorch container
       ansible.builtin.shell: docker pull vault.habana.ai/gaudi-docker/1.15.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.0:latest
