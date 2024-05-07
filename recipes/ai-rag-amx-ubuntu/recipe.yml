@@ -15,15 +15,40 @@
           - net-tools
         state: present
         update_cache: true
+    # Install Intel's Extension for PyTorch
     - name: Install Intel's Extension for PyTorch
       pip:
         name: intel_extension_for_pytorch
+        state: present
+        executable: pip3
+    # Install Intel's Extension for Transformers
+    - name: Install Intel's Extension for Transformers
+      pip:
+        name: intel_extension_for_transformers
         state: present
         executable: pip3
     # Install Flask via pip3
     - name: Install Flask
       pip:
         name: Flask
+        state: present
+        executable: pip3
+    # Install Accelerate via pip3
+    - name: Install Accelerate
+      pip:
+        name: Accelerate
+        state: present
+        executable: pip3
+    # Install neural_speed via pip3
+    - name: Install neural_speed
+      pip:
+        name: neural_speed
+        state: present
+        executable: pip3
+    # Install sentencepiece via pip3
+    - name: Install sentencepiece
+      pip:
+        name: sentencepiece
         state: present
         executable: pip3
     # Instal Langchain via pip3

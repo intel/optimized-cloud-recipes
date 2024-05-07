@@ -17,12 +17,12 @@ from datasets import load_dataset
 #For Intel Models
 from transformers import AutoTokenizer, TextStreamer
 import torch
-from intel_extension_for_transformers.transformers import AutoModelForCausalLM, WeightOnlyQuantConfig
+from intel_extension_for_transformers.transformers import AutoModelForCausalLM, RtnConfig
 import intel_extension_for_pytorch as ipex
 model_name = "Intel/neural-chat-7b-v3-3"
 
 # for int8, should set weight_dtype="int8"       
-config = WeightOnlyQuantConfig(compute_dtype="bf16", weight_dtype="int8")
+config = RtnConfig(bits=4, compute_dtype="int8")
 #prompt = "Once upon a time, there existed a little girl,"
 
 tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
@@ -242,7 +242,7 @@ def predict(question, selected_model, selected_dataset):
     print("\n")
     if selected_model_path == "Intel/neural-chat-7b-v3-3":
         model_name = "Intel/neural-chat-7b-v3-3"
-        config = WeightOnlyQuantConfig(compute_dtype="bf16", weight_dtype="int8")
+        config = RtnConfig(bits=4, compute_dtype="int8")
         prompt = template
         tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
         inputs = tokenizer(prompt, return_tensors="pt").input_ids
