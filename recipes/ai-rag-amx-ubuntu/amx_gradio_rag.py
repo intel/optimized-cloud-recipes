@@ -243,13 +243,17 @@ def predict(question, selected_model, selected_dataset):
     if selected_model_path == "Intel/neural-chat-7b-v3-3":
         model_name = "Intel/neural-chat-7b-v3-3"
         config = RtnConfig(bits=4, compute_dtype="int8")
-        prompt = template
+        user_query = template
+        print("\n")
+        print("prompt passed to template: ", user_query)
+        print("\n")
         tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        inputs = tokenizer(prompt, return_tensors="pt").input_ids
+        inputs = tokenizer(user_query, return_tensors="pt").input_ids
         streamer = TextStreamer(tokenizer)
         model = AutoModelForCausalLM.from_pretrained(model_name, quantization_config=config)
         outputs = model.generate(inputs, streamer=streamer, max_new_tokens=300)
-        return outputs
+        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        return response
     else: 
         llm = GPT4All(model=selected_model_path, callbacks=callbacks, verbose=False,
                     n_threads=n_threads, n_predict=max_tokens, repeat_penalty=repeat_penalty,
