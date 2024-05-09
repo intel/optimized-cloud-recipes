@@ -39,7 +39,8 @@ model_paths = {
     "Orca2 - Instruction Based | 13B Parameters | Microsoft Trained | 6.86GB Total Size" : "/data/models/orca_model.gguf",
     "Llama2 - Instruction Based | 13B Parameters | Nous Research Trained | 6.86GB Total Size" : "/data/models/llama_model.gguf", 
     "GPT4ALL Snoozy - Instruction Based | 13B Parameters | NomicAI Trained | 6.86GB Total Size" : "/data/models/snoozy_model.gguf",
-    "Intel Neural Chat - 7B Parameters AMX" : "Intel/neural-chat-7b-v3-3"
+    "Intel Neural Chat - 7B Parameters AMX Quantized INT8" : "Intel/neural-chat-7b-v3-3",
+    "Intel Neural Chat - 7B Parameters AMX FP32" : "Intel/neural-chat-7b-v3-3"
 }
 n_threads=64
 max_tokens=200
@@ -240,18 +241,30 @@ def predict(question, selected_model, selected_dataset):
     print("\n")
     print("\n MODEL SELECTED: ", selected_model_path)
     print("\n")
-    if selected_model_path == "Intel/neural-chat-7b-v3-3":
+    if selected_model == "Intel Neural Chat - 7B Parameters AMX Quantized INT8":
         model_name = "Intel/neural-chat-7b-v3-3"
+        #Changes the quantization - this model should be running on AMX
         config = RtnConfig(bits=4, compute_dtype="int8")
-        user_query = template
+        prompt = f"### System:\n{context}\n### User:\n{question}\n### Assistant:\n"
         print("\n")
-        print("prompt passed to template: ", user_query)
+        print("Prompt passed to tokenizer: ", prompt)
         print("\n")
         tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        inputs = tokenizer(user_query, return_tensors="pt").input_ids
-        streamer = TextStreamer(tokenizer)
+        inputs = tokenizer.encode(prompt, return_tensors="pt", add_special_tokens=False)
         model = AutoModelForCausalLM.from_pretrained(model_name, quantization_config=config)
-        outputs = model.generate(inputs, streamer=streamer, max_new_tokens=300)
+        outputs = model.generate(inputs, max_length=1000, num_return_sequences=1)
+        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        return response
+    if selected_model == "Intel Neural Chat - 7B Parameters AMX FP32":
+        model_name = "Intel/neural-chat-7b-v3-3"
+        prompt = f"### System:\n{context}\n### User:\n{question}\n### Assistant:\n"
+        print("\n")
+        print("Prompt passed to tokenizer: ", prompt)
+        print("\n")
+        tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        inputs = tokenizer.encode(prompt, return_tensors="pt", add_special_tokens=False)
+        model = AutoModelForCausalLM.from_pretrained(model_name)
+        outputs = model.generate(inputs, max_length=1000, num_return_sequences=1)
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
         return response
     else: 
