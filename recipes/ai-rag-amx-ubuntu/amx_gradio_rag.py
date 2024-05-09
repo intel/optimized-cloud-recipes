@@ -15,6 +15,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from datasets import load_dataset
 
 #For Intel Models
+import transformers
 from transformers import AutoTokenizer, TextStreamer
 import torch
 from intel_extension_for_transformers.transformers import AutoModelForCausalLM, RtnConfig
@@ -261,11 +262,12 @@ def predict(question, selected_model, selected_dataset):
         print("Prompt passed to tokenizer: ", prompt)
         print("\n")
         tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        inputs = tokenizer.encode(prompt, return_tensors="pt", add_special_tokens=False)
+        inputs = tokenizer(prompt, return_tensors="pt").input_ids
+        streamer = TextStreamer(tokenizer)
         model = AutoModelForCausalLM.from_pretrained(model_name, quantization_config=config)
-        outputs = model.generate(inputs, max_length=1000, num_return_sequences=1)
+        outputs = model.generate(inputs, streamer=streamer, max_new_tokens=300)
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        return response
+        return response.split("### Assistant:\n")[-1]
     if selected_model == "Intel Neural Chat - 7B Parameters AMX FP32":
         print("\n")
         print("Selected model = ", selected_model)
@@ -283,12 +285,12 @@ def predict(question, selected_model, selected_dataset):
         print("\n")
         print("Prompt passed to tokenizer: ", prompt)
         print("\n")
-        tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
         inputs = tokenizer.encode(prompt, return_tensors="pt", add_special_tokens=False)
-        model = AutoModelForCausalLM.from_pretrained(model_name)
+        model = transformers.AutoModelForCausalLM.from_pretrained(model_name)
         outputs = model.generate(inputs, max_length=1000, num_return_sequences=1)
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        return response
+        return response.split("### Assistant:\n")[-1]
     else: 
         llm = GPT4All(model=selected_model_path, callbacks=callbacks, verbose=False,
                     n_threads=n_threads, n_predict=max_tokens, repeat_penalty=repeat_penalty,

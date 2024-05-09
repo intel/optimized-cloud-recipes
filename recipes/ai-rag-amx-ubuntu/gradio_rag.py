@@ -16,6 +16,8 @@ from datasets import load_dataset
 
 import gradio as gr
 
+import transformers
+
 # Defining paths to the different models 
 model_paths = {
     #"Falcon" : "/data/models/ggml-model-gpt4all-falcon-q4_0.bin",

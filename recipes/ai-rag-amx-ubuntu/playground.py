@@ -30,5 +30,5 @@ system_input = "You are a math expert assistant. Your mission is to help users u
 user_input = "calculate 100 + 520 + 60"
 response = generate_response(system_input, user_input)
 print("\n")
-print(response)
+print("response: ", response)
 print("\n")
