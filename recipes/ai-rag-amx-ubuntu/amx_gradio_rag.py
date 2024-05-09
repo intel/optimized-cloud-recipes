@@ -242,9 +242,20 @@ def predict(question, selected_model, selected_dataset):
     print("\n MODEL SELECTED: ", selected_model_path)
     print("\n")
     if selected_model == "Intel Neural Chat - 7B Parameters AMX Quantized INT8":
+        print("\n")
+        print("Selected model = ", selected_model)
+        print("\n")
         model_name = "Intel/neural-chat-7b-v3-3"
         #Changes the quantization - this model should be running on AMX
         config = RtnConfig(bits=4, compute_dtype="int8")
+        question = question
+        print("\n")
+        print("Question passed to prompt AMX: ", question)
+        print("\n")
+        context = context
+        print("\n")
+        print("context passed to prompt AMX: ", question)
+        print("\n")
         prompt = f"### System:\n{context}\n### User:\n{question}\n### Assistant:\n"
         print("\n")
         print("Prompt passed to tokenizer: ", prompt)
@@ -256,7 +267,18 @@ def predict(question, selected_model, selected_dataset):
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
         return response
     if selected_model == "Intel Neural Chat - 7B Parameters AMX FP32":
+        print("\n")
+        print("Selected model = ", selected_model)
+        print("\n")
         model_name = "Intel/neural-chat-7b-v3-3"
+        question = question
+        print("\n")
+        print("Question passed to prompt AMX: ", question)
+        print("\n")
+        context = context
+        print("\n")
+        print("context passed to prompt AMX: ", question)
+        print("\n")
         prompt = f"### System:\n{context}\n### User:\n{question}\n### Assistant:\n"
         print("\n")
         print("Prompt passed to tokenizer: ", prompt)
