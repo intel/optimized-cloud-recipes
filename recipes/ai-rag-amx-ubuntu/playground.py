@@ -10,6 +10,10 @@ def generate_response(system_input, user_input):
     # Format the input using the provided template
     prompt = f"### System:\n{system_input}\n### User:\n{user_input}\n### Assistant:\n"
 
+    print("\n")
+    print("This is the prompt after inputs: ", prompt)
+    print("\n")
+
     # Tokenize and encode the prompt
     inputs = tokenizer.encode(prompt, return_tensors="pt", add_special_tokens=False)
 
