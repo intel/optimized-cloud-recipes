@@ -129,16 +129,21 @@
       command:
         cmd: gramine-sgx-gen-private-key
 
-    - name: Clone the Gramine Project for Intel Confidential Compute for X and POC example repository
-      git:
-        repo: "{{ item.repo }}"
-        dest: "{{ item.dest }}"
-      loop:
-        - { repo: 'https://github.com/shreejam21/contrib.git', dest: '/tmp/contrib' }
-        - { repo: 'https://github.com/shreejam21/sgx-demo.git', dest: '/tmp/sgx-demo' }
+- name: Install Python packages with pip
+  hosts: localhost
+  become: yes  # Use 'become' if you need to install packages with root privileges
+  tasks:
+    - name: Ensure pip is installed
+      ansible.builtin.package:
+        name: python3-pip
+        state: present
 
+    - name: Install torchvision and pillow Python packages
+      ansible.builtin.pip:
+        name:
+          - torchvision
+          - pillow
+        executable: pip3
+        extra_args: --user  # This installs the packages for the current user
 
-    - name: Build Docker image
-      shell: cd /tmp/sgx-demo && docker build -t sgx-app .
-      become: true
 
