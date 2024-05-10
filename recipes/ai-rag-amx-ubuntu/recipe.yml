@@ -72,13 +72,9 @@
 # Install specific versions of PyTorch, torchvision, and torchaudio via pip3
     - name: Install PyTorch
       pip:
-        name: 
-          - torch==2.2.2
-          - torchvision==0.17.2
-          - torchaudio==2.2.2
+        name: torch
         state: present
         executable: pip3
-        extra_args: --index-url https://download.pytorch.org/whl/cp
     # Install Transformers via pip3
     - name: Install Transformers
       pip:
