@@ -40,8 +40,8 @@ model_paths = {
     "Orca2 - Instruction Based | 13B Parameters | Microsoft Trained | 6.86GB Total Size" : "/data/models/orca_model.gguf",
     "Llama2 - Instruction Based | 13B Parameters | Nous Research Trained | 6.86GB Total Size" : "/data/models/llama_model.gguf", 
     "GPT4ALL Snoozy - Instruction Based | 13B Parameters | NomicAI Trained | 6.86GB Total Size" : "/data/models/snoozy_model.gguf",
-    "Intel Neural Chat - 7B Parameters AMX Quantized INT8" : "Intel/neural-chat-7b-v3-3",
-    "Intel Neural Chat - 7B Parameters AMX FP32" : "Intel/neural-chat-7b-v3-3"
+    "Intel Neural Chat - 7B Parameters Quantized INT8 - AMX" : "Intel/neural-chat-7b-v3-3",
+    "Intel Neural Chat - 7B Parameters FP32" : "Intel/neural-chat-7b-v3-3"
 }
 n_threads=64
 max_tokens=200
@@ -242,7 +242,7 @@ def predict(question, selected_model, selected_dataset):
     print("\n")
     print("\n MODEL SELECTED: ", selected_model_path)
     print("\n")
-    if selected_model == "Intel Neural Chat - 7B Parameters AMX Quantized INT8":
+    if selected_model == "Intel Neural Chat - 7B Parameters Quantized INT8 - AMX":
         print("\n")
         print("Selected model = ", selected_model)
         print("\n")
@@ -268,7 +268,7 @@ def predict(question, selected_model, selected_dataset):
         outputs = model.generate(inputs, streamer=streamer, max_new_tokens=300)
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
         return response.split("### Assistant:\n")[-1]
-    if selected_model == "Intel Neural Chat - 7B Parameters AMX FP32":
+    if selected_model == "Intel Neural Chat - 7B Parameters FP32":
         print("\n")
         print("Selected model = ", selected_model)
         print("\n")
@@ -288,7 +288,7 @@ def predict(question, selected_model, selected_dataset):
         tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
         inputs = tokenizer.encode(prompt, return_tensors="pt", add_special_tokens=False)
         model = transformers.AutoModelForCausalLM.from_pretrained(model_name)
-        outputs = model.generate(inputs, max_length=1000, num_return_sequences=1)
+        outputs = model.generate(inputs, max_length=1000, num_return_sequences=1) #INFERENCE CALL
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
         return response.split("### Assistant:\n")[-1]
     else: 
