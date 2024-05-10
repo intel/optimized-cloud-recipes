@@ -108,16 +108,16 @@
       file:
         path: /data/models
         state: directory
-    # - name: Install Jinja2 version 3.1.2
-    #   pip:
-    #     name: jinja2==3.1.2
-    #     state: present
-    #     executable: pip3
+    #Install Linux Tools
+    - name: Install Linux tools
+      become: yes
+      shell: apt-get install -y linux-tools-common linux-tools-generic linux-tools-`uname -r`
+
 
 ######################################################################
 #                                                                    #
 #                                                                    #
-# GRADIO WEBPAGE ISSUE                                               #
+# GRADIO WEBPAGE Dependency                                          #
 #                                                                    #
 ######################################################################
 
