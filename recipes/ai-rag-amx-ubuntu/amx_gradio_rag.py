@@ -1,7 +1,7 @@
 # Intel® Corporation Copyright
 # Contributors: William Fowler, Chris Ah-Siong, Joshua Segovia
 
-
+#Non Intel Model Functions and Frameworks
 import os
 import pandas as pd
 from langchain_community.llms import GPT4All
@@ -22,18 +22,15 @@ from intel_extension_for_transformers.transformers import AutoModelForCausalLM, 
 import intel_extension_for_pytorch as ipex
 model_name = "Intel/neural-chat-7b-v3-3"
 
-# for int8, should set weight_dtype="int8"       
-config = RtnConfig(bits=4, compute_dtype="int8")
-#prompt = "Once upon a time, there existed a little girl,"
-
-tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-
-
-
-
+#Import for the gradio front end:
 import gradio as gr
 
-# Defining paths to the different models 
+# for int8, should set weight_dtype="int8"       
+#config = RtnConfig(bits=4, compute_dtype="int8")
+#tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+
+
+#Defining paths to the different models 
 model_paths = {
     #"Falcon" : "/data/models/ggml-model-gpt4all-falcon-q4_0.bin",
     "Mistral OpenOrca FineTune - Chat Based | 7B Parameters | MistralAI Trained | 3.38GB Total Size" : "/data/models/mistral_model",
@@ -43,6 +40,8 @@ model_paths = {
     "Intel Neural Chat - 7B Parameters Quantized INT8 - AMX" : "Intel/neural-chat-7b-v3-3",
     "Intel Neural Chat - 7B Parameters FP32" : "Intel/neural-chat-7b-v3-3"
 }
+
+#Setting global variables
 n_threads=64
 max_tokens=200
 repeat_penalty=1.50
@@ -58,12 +57,14 @@ index = ""
 prompt = ""
 
 
+#Creating datasets dictionary - this will be used for RAG
 datasets = {"robot maintenance": "FunDialogues/customer-service-robot-support", 
                 "basketball coach": "FunDialogues/sports-basketball-coach", 
                 "physics professor": "FunDialogues/academia-physics-office-hours",
                 "grocery cashier" : "FunDialogues/customer-service-grocery-cashier",
                 "Doctor": "FunDialogues/healthcare-minor-consultation"}
 
+#Defining helper functions for RAG Mechanism
 def download_dataset(datasets, chosen_dataset):
     """
     Downloads the specified dataset and saves it to the data path.
@@ -151,19 +152,19 @@ def retrieval_mechanism(self, user_input, top_k=1, context_verbosity = False, ra
 
 callbacks = [StreamingStdOutCallbackHandler()]
 
-#Setting and loading the default model
+#Setting and loading the default model. The default model is openORCA
 selected_model_path = model_paths["Mistral OpenOrca FineTune - Chat Based | 7B Parameters | MistralAI Trained | 3.38GB Total Size"]
 llm = GPT4All(model=selected_model_path, callbacks=callbacks, verbose=False,
                     n_threads=n_threads, n_predict=max_tokens, repeat_penalty=repeat_penalty, 
                     n_batch=n_batch, top_k=top_k, temp=temp)
-
 template = """Question: {question}
             Answer: This is the response: """
-
 prompt = PromptTemplate(template=template, input_variables=["question"])
-#prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
-
 llm_chain = LLMChain(prompt=prompt, llm=llm)
+
+
+
+########################################################################################     PREDICT FUNCTION         ############################################################################
 
 def predict(question, selected_model, selected_dataset):
     # Load the selected dataset and build vectors
@@ -216,21 +217,7 @@ def predict(question, selected_model, selected_dataset):
         prompt = PromptTemplate(template=template, input_variables=["question"])
     else:
 
-        #User can change these prompts to elicit different responses from the LLM
-
-        '''
-        template = """ You are to act as an intelligent chatbot assistant. The responses should be conversational. Answer the following question:{question} with the context {context}. 
-        Do not just repeat the context, develop a succinct answer without extraneous or unecessary information. 
-        """
-        '''
-        
-        #template = "Answer the question in a short and direct manner without including any unecessary information. You can remove quotes and information like [Agent/Person/Contact]:"   
-        #template = "Using the context, develop an answer to the question in a short and direct manner without including any unecessary information. Only incude the answer in the response and nothing extraneous"  
-        #template = """You are an intelligent assistant that is meant to give advice. In addition to your own knowledge, you should also extract information from the following conversation: {context}. 
-        #You are asked {question}. Using both the context and your own knowledge, craft a response that is unique, short and direct. Do not quote the conversation, but add learned insights from the context.  
-        #"""
-
-        #template = "Based on the following conversation, answer the question: {question}. Avoid direct quotations and focus on generating original content based on your understanding. This is the conversation: {context}"
+        #User can change these prompts to elicit different responses from the LLM   
         template = "You are an expert recommender. Based on the following conversation, answer the question: {question}. Avoid direct quotations and focus on generating an original recommendation. This is the conversation: {context}"
 
         prompt = PromptTemplate(template=template, input_variables=["context", "question"]).partial(context=context)
@@ -298,18 +285,18 @@ def predict(question, selected_model, selected_dataset):
         
         print("\n MODEL SELECTED: ", selected_model_path)
         llm_chain.llm = llm  # Update the llm in the LLMChain
-
-        # Get the answer using the updated model
         answer = llm_chain.run(prompt)
         print("\n")
         print("\n This is the answer returned by the LLM: ", answer)
         print("\n")
         return answer
 
-# Create a list of models for the dropdown
+# Create a list of models for the dropdown - used by the front end gradio interface
 model_choices = list(model_paths.keys())
 dataset_choices = list(datasets.keys())
 
+
+###############################################################################   FRONT END GRADIO INTERFACE   #####################################################################
 iface = gr.Interface(
     fn=predict,
     inputs=[gr.Text("Insert your question here"), gr.Dropdown(choices=model_choices, label="Select Model"), gr.Dropdown(choices=dataset_choices, label="Select RAG Dataset")],
