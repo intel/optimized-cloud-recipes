@@ -16,8 +16,11 @@ The demo consists of a chatbot, that utilizes a combination of LLMs and RAG to g
 
 ## Non-Intel Trained
 Mistral OpenOrca FineTune - Chat Based | 7B Parameters | MistralAI Trained |
+
 Orca2 - Instruction Based | 13B Parameters | Microsoft Trained |
+
 Llama2 - Instruction Based | 13B Parameters | Nous Research Trained |
+
 GPT4ALL Snoozy - Instruction Based | 13B Parameters | NomicAI Trained |
 
 ## Intel Trained: 
