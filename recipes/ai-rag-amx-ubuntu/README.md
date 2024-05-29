@@ -10,16 +10,21 @@
 
 ## Description 
 
-Retrieval Augmented Generation (RAG) is a powerful technique that combines the capabilities of pre-trained Large Language Models (LLMs) with external data sources. Evaluating these models for effectiveness and efficiency is vital as they become integrated into more critical applications. The complexity and computational demands of these models necessitate powerful optimizations to ensure that they can operate at scale without prohibitive costs. Intel® Advanced Matrix Extensions (AMX) enhances the performance of deep learing training and inferenceing workloads while reducing total cost of ownership. This demonstration showcases how users can leverage AMX to deliver acceleration for inferencing and training while minimizing the need for specialized hardware. 
+The purpose of this demo aims to demonstrate the powerful capabilities of retrieval augmented generation based on large language models deployed on an Intel Xeon AWS instance (M7i.8xlarge), where we highlight performance optimizations leveraging Intel instructions to deliver increased accuracy and speed of inference. 
 
-Users can explore and evaluate the responses of the following models: 
+The demo consists of a chatbot, that utilizes a combination of LLMs and RAG to generate responses to user queries. The core of the chatbot’s response generation lies in the different LLMs being used:  
 
- Models:
+Non-Intel Trained
+o	Mistral OpenOrca FineTune - Chat Based | 7B Parameters | MistralAI Trained |
+o	Orca2 - Instruction Based | 13B Parameters | Microsoft Trained |
+o	Llama2 - Instruction Based | 13B Parameters | Nous Research Trained |
+o	GPT4ALL Snoozy - Instruction Based | 13B Parameters | NomicAI Trained |
+Intel Trained: 
+o	Intel Neural Chat - Chat Based | 7B Parameters | Intel Fine-Tuned
 
- Mistral OpenOrca FineTune - Chat Based | 7B Parameters | MistralAI Trained | 
- Orca2 - Instruction Based | 13B Parameters | Microsoft Trained | 
- Llama2 - Instruction Based | 13B Parameters | Nous Research Trained | 
- GPT4ALL Snoozy - Instruction Based | 13B Parameters | NomicAI Trained | 
+In particular, the non-intel models utilize AVX instructions, enhancing computational efficiency for real time information retrieval. The intel trained neural chat model further benefits from AMX, providing additional performance improvements for handling complex matrix operations. These optimizations enable users to perform inference without the need for specialized hardware and can deliver high-quality results efficiently on Intel Xeon CPUs. 
+
+Additionally, we implement RAG with LangChain, which retrieves relevant context or passages from the datasets (ranging from robot maintenance to minor healthcare consultations). The chatbot then utilizes the LLM to generate contextually relevant responses based on both the retrieved context, and the user query. 
 
 https://gpt4all.io/index.html
 
@@ -29,7 +34,7 @@ https://gpt4all.io/index.html
 
 ## Running the Demo
 
-1. SSH into newly created GCP VM and run `source /usr/local/tmp/optimized-cloud-recipes/recipes/ai-rag-ubuntu/gradio_rag.py`
+1. SSH into newly created AWS VM and run `source /usr/local/tmp/optimized-cloud-recipes/recipes/ai-rag-ubuntu/gradio_rag.py`
 
 2. On your computer open a browser and navigate to the Gradio link that is provided on your terminal
 

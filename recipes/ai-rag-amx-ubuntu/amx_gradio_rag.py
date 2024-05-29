@@ -1,4 +1,6 @@
 # Intel® Corporation Copyright
+# Original Code by Eduardo Alvarez <eduardo.a.alvarez@intel.com> 
+# Source: https://github.com/eduand-alvarez
 # Contributors: William Fowler, Chris Ah-Siong, Joshua Segovia
 
 #Non Intel Model Functions and Frameworks
@@ -24,11 +26,6 @@ model_name = "Intel/neural-chat-7b-v3-3"
 
 #Import for the gradio front end:
 import gradio as gr
-
-# for int8, should set weight_dtype="int8"       
-#config = RtnConfig(bits=4, compute_dtype="int8")
-#tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-
 
 #Defining paths to the different models 
 model_paths = {
@@ -94,23 +91,6 @@ def download_dataset(datasets, chosen_dataset):
         print('data already exists in path.')     
 
 
-def build_vectordb(chunk_size, overlap):
-    """
-    Builds a vector database from the dataset for retrieval purposes.
-
-    Parameters
-    ----------
-    chunk_size : int
-        The size of text chunks for vectorization.
-    overlap : int
-        The overlap size between chunks.
-    """
-    loader = TextLoader(data_path)
-    # Text Splitter
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=overlap)
-    # Embed the document and store into chroma DB
-    index = VectorstoreIndexCreator(embedding= HuggingFaceEmbeddings(), text_splitter=text_splitter).from_loaders([loader])
-
 def retrieval_mechanism(self, user_input, top_k=1, context_verbosity = False, rag_off= False):
     """
     Retrieves relevant document snippets based on the user's query.
@@ -168,7 +148,6 @@ llm_chain = LLMChain(prompt=prompt, llm=llm)
 
 def predict(question, selected_model, selected_dataset):
     # Load the selected dataset and build vectors
-    #download_dataset(datasets, selected_dataset)
     data_path = selected_dataset + '_dialogues.txt'
 
     if not os.path.isfile(data_path):
@@ -192,7 +171,6 @@ def predict(question, selected_model, selected_dataset):
     else:
         print('data already exists in path.')     
 
-    #build_vectordb(chunk_size, overlap)
     loader = TextLoader(data_path)
     # Text Splitter
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=overlap)
@@ -262,11 +240,11 @@ def predict(question, selected_model, selected_dataset):
         model_name = "Intel/neural-chat-7b-v3-3"
         question = question
         print("\n")
-        print("Question passed to prompt AMX: ", question)
+        print("Question passed to prompt: ", question)
         print("\n")
         context = context
         print("\n")
-        print("context passed to prompt AMX: ", question)
+        print("context passed to prompt: ", question)
         print("\n")
         prompt = f"### System:\n{context}\n### User:\n{question}\n### Assistant:\n"
         print("\n")
@@ -302,7 +280,7 @@ iface = gr.Interface(
     inputs=[gr.Text("Insert your question here"), gr.Dropdown(choices=model_choices, label="Select Model"), gr.Dropdown(choices=dataset_choices, label="Select RAG Dataset")],
     outputs="text",
     title="Intel® RAG AMX Demo",
-    description="This demo showcases the performance of four RAG based LLMs on Intel XEON using AMX. Please enter your question below, select a model, and choose a RAG Dataset:",
+    description="This demo showcases the performance of four RAG based LLMs on Intel XEON. Please enter your question below, select a model, and choose a RAG Dataset:",
     thumbnail = None,
     theme = None, 
     css = ".gradio-container {background-color: blue}", 
