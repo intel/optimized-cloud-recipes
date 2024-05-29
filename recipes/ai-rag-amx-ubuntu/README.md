@@ -26,6 +26,8 @@ GPT4ALL Snoozy - Instruction Based | 13B Parameters | NomicAI Trained |
 ## Intel Trained: 
 Intel Neural Chat - Chat Based | 7B Parameters | Intel Fine-Tuned
 
+##
+
 In particular, the non-intel models utilize AVX instructions, enhancing computational efficiency for real time information retrieval. The intel trained neural chat model further benefits from AMX, providing additional performance improvements for handling complex matrix operations. These optimizations enable users to perform inference without the need for specialized hardware and can deliver high-quality results efficiently on Intel Xeon CPUs. 
 
 Additionally, we implement RAG with LangChain, which retrieves relevant context or passages from the datasets (ranging from robot maintenance to minor healthcare consultations). The chatbot then utilizes the LLM to generate contextually relevant responses based on both the retrieved context, and the user query. 
