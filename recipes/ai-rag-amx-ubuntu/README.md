@@ -14,13 +14,14 @@ The purpose of this demo aims to demonstrate the powerful capabilities of retrie
 
 The demo consists of a chatbot, that utilizes a combination of LLMs and RAG to generate responses to user queries. The core of the chatbot’s response generation lies in the different LLMs being used:  
 
-Non-Intel Trained
-o	Mistral OpenOrca FineTune - Chat Based | 7B Parameters | MistralAI Trained |
-o	Orca2 - Instruction Based | 13B Parameters | Microsoft Trained |
-o	Llama2 - Instruction Based | 13B Parameters | Nous Research Trained |
-o	GPT4ALL Snoozy - Instruction Based | 13B Parameters | NomicAI Trained |
-Intel Trained: 
-o	Intel Neural Chat - Chat Based | 7B Parameters | Intel Fine-Tuned
+## Non-Intel Trained
+Mistral OpenOrca FineTune - Chat Based | 7B Parameters | MistralAI Trained |
+Orca2 - Instruction Based | 13B Parameters | Microsoft Trained |
+Llama2 - Instruction Based | 13B Parameters | Nous Research Trained |
+GPT4ALL Snoozy - Instruction Based | 13B Parameters | NomicAI Trained |
+
+## Intel Trained: 
+Intel Neural Chat - Chat Based | 7B Parameters | Intel Fine-Tuned
 
 In particular, the non-intel models utilize AVX instructions, enhancing computational efficiency for real time information retrieval. The intel trained neural chat model further benefits from AMX, providing additional performance improvements for handling complex matrix operations. These optimizations enable users to perform inference without the need for specialized hardware and can deliver high-quality results efficiently on Intel Xeon CPUs. 
 
