@@ -10,7 +10,7 @@
 
 ## Description 
 
-The purpose of this demo aims to demonstrate the powerful capabilities of retrieval augmented generation based on large language models deployed on an Intel Xeon AWS instance (M7i.8xlarge), where we highlight performance optimizations leveraging Intel instructions to deliver increased accuracy and speed of inference. 
+The purpose of this demo aims to demonstrate the powerful capabilities of retrieval augmented generation based on large language models deployed on 4th Gen Intel Xeon instaces with Intel AMX, where we highlight performance optimizations leveraging Intel instructions to deliver increased accuracy and speed of inference. 
 
 The demo consists of a chatbot, that utilizes a combination of LLMs and RAG to generate responses to user queries. The core of the chatbot’s response generation lies in the different LLMs being used:  
 
@@ -40,7 +40,7 @@ https://gpt4all.io/index.html
 
 ## Running the Demo
 
-1. SSH into newly created AWS VM and run `source /usr/local/tmp/optimized-cloud-recipes/recipes/ai-rag-ubuntu/gradio_rag.py`
+1. SSH into newly created VM and run `source /usr/local/tmp/optimized-cloud-recipes/recipes/ai-rag-ubuntu/gradio_rag.py`
 
 2. On your computer open a browser and navigate to the Gradio link that is provided on your terminal
 
