@@ -23,6 +23,21 @@
         name: jinja2==3.1.2
         state: present
         executable: pip3
+    - name: Install torch
+      pip:
+        name: torch==2.2.2
+        state: present
+        executable: pip3
+    - name: Install torchvision
+      pip:
+        name: torchvision==0.17.2
+        state: present
+        executable: pip3
+    - name: Install torchaudio version
+      pip:
+        name: torchaudio==2.2.2
+        state: present
+        executable: pip3
 
 # Install FastChat
 
