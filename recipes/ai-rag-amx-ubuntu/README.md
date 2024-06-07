@@ -36,7 +36,7 @@ https://gpt4all.io/index.html
 
 ## Usage
 
-[**AWS - Intel® Optimized Cloud Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-aws-vm/examples/gen-ai-rag-demo) 
+[**AWS - Intel® Optimized Cloud Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-rag-demo) 
 
 ## Running the Demo
 
