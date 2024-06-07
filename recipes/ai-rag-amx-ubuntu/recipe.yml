@@ -1,0 +1,291 @@
+##########################################################
+# Host configuration                                     #
+##########################################################
+---
+- name: Install pre-requisite packages
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install pre-requisite packages
+      ansible.builtin.apt:
+        pkg:
+          - python3
+          - python3-pip
+          - python-is-python3
+          - net-tools
+        state: present
+        update_cache: true
+    # Install Intel's Extension for PyTorch
+    - name: Install Intel's Extension for PyTorch
+      pip:
+        name: intel_extension_for_pytorch
+        state: present
+        executable: pip3
+    # Install Intel's Extension for Transformers
+    - name: Install Intel's Extension for Transformers
+      pip:
+        name: intel_extension_for_transformers
+        state: present
+        executable: pip3
+    # Install Flask via pip3
+    - name: Install Flask
+      pip:
+        name: Flask
+        state: present
+        executable: pip3
+    # Install Accelerate via pip3
+    - name: Install Accelerate
+      pip:
+        name: Accelerate
+        state: present
+        executable: pip3
+    # Install neural_speed via pip3
+    - name: Install neural_speed
+      pip:
+        name: neural_speed
+        state: present
+        executable: pip3
+    # Install sentencepiece via pip3
+    - name: Install sentencepiece
+      pip:
+        name: sentencepiece
+        state: present
+        executable: pip3
+    # Instal Langchain via pip3
+    - name: Install Langchain
+      pip:
+        name: langchain
+        state: present
+        executable: pip3
+    # Install Langchain via pip3
+    - name: Install Langchain community
+      pip:
+        name: langchain-community
+        state: present
+        executable: pip3
+    # Install Datasets via pip3
+    - name: Install Datasets
+      pip:
+        name: datasets
+        state: present
+        executable: pip3
+    # Install specific versions of PyTorch, torchvision, and torchaudio via pip3
+    - name: Install PyTorch
+      pip:
+        name: torch
+        state: present
+        executable: pip3
+    # Install Transformers via pip3
+    - name: Install Transformers
+      pip:
+        name: transformers
+        state: present
+        executable: pip3
+    # Install Sentence Transformers
+    - name: Install Sentence-Transformers
+      pip:
+        name: sentence-transformers
+        state: present
+        executable: pip3
+    # Install gpt4all via pip3
+    - name: Install gpt4all
+      pip:
+        name: gpt4all
+        state: present
+        executable: pip3
+    # Install gradio via pip3
+    - name: Install gradio
+      pip:
+        name: gradio
+        state: latest
+        executable: pip3
+    # Create directory for model
+    - name: Create directory for model
+      file:
+        path: /data/models
+        state: directory
+    #Install Linux Tools
+    - name: Install Linux tools
+      become: yes
+      shell: apt-get install -y linux-tools-common linux-tools-generic linux-tools-`uname -r`
+
+
+######################################################################
+#                                                                    #
+#                                                                    #
+# GRADIO WEBPAGE Dependency                                          #
+#                                                                    #
+######################################################################
+
+- name: Install gradio webpage dependency
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install gradio webpage package
+      get_url:
+        url: "https://cdn-media.huggingface.co/frpc-gradio-0.2/frpc_linux_amd64"
+        dest: "/usr/local/lib/python3.10/dist-packages/gradio/frpc_linux_amd64_v0.2"
+        timeout: 10000
+      retries: 10
+      register: result
+      until: result is succeeded
+      no_log: false
+      ignore_errors: True
+      with_items:
+        - "https://cdn-media.huggingface.co/frpc-gradio-0.2/frpc_linux_amd64"
+
+######################################################################
+# MODEL DOWNLOAD                                                     #
+#                                                                    #
+# Downloaded nomic-ai/gpt4all-falcon-ggml from HuggingFace           #
+#                                                                    #
+######################################################################
+# - name: Install gpt4all Falcon #INSTRUCTION BASED
+#   hosts: localhost
+#   connection: local
+#   tasks:
+#     - name: Install Falcon Model
+#       get_url:
+#         url: "https://gpt4all.io/models/gguf/gpt4all-falcon-newbpe-q4_0.gguf"
+#         dest: "/data/models/ggml-model-gpt4all-falcon-q4_0.bin"
+#         timeout: 10000
+#       retries: 10
+#       register: result
+#       until: result is succeeded
+#       no_log: false
+#       ignore_errors: True
+#       with_items:
+#         - "https://gpt4all.io/models/gguf/gpt4all-falcon-newbpe-q4_0.gguf"
+
+- name: Install gpt4all mistral #CHAT BASED
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install Mistral Model
+      get_url:
+        url: "https://gpt4all.io/models/gguf/mistral-7b-openorca.gguf2.Q4_0.gguf"
+        dest: "/data/models/mistral_model.gguf"
+        timeout: 10000
+      retries: 10
+      register: result
+      until: result is succeeded
+      no_log: false
+      ignore_errors: True
+      with_items:
+        - "https://gpt4all.io/models/gguf/mistral-7b-openorca.gguf2.Q4_0.gguf"
+
+- name: Install orca #INSTRUCTION BASED 3.56GB SIZE
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install orca Model
+      get_url:
+        url: "https://gpt4all.io/models/gguf/orca-2-7b.Q4_0.gguf"
+        dest: "/data/models/orca_model.gguf"
+        timeout: 10000
+      retries: 10
+      register: result
+      until: result is succeeded
+      no_log: false
+      ignore_errors: True
+      with_items:
+        - "https://gpt4all.io/models/gguf/orca-2-7b.Q4_0.gguf"
+
+- name: Install hermes llama #INSTRUCTION BASED 6.86GB 16GB RAM
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install hermes llama Model
+      get_url:
+        url: "https://gpt4all.io/models/gguf/nous-hermes-llama2-13b.Q4_0.gguf"
+        dest: "/data/models/llama_model.gguf"
+        timeout: 10000
+      retries: 10
+      register: result
+      until: result is succeeded
+      no_log: false
+      ignore_errors: True
+      with_items:
+        - "https://gpt4all.io/models/gguf/nous-hermes-llama2-13b.Q4_0.gguf"
+
+- name: Install snoozy #CHAT BASED 8GB RAM 3.64 SIZE
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Install snoozy model
+      get_url:
+        url: "https://gpt4all.io/models/gguf/gpt4all-13b-snoozy-q4_0.gguf"
+        dest: "/data/models/snoozy_model.gguf"
+        timeout: 10000
+      retries: 10
+      register: result
+      until: result is succeeded
+      no_log: false
+      ignore_errors: True
+      with_items:
+        - "https://gpt4all.io/models/gguf/gpt4all-13b-snoozy-q4_0.gguf"
+
+- name: Download Image 
+  hosts: all  
+  become: true 
+  tasks:
+    - name: Download image
+      get_url:
+        url: https://upload.wikimedia.org/wikipedia/commons/8/85/Intel_logo_2023.svg
+        dest: "/data/intel-logo.svg"  
+        mode: 0644  
+
+######################################################################
+# Demo                                                               #
+#                                                                    #
+# Run 'source /usr/local/bin/run_demo.sh'                            #
+#                                                                    #
+######################################################################
+# - name: Install Fschat
+#   hosts: localhost
+#   connection: local
+#   tasks:
+#     - name: Install fschat
+#       pip:
+#         name: fschat[model_worker,webui]==0.2.30
+#         state: present
+#         executable: pip3
+
+# - name: Serve Falcon on CPU 
+#   hosts: localhost
+#   connection: local
+#   tasks:
+#     - name: Start web controller shell
+#       shell: nohup python3 -m fastchat.serve.controller --host 0.0.0.0 </dev/null >/dev/null 2>&1 & 
+#     - name: Serve Falcon on CPU
+#       environment:
+#         CPU_ISA: amx
+#       shell: sleep 10 & nohup python -m fastchat.serve.model_worker --model-path lmsys/vicuna-7b-v1.3 --device cpu --model-name 4th_GenXeon_Vicuna_7b --port 21004 --worker-address http://localhost:21004 </dev/null >/dev/null 2>&1 &
+
+# - name: Create script to run gradio frontend
+#   hosts: localhost
+#   connection: local
+#   vars:
+#     script_dest: /usr/local/bin
+#   tasks:
+#     - name: Add script to run demo to bin
+#       copy:
+#         dest: "{{ script_dest }}/run_demo.sh"
+#         content: |
+#           #!/bin/bash
+#           sudo python3 -m fastchat.serve.gradio_web_server --share
+#         mode: a+x
+
+# - name: Complete Installation
+#   hosts: localhost
+#   connection: local
+#   tasks:
+#     - name: Create file to demonstrate recipe completion
+#       copy:
+#         dest: "/opt/recipe-run-completed_{{ ansible_date_time.date }}.txt"
+#         content: |
+#           # Run 'source /usr/local/bin/run_demo.sh' to start the demo
+#           # Then open a browser and navigate to http://<VM_PLUBLIC_IP>:7860         
+#         mode: a+x
+#     - name: Run 'source /usr/local/bin/run_demo.sh' to start demo
+#       shell: echo "Run 'source /usr/local/bin/run_demo.sh' to start demo"
