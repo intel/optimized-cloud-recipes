@@ -78,3 +78,9 @@
         cmd: |
           cd /opt/GenAIExamples/ChatQnA/docker/ui
           docker build -t opea/chatqna-ui:latest -f docker/Dockerfile .
+    - name: Launch the OPEA containers
+      ansible.builtin.shell:
+        cmd: |
+          source /etc/profile.d/opea.sh
+          cd /opt/GenAIExamples/ChatQnA/docker/xeon
+          docker compose -f docker_compose.yaml up -d
