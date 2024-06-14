@@ -24,9 +24,9 @@
     - name: Add Docker repository to apt sources
       shell: |
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-    - name: Update apt cache
-      shell: |
-        apt-get update
+    - name: Run the equivalent of "apt-get update" as a separate step
+      ansible.builtin.apt:
+        update_cache: yes
     - name: Install Docker
       apt:
         name:
@@ -52,7 +52,7 @@
       ansible.builtin.shell:
         cmd: |
           cd /opt/GenAIComps
-          docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/docker/Dockerfile .
+          docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
     - name: Build Rerank Image
       ansible.builtin.shell:
         cmd: |
