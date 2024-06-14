@@ -27,6 +27,13 @@
     - name: Run the equivalent of "apt-get update" as a separate step
       ansible.builtin.apt:
         update_cache: yes
+    - name: Test the environment variables
+      ansible.builtin.shell:
+        cmd: |
+          . /etc/profile.d/opea.sh
+    - name: Debug the environment
+      debug:
+        mesg: "{{ ansible_env }}"
     - name: Install Docker
       apt:
         name:
@@ -78,16 +85,9 @@
         cmd: |
           cd /opt/GenAIExamples/ChatQnA/docker/ui
           docker build -t opea/chatqna-ui:latest -f docker/Dockerfile .
-    - name: Set environment variables
-      ansible.builtin.shell:
-        cmd: |
-          source /etc/profile.d/opea.sh
-    - name: Ansible playbook to retrieve environment variables
-      debug:
-          msg: "{{ansible_env}}"
     - name: Launch the OPEA containers
       ansible.builtin.shell:
         cmd: |
-          source /etc/profile.d/opea.sh
+          . /etc/profile.d/opea.sh
           cd /opt/GenAIExamples/ChatQnA/docker/xeon
           docker compose -f docker_compose.yaml up -d
