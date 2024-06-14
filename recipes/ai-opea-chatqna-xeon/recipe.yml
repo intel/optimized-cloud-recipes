@@ -78,6 +78,13 @@
         cmd: |
           cd /opt/GenAIExamples/ChatQnA/docker/ui
           docker build -t opea/chatqna-ui:latest -f docker/Dockerfile .
+    - name: Set environment variables
+      ansible.builtin.shell:
+        cmd: |
+          source /etc/profile.d/opea.sh
+    - name: Ansible playbook to retrieve environment variables
+      debug:
+          msg: "{{ansible_env}}"
     - name: Launch the OPEA containers
       ansible.builtin.shell:
         cmd: |
