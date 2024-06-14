@@ -10,7 +10,6 @@ export TEI_RERANKING_ENDPOINT="http://$host_ip:8808"
 export TGI_LLM_ENDPOINT="http://$host_ip:8008"
 export REDIS_URL="redis://$host_ip:6379"
 export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
 export MEGA_SERVICE_HOST_IP=$host_ip
 export EMBEDDING_SERVICE_HOST_IP=$host_ip
 export RETRIEVER_SERVICE_HOST_IP=$host_ip
