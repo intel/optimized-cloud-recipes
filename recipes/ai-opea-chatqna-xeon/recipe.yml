@@ -27,13 +27,6 @@
     - name: Run the equivalent of "apt-get update" as a separate step
       ansible.builtin.apt:
         update_cache: yes
-    - name: Test the environment variables
-      ansible.builtin.shell:
-        cmd: |
-          . /etc/profile.d/opea.sh
-    - name: Debug the environment
-      debug:
-        mesg: "{{ ansible_env }}"
     - name: Install Docker
       apt:
         name:
