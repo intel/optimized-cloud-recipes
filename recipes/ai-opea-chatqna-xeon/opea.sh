@@ -16,4 +16,5 @@ export RETRIEVER_SERVICE_HOST_IP=$host_ip
 export RERANK_SERVICE_HOST_IP=$host_ip
 export LLM_SERVICE_HOST_IP=$host_ip
 export BACKEND_SERVICE_ENDPOINT="http://$host_ip:8888/v1/chatqna"
+export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
 export host_ip=$host_ip

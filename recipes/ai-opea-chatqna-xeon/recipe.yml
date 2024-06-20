@@ -41,8 +41,9 @@
         dest: /opt/GenAIComps
     - name: Clone the GenAIExamples repo
       git:
-        repo: https://github.com/opea-project/GenAIExamples.git
+        repo: https://github.com/wsfowler/GenAIExamples.git
         dest: /opt/GenAIExamples
+        version: xeon_update
     - name: Build Embedding Image
       ansible.builtin.shell:
         cmd: |
