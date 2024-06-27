@@ -78,6 +78,14 @@
         cmd: |
           cd /opt/GenAIExamples/ChatQnA/docker/ui
           docker build -t opea/chatqna-ui:latest -f docker/Dockerfile .
+    - name: Build UI Converstation Image
+      ansible.builtin.shell:
+        cmd: |
+          cd /opt/GenAIExamples/ChatQnA/docker/ui
+          export host_ip=$(ec2metadata --public-ipv4)
+          export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
+          export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
+          docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
     - name: Launch the OPEA containers
       ansible.builtin.shell:
         cmd: |
