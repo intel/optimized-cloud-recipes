@@ -35,7 +35,7 @@
     #############################################################################################################################################
     - name: Download Habana installer
       ansible.builtin.get_url:
-        url: https://vault.habana.ai/artifactory/gaudi-installer/1.15.1/habanalabs-installer.sh
+        url: https://vault.habana.ai/artifactory/gaudi-installer/1.16.1/habanalabs-installer.sh
         dest: /tmp/habanalabs-installer.sh
         mode: '0755'
     - name: Install Habana base
@@ -81,4 +81,4 @@
         state: restarted
     # Install the Gaudi pytorch container from Habana Labs 
     - name: Pull the Gaudi pytorch container
-      ansible.builtin.shell: docker pull vault.habana.ai/gaudi-docker/1.15.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.0:latest
+      ansible.builtin.shell: docker pull vault.habana.ai/gaudi-docker/1.16.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest
