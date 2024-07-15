@@ -14,15 +14,13 @@
           - python-is-python3
           - net-tools
           - libmkl-dev
+          - docker.io
         state: present
         update_cache: true
     - name: Install Jupyterlab using pip 
       ansible.builtin.pip:
         name: jupyterlab
         state: present
-    # Remove the crontab entry used to run the ansible playbook after reboot, skip this if not using cloud-init
-    - name: Remove the cron job
-      ansible.builtin.shell: crontab -u root -r
     #############################################################################################################################################
     # Setup Habana Software Stack                                                                                                                    #
     #                                                                                                                                           #
