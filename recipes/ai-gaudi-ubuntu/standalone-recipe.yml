@@ -6,21 +6,21 @@
   hosts: localhost
   connection: local
   tasks:
-    # - name: Install pre-requisite packages
-    #   ansible.builtin.apt:
-    #     pkg:
-    #       - python3
-    #       - python3-pip
-    #       - python-is-python3
-    #       - net-tools
-    #       - libmkl-dev
-    #       - docker.io
-    #     state: present
-    #     update_cache: true
-    # - name: Install Jupyterlab using pip 
-    #   ansible.builtin.pip:
-    #     name: jupyterlab
-    #     state: present
+    - name: Install pre-requisite packages
+      ansible.builtin.apt:
+        pkg:
+          - python3
+          - python3-pip
+          - python-is-python3
+          - net-tools
+          - libmkl-dev
+          - docker.io
+        state: present
+        update_cache: true
+    - name: Install Jupyterlab using pip 
+      ansible.builtin.pip:
+        name: jupyterlab
+        state: present
     #############################################################################################################################################
     # Setup Habana Software Stack                                                                                                                    #
     #                                                                                                                                           #
@@ -48,52 +48,47 @@
         regexp: "\\$\\{_SUDO_CMD\\} DEBIAN_FRONTEND=noninteractive \\$\\{__pkg__\\} install -y libmkl-dev"
         line: "             ${_SUDO_CMD} ${__pkg__} install -y libmkl-dev"
         backrefs: yes
-    # - name: Modify the Habana installer to remove the DEBIAN_FRONTEND=noninteractive flag from apt update
-    #   ansible.builtin.lineinfile:
-    #     path: /tmp/habanalabs-installer.sh
-    #     regexp: ^\\${_SUDO_CMD} DEBIAN_FRONTEND=noninteractive \\${__pkg__} update
-    #     line: \\${_SUDO_CMD} \\${__pkg__} update
-    # - name: Install Habana base
-    #   ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t base -y
-    # - name: Install Habana dependencies using script
-    #   ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t dependencies -y
-    #   become_user: ubuntu
-    #   become: true
-    # - name: Install Habana pytorch
-    #   ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t pytorch --venv -y
-    # # Install the Habana Container Runtime by dowloading the habana artifactory key, adding the artifactory repository to the sources list, and installing the habanalabs-container-runtime package
-    # - name: Download Habana artifactory key
-    #   ansible.builtin.get_url:
-    #     url: https://vault.habana.ai/artifactory/api/gpg/key/public
-    #     dest: /tmp/habana-artifactory-key
-    # - name: Add Habana artifactory repository to sources list
-    #   ansible.builtin.copy:
-    #     content: |
-    #       deb https://vault.habana.ai/artifactory/debian jammy main
-    #     dest: /etc/apt/sources.list.d/artifactory.list
-    # - name: Add Habana artifactory key
-    #   ansible.builtin.shell: apt-key add /tmp/habana-artifactory-key
-    # - name: Install Habana Container Runtime
-    #   ansible.builtin.apt:
-    #     name: habanalabs-container-runtime
-    #     state: present
-    #     update_cache: true
-    # - name: Add Habana Container Runtime to the docker daemon.json
-    #   ansible.builtin.copy:
-    #     content: |
-    #       {
-    #        "runtimes": {
-    #          "habana": {
-    #             "path": "/usr/bin/habana-container-runtime",
-    #             "runtimeArgs": []
-    #           }
-    #         }
-    #       }
-    #     dest: /etc/docker/daemon.json
-    # - name: Restart docker service
-    #   ansible.builtin.service:
-    #     name: docker
-    #     state: restarted
-    # # Install the Gaudi pytorch container from Habana Labs 
-    # - name: Pull the Gaudi pytorch container
-    #   ansible.builtin.shell: docker pull vault.habana.ai/gaudi-docker/1.16.0/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest
+    - name: Install Habana base
+      ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t base -y
+    - name: Install Habana dependencies using script
+      ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t dependencies -y
+      become_user: ubuntu
+      become: true
+    - name: Install Habana pytorch
+      ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t pytorch --venv -y
+    # Install the Habana Container Runtime by dowloading the habana artifactory key, adding the artifactory repository to the sources list, and installing the habanalabs-container-runtime package
+    - name: Download Habana artifactory key
+      ansible.builtin.get_url:
+        url: https://vault.habana.ai/artifactory/api/gpg/key/public
+        dest: /tmp/habana-artifactory-key
+    - name: Add Habana artifactory repository to sources list
+      ansible.builtin.copy:
+        content: |
+          deb https://vault.habana.ai/artifactory/debian jammy main
+        dest: /etc/apt/sources.list.d/artifactory.list
+    - name: Add Habana artifactory key
+      ansible.builtin.shell: apt-key add /tmp/habana-artifactory-key
+    - name: Install Habana Container Runtime
+      ansible.builtin.apt:
+        name: habanalabs-container-runtime
+        state: present
+        update_cache: true
+    - name: Add Habana Container Runtime to the docker daemon.json
+      ansible.builtin.copy:
+        content: |
+          {
+           "runtimes": {
+             "habana": {
+                "path": "/usr/bin/habana-container-runtime",
+                "runtimeArgs": []
+              }
+            }
+          }
+        dest: /etc/docker/daemon.json
+    - name: Restart docker service
+      ansible.builtin.service:
+        name: docker
+        state: restarted
+    # Install the Gaudi pytorch container from Habana Labs 
+    - name: Pull the Gaudi pytorch container
+      ansible.builtin.shell: docker pull vault.habana.ai/gaudi-docker/1.16.0/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest
