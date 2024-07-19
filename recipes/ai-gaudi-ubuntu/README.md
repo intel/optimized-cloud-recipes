@@ -48,7 +48,7 @@ sudo apt update
 sudo apt install ansible -y
 
 #Run ansible-pull
-sudo ansible-pull -vv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-gaudi-ubuntu/recipe.yml
+sudo ansible-pull -vv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-gaudi-ubuntu/standalone-recipe.yml
 
 # Logs at 'tail -f 10 /var/log/syslog'
 ```
@@ -58,7 +58,7 @@ sudo ansible-pull -vv -U https://github.com/intel/optimized-cloud-recipes.git re
 1. SSH into newly created VM and run:
 
 ```bash
-sudo docker run -it --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --net=host --ipc=host vault.habana.ai/gaudi-docker/1.15.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.0:latest
+sudo docker run -it --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --net=host --ipc=host vault.habana.ai/gaudi-docker/1.16.0/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest
 ```
 
 2. This will launch the pytorch container where the Gaudi demos can be launched.
