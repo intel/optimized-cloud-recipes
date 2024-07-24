@@ -41,8 +41,12 @@
         dest: /opt/GenAIComps
     - name: Clone the GenAIExamples repo
       git:
-        repo: https://github.com/opea-project/GenAIExamples.git
+        repo: https://github.com/wsfowler/GenAIExamples.git
         dest: /opt/GenAIExamples
+    - name: Clone the vllm repo
+      git:
+        repo: https://github.com/vllm-project/vllm.git
+        dest: /opt/vllm
     - name: Pull Embedding Image
       ansible.builtin.shell:
         cmd: |
@@ -75,9 +79,14 @@
       ansible.builtin.shell:
         cmd: |
           docker pull opea/chatqna-conversation-ui:latest 
+    - name: Build vllm:cpu image
+      ansible.builtin.shell:
+        cmd: |
+          cd /opt/vllm
+          docker build -t vllm:cpu -f /opt/vllm/Dockerfile.cpu .
     - name: Launch the OPEA containers
       ansible.builtin.shell:
         cmd: |
           . /etc/profile.d/opea.sh
           cd /opt/GenAIExamples/ChatQnA/docker/xeon
-          docker compose -f docker_compose.yaml up -d
+          docker compose -f docker_compose_vlllm.yaml up -d
