@@ -77,10 +77,11 @@
       ansible.builtin.shell:
         cmd: |
           docker pull opea/chatqna-ui:latest
-    - name: Pull UI Converstation Image
-      ansible.builtin.shell:
-        cmd: |
-          docker pull opea/chatqna-conversation-ui:latest 
+    ## Uncomment to use the newer version of the example
+    # - name: Pull UI Converstation Image
+    #   ansible.builtin.shell:
+    #     cmd: |
+    #       docker pull opea/chatqna-conversation-ui:latest 
     # - name: Build vllm:cpu image
     #   ansible.builtin.shell:
     #     cmd: |
@@ -92,5 +93,5 @@
           . /etc/profile.d/opea.sh
           cd /opt/GenAIExamples/ChatQnA/docker/xeon
           docker compose -f docker_compose.yaml up -d
-        # For the newer version of the example
+    ## For the newer version of the example, replace the line above with the line below
           # docker compose -f docker_compose_vllm.yaml up -d

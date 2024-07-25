@@ -47,15 +47,22 @@ sudo apt update
 # Install Ansible
 sudo apt install ansible -y
 
-#Run ansible-pull
-sudo ansible-pull -vv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-apea-chatqna-xeon/recipe.yml
+# Clone the repo
+git clone https://github.com/intel/optimized-cloud-recipes.git
+
+# Modify the opea.sh file and set the `host_ip` variable to your host's IP and uncomment and set your Huggingface Token, then source the opea.sh file
+nano recipes/ai-opea-chatqna-xeon/opea.sh
+source recipes/ai-opea-chatqna-xeon/opea.sh
+
+# Run the recipe
+sudo ansible-playbook recipes/ai-opea-chatqna-xeon/recipe.yml
 
 # Logs at 'tail -f 10 /var/log/syslog'
 ```
 
 ## Accessing the demo
 
-1. Open a browser and go to 'http://yourpublicip:5174'
+1. Open a browser and go to 'http://yourpublicip:5173'
 
 2. This will launch the UI for the demo.
 

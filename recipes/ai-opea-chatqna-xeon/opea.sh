@@ -24,3 +24,4 @@ export DATAPREP_GET_FILE_ENDPOINT="http://$host_ip:6008/v1/dataprep/get_file"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://$host_ip:6009/v1/dataprep/delete_file"
 export DOC_BASE_URL=''
 export host_ip=$host_ip
+#export HUGGINGFACEHUB_API_TOKEN="YourHuggingfaceToken"
