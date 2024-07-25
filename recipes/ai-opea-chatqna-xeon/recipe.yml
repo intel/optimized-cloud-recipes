@@ -1,6 +1,7 @@
 # Ansible Playbook of the recipe found here: https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/microservice/gaudi/README.md
 # This is a simple example of a microservice that uses the Gaudi framework to create a simple chatbot that answers questions.
 # Needs to be run as root user or with sudo privileges.
+# To use the newer version of the example, see commented out sections below
 ---
 - name: OPEA ChatQnA
   hosts: localhost
@@ -43,10 +44,11 @@
       git:
         repo: https://github.com/wsfowler/GenAIExamples.git
         dest: /opt/GenAIExamples
-    - name: Clone the vllm repo
-      git:
-        repo: https://github.com/vllm-project/vllm.git
-        dest: /opt/vllm
+    # Uncomment to use the newer version of the example
+    # - name: Clone the vllm repo
+    #   git:
+    #     repo: https://github.com/vllm-project/vllm.git
+    #     dest: /opt/vllm
     - name: Pull Embedding Image
       ansible.builtin.shell:
         cmd: |
@@ -79,14 +81,16 @@
       ansible.builtin.shell:
         cmd: |
           docker pull opea/chatqna-conversation-ui:latest 
-    - name: Build vllm:cpu image
-      ansible.builtin.shell:
-        cmd: |
-          cd /opt/vllm
-          docker build -t vllm:cpu -f /opt/vllm/Dockerfile.cpu .
+    # - name: Build vllm:cpu image
+    #   ansible.builtin.shell:
+    #     cmd: |
+    #       cd /opt/vllm
+    #       docker build -t vllm:cpu -f /opt/vllm/Dockerfile.cpu .
     - name: Launch the OPEA containers
       ansible.builtin.shell:
         cmd: |
           . /etc/profile.d/opea.sh
           cd /opt/GenAIExamples/ChatQnA/docker/xeon
-          docker compose -f docker_compose_vlllm.yaml up -d
+          docker compose -f docker_compose.yaml up -d
+        # For the newer version of the example
+          # docker compose -f docker_compose_vllm.yaml up -d
