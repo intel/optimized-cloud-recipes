@@ -1,6 +1,7 @@
 # Ansible Playbook of the recipe found here: https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/microservice/gaudi/README.md
 # This is a simple example of a microservice that uses the Gaudi framework to create a simple chatbot that answers questions.
 # Needs to be run as root user or with sudo privileges.
+# To use the newer version of the example, see commented out sections below
 ---
 - name: OPEA ChatQnA
   hosts: localhost
@@ -41,54 +42,56 @@
         dest: /opt/GenAIComps
     - name: Clone the GenAIExamples repo
       git:
-        repo: https://github.com/opea-project/GenAIExamples.git
+        repo: https://github.com/wsfowler/GenAIExamples.git
         dest: /opt/GenAIExamples
-    - name: Build Embedding Image
+    # Uncomment to use the newer version of the example
+    # - name: Clone the vllm repo
+    #   git:
+    #     repo: https://github.com/vllm-project/vllm.git
+    #     dest: /opt/vllm
+    - name: Pull Embedding Image
       ansible.builtin.shell:
         cmd: |
-          cd /opt/GenAIComps
-          docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
-    - name: Build Retriever Image
+          docker pull opea/embedding-tei:latest
+    - name: Pull Retriever Image
       ansible.builtin.shell:
         cmd: |
-          cd /opt/GenAIComps
-          docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
-    - name: Build Rerank Image
+          docker pull opea/retriever-redis:latest
+    - name: Pull Rerank Image
       ansible.builtin.shell:
         cmd: |
-          cd /opt/GenAIComps
-          docker build -t opea/reranking-tei:latest -f comps/reranks/langchain/docker/Dockerfile .
-    - name: Build LLM Image
+          docker pull opea/reranking-tei:latest
+    - name: Pull LLM Image
       ansible.builtin.shell:
         cmd: |
-          cd /opt/GenAIComps
-          docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    - name: Build Dataprep Image
+          docker pull opea/llm-tgi:latest
+    - name: Pull Dataprep Image
       ansible.builtin.shell:
         cmd: |
-          cd /opt/GenAIComps
-          docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
-    - name: Build MegaService Docker Image
+          docker pull opea/dataprep-redis:latest
+    - name: Pull ChatQnA MegaService Docker Image
       ansible.builtin.shell:
         cmd: |
-          cd /opt/GenAIExamples/ChatQnA/docker
-          docker build -t opea/chatqna:latest -f Dockerfile .
-    - name: Build UI Docker Image
+          docker pull opea/chatqna:latest
+    - name: Pull ChatQnA UI Docker Image
       ansible.builtin.shell:
         cmd: |
-          cd /opt/GenAIExamples/ChatQnA/docker/ui
-          docker build -t opea/chatqna-ui:latest -f docker/Dockerfile .
-    - name: Build UI Converstation Image
-      ansible.builtin.shell:
-        cmd: |
-          cd /opt/GenAIExamples/ChatQnA/docker/ui
-          export host_ip=$(ec2metadata --public-ipv4)
-          export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-          export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-          docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+          docker pull opea/chatqna-ui:latest
+    ## Uncomment to use the newer version of the example
+    # - name: Pull UI Converstation Image
+    #   ansible.builtin.shell:
+    #     cmd: |
+    #       docker pull opea/chatqna-conversation-ui:latest 
+    # - name: Build vllm:cpu image
+    #   ansible.builtin.shell:
+    #     cmd: |
+    #       cd /opt/vllm
+    #       docker build -t vllm:cpu -f /opt/vllm/Dockerfile.cpu .
     - name: Launch the OPEA containers
       ansible.builtin.shell:
         cmd: |
           . /etc/profile.d/opea.sh
           cd /opt/GenAIExamples/ChatQnA/docker/xeon
           docker compose -f docker_compose.yaml up -d
+    ## For the newer version of the example, replace the line above with the line below
+          # docker compose -f docker_compose_vllm.yaml up -d
