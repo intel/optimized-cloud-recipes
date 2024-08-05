@@ -33,7 +33,7 @@
     #############################################################################################################################################
     - name: Download Habana installer
       ansible.builtin.get_url:
-        url: https://vault.habana.ai/artifactory/gaudi-installer/1.16.0/habanalabs-installer.sh
+        url: https://vault.habana.ai/artifactory/gaudi-installer/1.16.2/habanalabs-installer.sh
         dest: /tmp/habanalabs-installer.sh
         mode: '0755'
     - name: Modify the Habana installer to remove the DEBIAN_FRONTEND=noninteractive flag from apt install libmkl-dev
@@ -52,8 +52,6 @@
       ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t base -y
     - name: Install Habana dependencies using script
       ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t dependencies -y
-      become_user: ubuntu
-      become: true
     - name: Install Habana pytorch
       ansible.builtin.shell: /tmp/habanalabs-installer.sh install -t pytorch --venv -y
     # Install the Habana Container Runtime by dowloading the habana artifactory key, adding the artifactory repository to the sources list, and installing the habanalabs-container-runtime package
@@ -91,4 +89,4 @@
         state: restarted
     # Install the Gaudi pytorch container from Habana Labs 
     - name: Pull the Gaudi pytorch container
-      ansible.builtin.shell: docker pull vault.habana.ai/gaudi-docker/1.16.0/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest
+      ansible.builtin.shell: docker pull vault.habana.ai/gaudi-docker/1.16.2/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest
