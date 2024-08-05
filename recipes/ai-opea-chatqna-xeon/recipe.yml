@@ -42,7 +42,7 @@
         dest: /opt/GenAIComps
     - name: Clone the GenAIExamples repo
       git:
-        repo: https://github.com/opea-project/GenAIExamples.git
+        repo: https://github.com/wsfowler/GenAIExamples.git
         dest: /opt/GenAIExamples
     # Uncomment to use the newer version of the example
     # - name: Clone the vllm repo
