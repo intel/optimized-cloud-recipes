@@ -22,8 +22,7 @@
 
 **Currently out-of-scope:**
 
-1. Physical on-prem hardware configuration
-2. Benchmarking
+1. Benchmarking is not always executed for each recipe.
 
 **Note: Intel Cloud Optimized Modules for Ansible focus on the enablement of Intel Technologies and often will include a demo but are not meant to be a benchmarking tool.**
 
@@ -38,10 +37,13 @@ The primary goal of Intel Cloud Optimized Modules for Ansible is to simplify and
 
 Some examples of technologies that can be enabled and optimized are:
 
+- OPEA - Open Platform for AI[LINK](https://opea.dev/)
+- RAG - Retrieval Augmented Generation
+- Intel Guadi AI Accelerator
 - OneAPI AI Training and Inference with Intel® Advanced Matrix Extensions (Intel® AMX)
-- Encryption/Decryption with Intel Quick Assist Technology (Intel QAT)
-- MySQL Open Source Database
-- PostgreSQL Open Source Database
+- Intel AMX - Advanced Matrix Extensions
+- Intel SGX - Software Guard Extensions
+- GenAI Stable Diffusion
 
 ## Intel® Cloud Optimization Modules for HashiCorp, the Intel Cloud Optimized Modules for Ansible companion
 
@@ -185,6 +187,4 @@ We are glad to review and accept contributions.
 
 ## Considerations
 
-Today, the scope is limited to enabling/optimizing VMs on public cloud providers.
-
-The Intel Cloud Optimized Modules for Ansible are currently not managing on-prem physical hardware configurations.
+Many times these Modules will need to be enhanced for additional use cases. We are open to contributions and suggestions.
