@@ -2,7 +2,7 @@
   <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
-# Intel® Optimized Cloud Recipes  - OPEA ChatQnA Example on Intel® Xeon®
+# Intel® Optimized Cloud Modules for Ansible - OPEA ChatQnA Example on Intel® Xeon®
 
 ## Overview
 
