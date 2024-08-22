@@ -3,14 +3,14 @@
   <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
-# Intel® Optimized Cloud Recipes (OCRs)
+# Intel® Optimized Cloud Modules for Ansible 
 
 © Copyright 2023, Intel Corporation
 
 ## Overview
 
 
-**Intel® Optimized Cloud Recipes (OCRs) are:**
+**Intel® Optimized Cloud Modules for Ansible are:**
 
 1. A combination of documentation(markdown) and scripted automation.
 2. Developed to enable/optimize technologies on Intel® Architecture (IA).
@@ -20,24 +20,21 @@
 6. Ready to be Integrated into Intel® Cloud Optimization Modules for HashiCorp Terraform using Cloud Cloud-Init integration. See [GCP Module example](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gcp-linux-with-aikit)).
 7. Can also be used directly on their own(see usage on each recipe).
 
-**Currently out-of-scope for OCRs:**
+**Currently out-of-scope:**
 
-1. Physical on-prem hardware configuration.
-2. Defining tuning parameters/knobs and values that are required to optimize a workload.
-3. Benchmarking.
+1. Physical on-prem hardware configuration
+2. Benchmarking
 
-
-
-**Note: OCRs focus on the enablement of Intel Technologies and often will include a demo but are not meant to be a benchmarking tool.**
+**Note: Intel Cloud Optimized Modules for Ansible focus on the enablement of Intel Technologies and often will include a demo but are not meant to be a benchmarking tool.**
 
 **Intel is working on a separate benchmarking repository called [Workload Services Framework](https://github.com/intel/workload-services-framework) that will consume these recipes and provide benchmarking capabilities.**
 
 
 ## Value
 
-The primary goal of OCRs is to simplify and accelerate the enablement of Intel® Technologies on public cloud VMs.
+The primary goal of Intel Cloud Optimized Modules for Ansible is to simplify and accelerate the enablement of Intel® Technologies on public cloud VMs.
 
-## Examples of Recipes
+## Examples of Intel Cloud Optimized Modules for Ansible
 
 Some examples of technologies that can be enabled and optimized are:
 
@@ -46,17 +43,17 @@ Some examples of technologies that can be enabled and optimized are:
 - MySQL Open Source Database
 - PostgreSQL Open Source Database
 
-## Intel® Cloud Optimization Modules for HashiCorp, the OCRs companion
+## Intel® Cloud Optimization Modules for HashiCorp, the Intel Cloud Optimized Modules for Ansible companion
 
 The Intel® Cloud Optimization Modules for HashiCorp Terraform enable the deployment of optimized instances on public cloud. The modules are available on the [Terraform Registry](https://registry.terraform.io/modules/intel).
 
-**The Modules can be easily integrated with these Recipes, see Usage below.**
+**The Modules can be easily integrated with these Intel Cloud Optimized Modules for Ansible, see Usage below.**
 
 ## Usage
 
-Recipes are located in the `./recipes` folder. Each recipe has its own folder and contains a `README.md` file with instructions on how to use it.
+Intel Cloud Optimized Modules for Ansible are located in the `./recipes` folder. Each recipe has its own folder and contains a `README.md` file with instructions on how to use it.
 
-There are two primary ways to use these Recipes:
+There are two primary ways to use these Intel Cloud Optimized Modules for Ansible:
 
 1. **Via a Cloud-init Integration with Intel® Cloud Optimization Modules for HashiCorp Terraform**
 2. **By running Ansible via the command line**
@@ -190,4 +187,4 @@ We are glad to review and accept contributions.
 
 Today, the scope is limited to enabling/optimizing VMs on public cloud providers.
 
-The OCRs are currently not managing on-prem physical hardware configurations.
+The Intel Cloud Optimized Modules for Ansible are currently not managing on-prem physical hardware configurations.

@@ -2,7 +2,7 @@
   <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
-# Intel® Optimized Cloud Recipes  - Intel® Gaudi® on Ubuntu
+# Intel® Optimized Cloud Modules for Ansible  - Intel® Gaudi® on Ubuntu
 
 ## Overview
 

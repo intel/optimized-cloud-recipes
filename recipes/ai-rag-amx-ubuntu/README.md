@@ -4,6 +4,8 @@
 
 # Intel® Corporation Copyright
 
+# Intel® Optimized Cloud Modules for Ansible
+
 **Contributors: William Fowler, Joshua Segovia, Chris Ah-Siong**
 
 # Intel® Gen AI RAG DEMO using Xeon AMX
