@@ -92,4 +92,4 @@
         cmd: |
           . /etc/profile.d/opea.sh
           cd /opt/GenAIExamples/ChatQnA/docker/xeon
-          docker compose -f compose_vllm.yaml up -d
+          docker compose -f compose.yaml up -d
