@@ -3,7 +3,7 @@
 # Needs to be run as root user or with sudo privileges.
 # This is compatible with Ubuntu 
 ---
-- name: OPEA ChatQnA
+- name: OPEA CodeGen
   hosts: localhost
   tasks:
     - name: Install pre-requisite packages
