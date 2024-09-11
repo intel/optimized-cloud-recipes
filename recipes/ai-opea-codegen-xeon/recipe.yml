@@ -1,8 +1,9 @@
-# Ansible Playbook of the recipe found here: https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA
+# Ansible Playbook automation of OPEA found here: https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/README.md
+# This can be used standalone or as part of a Terraform script to automate the deployment of OPEA on Intel Xeon servers. See README.md
 # Needs to be run as root user or with sudo privileges.
-# To use the newer version of the example, see commented out sections below
+# This is compatible with Ubuntu 
 ---
-- name: OPEA ChatQnA
+- name: OPEA CodeGen
   hosts: localhost
   tasks:
     - name: Install pre-requisite packages
@@ -41,11 +42,11 @@
         dest: /opt/GenAIComps
     - name: Clone the GenAIExamples repo
       git:
-        repo: https://github.com/lucasmelogithub/GenAIExamples.git #To be updated to opea-project org later per Lucas Melo
+        repo: https://github.com/opea-project/GenAIExamples.git #To be updated to opea-project org later per Lucas Melo
         dest: /opt/GenAIExamples
     - name: Launch the OPEA containers
       ansible.builtin.shell:
         cmd: |
           . /etc/profile.d/opea.sh
-          cd /opt/GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon
+          cd /opt/GenAIExamples/CodeGen/docker_compose/intel/cpu/xeon
           docker compose -f compose.yaml up -d
