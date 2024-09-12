@@ -5,6 +5,8 @@
 ---
 - name: OPEA CodeGen
   hosts: localhost
+  vars:
+    TAG: "v0.9"
   tasks:
     - name: Install pre-requisite packages
       ansible.builtin.apt:
@@ -42,7 +44,7 @@
         dest: /opt/GenAIComps
     - name: Clone the GenAIExamples repo
       git:
-        repo: https://github.com/opea-project/GenAIExamples.git #To be updated to opea-project org later per Lucas Melo
+        repo: https://github.com/lucasmelogithub/GenAIExamples.git #To be updated to 'opea-project' org later per Lucas Melo. Required to use new React UI on compose.yaml
         dest: /opt/GenAIExamples
     - name: Launch the OPEA containers
       ansible.builtin.shell:
@@ -50,3 +52,5 @@
           . /etc/profile.d/opea.sh
           cd /opt/GenAIExamples/CodeGen/docker_compose/intel/cpu/xeon
           docker compose -f compose.yaml up -d
+        Environment:
+          TAG: "{{ TAG }}"
