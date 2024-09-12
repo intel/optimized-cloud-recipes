@@ -62,7 +62,7 @@ sudo ansible-playbook recipes/ai-opea-codegen-xeon/recipe.yml
 
 ## Accessing the demo
 
-1. Open a browser and go to 'http://yourpublicip:5174'
+1. Open a browser and go to 'http://yourpublicip:5173'
 
 2. This will launch the UI for the demo.
 
