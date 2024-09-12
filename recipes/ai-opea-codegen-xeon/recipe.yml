@@ -52,5 +52,5 @@
           . /etc/profile.d/opea.sh
           cd /opt/GenAIExamples/CodeGen/docker_compose/intel/cpu/xeon
           docker compose -f compose.yaml up -d
-        Environment:
-          TAG: "{{ TAG }}"
+      environment:
+        TAG: "{{ TAG }}"
