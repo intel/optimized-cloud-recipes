@@ -2,14 +2,21 @@
   <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/logo-classicblue-800px.png?raw=true" alt="Intel Logo" width="250"/>
 </p>
 
-# Intel® Optimized Cloud Modules for Ansible - OPEA ChatQnA on Intel® Xeon®
+# Intel® Optimized Cloud Modules for Ansible - TII Falcon2-11B OPEA RAG ChatQnA on Intel® Xeon®
 
 ## Overview
 
-| Area   | Description                                                 | Links |
-| :----- | :---------------------------------------------------------- | :-------- |
-| Recipe | **OPEA ChatQnA on Intel® Xeon® on Ubuntu** ||
-Demo | OPEA ChatQnA on Intel® Xeon® |  [OPEA ChatQnA](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/xeon) |
+This Module will deploy the TII Falcon2-11B model using the Open Platform for Enterprise AI (OPEA) ChatQnA example on Intel® Xeon®. 
+
+The TII Falcon2-11B model is a large language model (LLM) that is optimized for Intel® Advanced Matrix Extensions (AMX) and is hosted on Hugging Face. 
+
+The OPEA RAG ChatQnA example is a question and answer (QnA) chatbot that uses the TII Falcon2-11B model to answer questions from private documents using RAG. This example is optimized for Intel® Xeon® processors and can be run on any cloud provider or on-premises.
+
+| Area      | Description                                | Links |
+| :-------- | :----------------------------------------- | :---- |
+| Module    | **OPEA ChatQnA on Intel® Xeon® on Ubuntu** |       |
+| LLM Model | TII Falcon2-11B | https://huggingface.co/tiiuae/falcon-11B |
+|Demo | OPEA ChatQnA on Intel® Xeon® |  [OPEA ChatQnA](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/xeon) |
 | Install time | 15 minutes | |
 | Logs | `tail -f /var/log/cloud-init-output.log`| |
 
@@ -28,7 +35,7 @@ There are two main usage options:
 
 ### Option 1 - The simplest way to implement the recipe is with Intel Cloud Modules
 
-[**AWS - Intel® Optimized Cloud Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)
+[**AWS - Intel® Optimized Cloud Modules for HashiCorp Terraform example**](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon11B)
 
 ### Option 2 - Running Ansible manually via the Operating System command line
 
@@ -51,11 +58,11 @@ sudo apt install ansible -y
 git clone https://github.com/intel/optimized-cloud-recipes.git
 
 # Modify the opea.sh file and set the `host_ip` variable to your host's IP and uncomment and set your Huggingface Token, then source the opea.sh file
-nano recipes/ai-opea-chatqna-xeon/opea.sh
-source recipes/ai-opea-chatqna-xeon/opea.sh
+nano recipes/ai-opea-chatqna-xeon-falcon11B/opea.sh
+source recipes/ai-opea-chatqna-xeon-falcon11B/opea.sh
 
 # Run the recipe
-sudo ansible-playbook recipes/ai-opea-chatqna-xeon/recipe.yml
+sudo ansible-playbook recipes/ai-opea-chatqna-xeon-falcon11B/recipe.yml
 
 # Logs at 'tail -f 10 /var/log/syslog'
 ```
@@ -76,7 +83,7 @@ To change the models, stop the containers by running the following:
 
 Modify the file `/etc/profile.d/opea.sh` to change the models used. After making the changes you want, re-source the environment variables by running:
 
-`. /etc/profile.d/opea.sh`
+`source /etc/profile.d/opea.sh`
 
 Then relaunch the containers with:
 

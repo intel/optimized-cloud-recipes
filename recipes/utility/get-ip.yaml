@@ -1,0 +1,98 @@
+---
+- name: Detect Cloud Environment, Set Environment Variable, Get Public IP, and Source Environment
+  hosts: localhost
+  gather_facts: no
+  vars:
+    cloud_environment: unknown
+    public_ip: unknown
+
+  tasks:
+    - name: Detect AWS
+      uri:
+        url: http://169.254.169.254/latest/meta-data/
+        timeout: 5
+      register: aws_check
+      failed_when: false
+      ignore_errors: yes
+
+    - name: Set AWS if detected
+      set_fact:
+        cloud_environment: aws
+      when: aws_check.status == 200
+
+    - name: Get AWS Public IP
+      shell: 'curl -s http://169.254.169.254/latest/meta-data/public-ipv4'
+      register: aws_public_ip
+      when: cloud_environment == 'aws'
+      ignore_errors: yes
+
+    - name: Detect Azure
+      uri:
+        url: http://169.254.169.254/metadata/instance?api-version=2021-02-01
+        headers:
+          Metadata: true
+        timeout: 5
+      register: azure_check
+      failed_when: false
+      ignore_errors: yes
+
+    - name: Set Azure if detected
+      set_fact:
+        cloud_environment: azure
+      when: azure_check.status == 200
+
+    - name: Get Azure Public IP
+      shell: 'curl -s -H "Metadata:true" "http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/publicIpAddress?api-version=2021-02-01&format=text"'
+      register: azure_public_ip
+      when: cloud_environment == 'azure'
+      ignore_errors: yes
+
+    - name: Detect GCP
+      uri:
+        url: http://metadata.google.internal/computeMetadata/v1/
+        headers:
+          Metadata-Flavor: Google
+        timeout: 5
+      register: gcp_check
+      failed_when: false
+      ignore_errors: yes
+
+    - name: Set GCP if detected
+      set_fact:
+        cloud_environment: gcp
+      when: gcp_check.status == 200
+
+    - name: Get GCP Public IP
+      shell: 'curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip'
+      register: gcp_public_ip
+      when: cloud_environment == 'gcp'
+      ignore_errors: yes
+
+    - name: Set public IP based on cloud environment
+      set_fact:
+        public_ip: "{{ aws_public_ip.stdout if cloud_environment == 'aws' else azure_public_ip.stdout if cloud_environment == 'azure' else gcp_public_ip.stdout if cloud_environment == 'gcp' else 'unknown' }}"
+
+    - name: Set environment variables
+      ansible.builtin.lineinfile:
+        path: /etc/profile.d/opea-ip.sh
+        line: "{{ item }}"
+        regexp: "^{{ item.split('=')[0] }}="
+        create: yes
+      become: yes
+      with_items:
+        - "export CLOUD_ENVIRONMENT={{ cloud_environment }}"
+        - "export public_ip={{ public_ip }}"
+        - "host_ip=$(hostname -I | awk '{print $1}')"
+        - "export host_ip=$host_ip"
+
+    - name: Source /etc/profile.d/opea-ip.sh
+      shell: . /etc/profile.d/opea-ip.sh
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Display detected cloud environment and public IP
+      debug:
+        msg: 
+          - "Detected cloud environment: {{ cloud_environment }}"
+          - "Public IP: {{ public_ip }}"
