@@ -42,10 +42,16 @@
       git:
         repo: https://github.com/opea-project/GenAIComps.git
         dest: /opt/GenAIComps
-    - name: Clone the GenAIExamples repo
+    - name: Clone the GenAIExamples repo at commit 88e2999058093a6a63040c8b815f98670a527a4e
       git:
         repo: https://github.com/lucasmelogithub/GenAIExamples.git #To be updated to 'opea-project' org later per Lucas Melo. Required to use new React UI on compose.yaml
+        version: 88e2999058093a6a63040c8b815f98670a527a4e
         dest: /opt/GenAIExamples
+    - name: Build React UI for OPEA
+      ansible.builtin.shell:
+        cmd: |
+          cd /opt/GenAIExamples/CodeGen/ui
+          docker build --no-cache -t opea/codegen-react-ui:v0.9 --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .    
     - name: Launch the OPEA containers
       ansible.builtin.shell:
         cmd: |
