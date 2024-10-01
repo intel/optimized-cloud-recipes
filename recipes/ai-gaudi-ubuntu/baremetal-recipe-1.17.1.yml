@@ -176,13 +176,13 @@
         state: present
       loop: "{{ habana_drivers }}"
 
-    - name: Confirm drivers are loaded
+    - name: Confirm Habana drivers are loaded
       shell: "lsmod | grep {{ item }}"
       register: lsmod_result
       changed_when: false
       loop: "{{ habana_drivers }}"
 
-    - name: Display loaded drivers
+    - name: Display loaded Habana drivers
       debug:
         msg: "{{ item.stdout }}"
       loop: "{{ lsmod_result.results }}"
