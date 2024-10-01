@@ -1,5 +1,7 @@
 ##########################################################
 # Host configuration                                     #
+# Installs version 1.16.2                                #
+# Note: This doesn't update SPI Firmware                 #
 ##########################################################
 ---
 - name: Handle pre-requisites

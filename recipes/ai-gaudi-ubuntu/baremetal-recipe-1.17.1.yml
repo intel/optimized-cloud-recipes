@@ -1,0 +1,193 @@
+##########################################################
+# Host configuration                                     #
+# Installs version 1.17.1                                #
+##########################################################
+---
+- name: Handle pre-requisites
+  hosts: localhost
+  vars:
+    habana_packages:
+      - habanalabs-container-runtime
+      - habanalabs-dkms
+      - habanalabs-firmware-odm
+      - habanalabs-firmware-tools
+      - habanalabs-firmware
+      - habanalabs-graph
+      - habanalabs-qual
+      - habanalabs-rdma-core
+      - habanalabs-thunk
+    habana_drivers:
+      - habanalabs_en
+      - habanalabs_ib
+      - habanalabs_cn
+      - habanalabs
+    habana_installer: "/opt/habanalabs-installer-1.17.1.sh"
+  tasks:
+    - name: Install pre-requisite packages
+      ansible.builtin.apt:
+        pkg:
+          - python3
+          - python3-pip
+          - python-is-python3
+          - net-tools
+          - libmkl-dev
+          - docker.io
+        state: present
+        update_cache: true
+    - name: Install Jupyterlab using pip 
+      ansible.builtin.pip:
+        name: jupyterlab
+        state: present
+    #############################################################################################################################################
+    # Setup Habana Software Stack                                                                                                                    #
+    #                                                                                                                                           #
+    # Following the instructions here: https://docs.habana.ai/en/latest/Installation_Guide/Bare_Metal_Fresh_OS.html#sw-stack-installation-bare  #
+    #                                                                                                                                           #
+    # Run the Habana setup script                                                                                                               #
+    # - /tmp/habanalabs-installer.sh install -t base -y                                                                                         #
+    # - /tmp/habanalabs-installer.sh install -t dependencies -y                                                                                 #
+    # - /tmp/habanalabs-installer.sh install -t pytorch -y                                                                                      #
+    #############################################################################################################################################
+    - name: Download Habana installer
+      ansible.builtin.get_url:
+        url: https://vault.habana.ai/artifactory/gaudi-installer/1.17.1/habanalabs-installer.sh
+        dest: /opt/habanalabs-installer-1.17.1.sh
+        mode: '0755'
+    - name: Modify the Habana installer to remove the DEBIAN_FRONTEND=noninteractive flag from apt install libmkl-dev
+      ansible.builtin.lineinfile:
+        path: /opt/habanalabs-installer-1.17.1.sh
+        regexp: "\\$\\{_SUDO_CMD\\} DEBIAN_FRONTEND=noninteractive \\$\\{__pkg__\\} install -y libmkl-dev"
+        line: "             ${_SUDO_CMD} ${__pkg__} install -y libmkl-dev"
+        backrefs: yes
+    - name: Modify the Habana installer to remove the DEBIAN_FRONTEND=noninteractive flag from apt install libmkl-dev
+      ansible.builtin.lineinfile:
+        path: /opt/habanalabs-installer-1.17.1.sh
+        regexp: "\\$\\{_SUDO_CMD\\} DEBIAN_FRONTEND=noninteractive \\$\\{__pkg__\\} install -y libmkl-dev"
+        line: "             ${_SUDO_CMD} ${__pkg__} install -y libmkl-dev"
+        backrefs: yes
+
+    ##########################################################
+    # Check to see if upgrade or install is needed           #
+    ##########################################################
+
+    - name: Check if Habana packages are installed
+      command: dpkg-query -W -f='${Status}' {{ item }}
+      register: package_status
+      failed_when: false
+      changed_when: false
+      loop: "{{ habana_packages }}"
+
+    - name: Check if packages are up to date
+      command: apt list --upgradable {{ item }}
+      register: upgrade_status
+      changed_when: false
+      loop: "{{ habana_packages }}"
+
+    - name: Set facts about package status
+      set_fact:
+        missing_packages: "{{ package_status.results | selectattr('rc', 'ne', 0) | map(attribute='item') | list }}"
+        upgradable_packages: "{{ upgrade_status.results | selectattr('stdout', 'search', 'upgradable') | map(attribute='item') | list }}"
+
+    # Install packages if any are missing or it's a clean install
+
+    - name: Install Habana base
+      shell: /opt/habanalabs-installer-1.17.1.sh install -t base -y
+      when: missing_packages | length > 0
+      register: install_result
+    - name: Install Habana dependencies using script
+      shell: /opt/habanalabs-installer-1.17.1.sh install -t dependencies -y
+      when: missing_packages | length > 0
+      register: install_result
+    - name: Install Habana pytorch
+      shell: /opt/habanalabs-installer-1.17.1.sh install -t pytorch -y
+      when: missing_packages | length > 0
+      register: install_result
+
+    # Install the Habana Container Runtime by dowloading the habana artifactory key, adding the artifactory repository to the sources list, and installing the habanalabs-container-runtime package
+    - name: Download Habana artifactory key
+      get_url:
+        url: https://vault.habana.ai/artifactory/api/gpg/key/public
+        dest: /tmp/habana-artifactory-key
+      when: missing_packages | length > 0
+      register: install_result
+    - name: Add Habana artifactory repository to sources list
+      copy:
+        content: |
+          deb https://vault.habana.ai/artifactory/debian jammy main
+        dest: /etc/apt/sources.list.d/artifactory.list
+      when: missing_packages | length > 0
+      register: install_result
+    - name: Add Habana artifactory key
+      shell: apt-key add /tmp/habana-artifactory-key
+      when: missing_packages | length > 0
+      register: install_result
+    - name: Install Habana Container Runtime
+      apt:
+        name: habanalabs-container-runtime
+        state: present
+        update_cache: true
+      when: missing_packages | length > 0
+      register: install_result
+    - name: Add Habana Container Runtime to the docker daemon.json
+      copy:
+        content: |
+          {
+           "runtimes": {
+             "habana": {
+                "path": "/usr/bin/habana-container-runtime",
+                "runtimeArgs": []
+              }
+            }
+          }
+        dest: /etc/docker/daemon.json
+      when: missing_packages | length > 0
+      register: install_result
+    - name: Restart docker service
+      service:
+        name: docker
+        state: restarted
+      when: missing_packages | length > 0
+      register: install_result
+
+    # Update Habana Stack if already installed
+    - name: Update packages if any are not up to date
+      shell: /opt/habanalabs-installer-1.17.1.sh upgrade -t all
+      when: upgradable_packages | length > 0
+      register: update_result
+
+    ## Due to versioning of the firmware and drivers in 1.17.1, won't be able to reliably check to see if the firmware update is needed.
+    ## Will do the firmware update each time.
+    ## Future versions: Need to add check here to see if firmware needs to be updated
+    ## Will unload the drivers, update the SPI firmware and then reload the drivers
+    - name: Unload the Habana drivers in specified order
+      modprobe:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ habana_drivers | reverse | list }}"
+    - name: Upgrading Habana SPI Firmware
+      shell: /usr/sbin/hl-fw-loader -y
+      register: command_result
+    - name: Display command output
+      debug:
+        var: command_result.stdout_lines
+    - name: Reload Habana drivers
+      modprobe:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ habana_drivers }}"
+
+    - name: Confirm Habana drivers are loaded
+      shell: "lsmod | grep {{ item }}"
+      register: lsmod_result
+      changed_when: false
+      loop: "{{ habana_drivers }}"
+
+    - name: Display loaded Habana drivers
+      debug:
+        msg: "{{ item.stdout }}"
+      loop: "{{ lsmod_result.results }}"
+      when: item.stdout != ""
+
+    # Always pull the latest Gaudi pytorch container from Habana Labs 
+    - name: Pull the latest Gaudi pytorch container
+      shell: docker pull vault.habana.ai/gaudi-docker/1.17.1/ubuntu22.04/habanalabs/pytorch-installer-2.3.1:latest

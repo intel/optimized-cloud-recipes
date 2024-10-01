@@ -20,8 +20,6 @@ Demo | Setups environment to run Gaudi Demos |  [LINK](TBD)
 | OS            | Ubuntu* 22.04 LTS or newer               |
 | Hardware      | Intel® Gaudi® AI Accelerator |
 
-**Note: Only AWS DL1 Instances are supported**
-
 ## Usage
 
 There are two main usage options:
@@ -32,7 +30,13 @@ There are two main usage options:
 
 ### Option 2 - Running Ansible manually via the Operating System command line
 
-By using [ansible-pull](https://docs.ansible.com/ansible/latest/cli/ansible-pull.html), Ansible can run directly on the host.
+Pick the recipe file based on the version of the Intel® Gaudi® drivers
+
+| Driver Version | Recipe File | Notes |
+| :------------- | :---------- | :---- |
+| 1.16.0         | [recipe.yml](recipe.yml)| Used in specific demos, works on AWS DL1 instances |
+| 1.16.2         | [standalone-recipe-1.16.2.yml](standalone-recipe-1.16.2.yml)| Doesn't upgrade SPI Firmware |
+| 1.17.1         | [baremetal-recipe-1.17.1.yml](baremetal-recipe-1.17.1.yml)| For clean installs or upgrades. Upgrades SPI Firmware.|
 
 For example, on Ubuntu:
 
@@ -47,8 +51,11 @@ sudo apt update
 # Install Ansible
 sudo apt install ansible -y
 
-#Run ansible-pull
-sudo ansible-pull -vv -U https://github.com/intel/optimized-cloud-recipes.git recipes/ai-gaudi-ubuntu/standalone-recipe.yml
+# Clone the repo
+git clone https://github.com/intel/optimized-cloud-recipes.git 
+
+# Run the recipe, pick the recipe version for the Habana version you want
+sudo ansible-playbook optimized-cloud-recipes/recipes/ai-gaudi-ubuntu/baremetal-1.17.1.yml
 
 # Logs at 'tail -f 10 /var/log/syslog'
 ```
