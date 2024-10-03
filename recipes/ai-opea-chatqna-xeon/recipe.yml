@@ -2,6 +2,10 @@
 # Needs to be run as root user or with sudo privileges.
 # To use the newer version of the example, see commented out sections below
 ---
+
+- name: Import base playbook to update opea.sh with private and public IP
+  ansible.builtin.import_playbook: ../utility/get-ip.yaml
+
 - name: OPEA ChatQnA
   hosts: localhost
   # Modify the TAG variable to the desired version of the OPEA containers: https://hub.docker.com/u/opea
