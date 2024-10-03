@@ -1,9 +1,5 @@
 #!/bin/bash
 
-public_ip=$(ec2metadata --public-ipv4)
-host_ip=$(hostname -I | awk '{print $1}')
-export host_ip=$host_ip
-export public_ip=$public_ip
 export no_proxy=
 export http_proxy=
 export https_proxy=

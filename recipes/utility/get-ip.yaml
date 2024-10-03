@@ -1,5 +1,5 @@
 ---
-- name: Detect Cloud Environment, Set Environment Variable, Get Public IP, and Source Environment
+- name: Detect Cloud Environment, Set Environment Variable, Get Public IP, and Update opea.sh
   hosts: localhost
   gather_facts: no
   vars:
@@ -74,22 +74,17 @@
 
     - name: Set environment variables
       ansible.builtin.lineinfile:
-        path: /etc/profile.d/opea-ip.sh
+        path: /etc/profile.d/opea.sh
         line: "{{ item }}"
         regexp: "^{{ item.split('=')[0] }}="
         create: yes
+        insertafter: '^#!/bin/bash'
       become: yes
       with_items:
+        - "export host_ip=$host_ip"
         - "export CLOUD_ENVIRONMENT={{ cloud_environment }}"
         - "export public_ip={{ public_ip }}"
         - "host_ip=$(hostname -I | awk '{print $1}')"
-        - "export host_ip=$host_ip"
-
-    - name: Source /etc/profile.d/opea-ip.sh
-      shell: . /etc/profile.d/opea-ip.sh
-      args:
-        executable: /bin/bash
-      changed_when: false
 
     - name: Display detected cloud environment and public IP
       debug:
