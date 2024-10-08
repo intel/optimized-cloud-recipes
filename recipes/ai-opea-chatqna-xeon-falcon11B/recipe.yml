@@ -55,6 +55,6 @@
         cmd: |
           . /etc/profile.d/opea.sh
           cd /opt/GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon
-          docker compose -f compose.yaml up -d
+          docker compose -f compose2.yaml up -d
       environment:
         TAG: "{{ TAG }}"
