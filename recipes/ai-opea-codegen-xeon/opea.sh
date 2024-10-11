@@ -3,7 +3,7 @@
 export no_proxy=
 export http_proxy=
 export https_proxy=
-export LLM_MODEL_ID="meta-llama/CodeLlama-7b-hf"
+export LLM_MODEL_ID="codellama/CodeLlama-7b-Instruct-hf"
 #export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8028"
 export MEGA_SERVICE_HOST_IP=${host_ip}
