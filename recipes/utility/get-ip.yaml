@@ -5,6 +5,7 @@
   vars:
     cloud_environment: unknown
     public_ip: unknown
+    host_ip: "{{ lookup('pipe', \"hostname -I | awk '{print $1}'\") }}"
 
   tasks:
     - name: Detect AWS
@@ -70,8 +71,7 @@
 
     - name: Set public IP based on cloud environment
       set_fact:
-        public_ip: "{{ aws_public_ip.stdout if cloud_environment == 'aws' else azure_public_ip.stdout if cloud_environment == 'azure' else gcp_public_ip.stdout if cloud_environment == 'gcp' else 'unknown' }}"
-
+        public_ip: "{{ aws_public_ip.stdout if cloud_environment == 'aws' else azure_public_ip.stdout if cloud_environment == 'azure' else gcp_public_ip.stdout if cloud_environment == 'gcp' else host_ip }}"
     - name: Set environment variables
       ansible.builtin.lineinfile:
         path: /etc/profile.d/opea.sh
@@ -91,3 +91,4 @@
         msg: 
           - "Detected cloud environment: {{ cloud_environment }}"
           - "Public IP: {{ public_ip }}"
+          - "Host IP: {{ host_ip }}"
