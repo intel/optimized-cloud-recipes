@@ -37,9 +37,9 @@ The primary goal of Intel Cloud Optimized Modules for Ansible is to simplify and
 
 Some examples of technologies that can be enabled and optimized are:
 
-- OPEA - Open Platform for AI[LINK](https://opea.dev/)
+- OPEA - [Open Platform for Enterprise AI](https://opea.dev/)
 - RAG - Retrieval Augmented Generation
-- Intel Guadi AI Accelerator
+- Intel Gaudi AI Accelerator
 - OneAPI AI Training and Inference with Intel® Advanced Matrix Extensions (Intel® AMX)
 - Intel AMX - Advanced Matrix Extensions
 - Intel SGX - Software Guard Extensions
