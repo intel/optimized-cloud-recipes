@@ -127,6 +127,7 @@ For example, on Ubuntu by using [ansible-pull](https://docs.ansible.com/ansible/
 sudo apt install git -y
 
 # Install Ansible Key (Ubuntu), see ansible installation guide above for other distros.
+sudo apt update
 sudo apt install software-properties-common
 sudo add-apt-repository --yes --update ppa:ansible/ansible
 
