@@ -37,9 +37,9 @@ The primary goal of Intel Cloud Optimized Modules for Ansible is to simplify and
 
 Some examples of technologies that can be enabled and optimized are:
 
-- OPEA - Open Platform for AI[LINK](https://opea.dev/)
+- OPEA - [Open Platform for Enterprise AI](https://opea.dev/)
 - RAG - Retrieval Augmented Generation
-- Intel Guadi AI Accelerator
+- Intel Gaudi AI Accelerator
 - OneAPI AI Training and Inference with Intel® Advanced Matrix Extensions (Intel® AMX)
 - Intel AMX - Advanced Matrix Extensions
 - Intel SGX - Software Guard Extensions
@@ -126,9 +126,10 @@ For example, on Ubuntu by using [ansible-pull](https://docs.ansible.com/ansible/
 # Install Git 
 sudo apt install git -y
 
-# Install Ansible Key
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+# Install Ansible Key (Ubuntu), see ansible installation guide above for other distros.
 sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
 
 # Install Ansible
 sudo apt install ansible -y
