@@ -111,6 +111,12 @@
         - "export host_ip=127.0.0.1"
         - "export public_ip=127.0.0.1"
       when: cloud_environment == 'intel_tiber'
+      
+    - name: Set host_ip and public_ip for localhost when Intel Tiber AI Cloud is detected  
+      when: cloud_environment == 'intel_tiber'
+      set_fact:
+        host_ip: "127.0.0.1"
+        public_ip: "127.0.0.1"
 
     - name: Display detected cloud environment and public IP
       debug:
