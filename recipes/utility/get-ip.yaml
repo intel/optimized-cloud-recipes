@@ -6,7 +6,6 @@
     cloud_environment: unknown
     public_ip: unknown
     host_ip: "{{ lookup('pipe', \"hostname -I | awk '{print $1}'\") }}"
-    lucas: ""
 
   tasks:
     - name: Detect AWS
@@ -112,7 +111,7 @@
         - "export host_ip=127.0.0.1"
         - "export public_ip=127.0.0.1"
       when: cloud_environment == 'intel_tiber'
-      
+
     - name: Display detected cloud environment and public IP
       debug:
         msg: 
