@@ -6,6 +6,7 @@
     cloud_environment: unknown
     public_ip: unknown
     host_ip: "{{ lookup('pipe', \"hostname -I | awk '{print $1}'\") }}"
+    lucas: ""
 
   tasks:
     - name: Detect AWS
@@ -73,9 +74,20 @@
       set_fact:
         public_ip: "{{ aws_public_ip.stdout if cloud_environment == 'aws' else azure_public_ip.stdout if cloud_environment == 'azure' else gcp_public_ip.stdout if cloud_environment == 'gcp' else host_ip }}"
     
-    - name: Set environment variables
+    - name: Intel Tiber AI Cloud - Acquire hostname to detect if it is Intel Tiber AI Cloud  
+      shell: 'hostname -f'
+      register: intel_tiber_hostname
+      ignore_errors: yes
+
+    - name: Set Intel Tiber AI Cloud if detected
+      set_fact:
+        cloud_environment: intel_tiber
+      when: "'idcservice.net' in intel_tiber_hostname.stdout"
+
+    - name: Set environment variables on opea.sh for all cloud environments except Intel Tiber AI Cloud
       ansible.builtin.lineinfile:
         path: /etc/profile.d/opea.sh
+        when: cloud_environment != 'intel_tiber'
         line: "{{ item }}"
         regexp: "^{{ item.split('=')[0] }}="
         create: yes
@@ -86,6 +98,20 @@
         - "export CLOUD_ENVIRONMENT={{ cloud_environment }}"
         - "export public_ip={{ public_ip }}"
         - "host_ip=$(hostname -I | awk '{print $1}')"
+
+    - name: Intel Tiber AI Cloud - Set environment variables on opea.sh for Intel Tiber AI Cloud 
+      ansible.builtin.lineinfile:
+        path: /etc/profile.d/opea.sh
+        when: cloud_environment == 'intel_tiber'
+        line: "{{ item }}"
+        regexp: "^{{ item.split('=')[0] }}="
+        create: yes
+        insertafter: '^#!/bin/bash'
+      become: yes
+      with_items:
+        - "export CLOUD_ENVIRONMENT={{ cloud_environment }}"
+        - "export host_ip=127.0.0.1"
+        - "export public_ip=127.0.0.1"
 
     - name: Display detected cloud environment and public IP
       debug:
