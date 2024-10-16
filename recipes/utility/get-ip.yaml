@@ -87,7 +87,6 @@
     - name: Set environment variables on opea.sh for all cloud environments except Intel Tiber AI Cloud
       ansible.builtin.lineinfile:
         path: /etc/profile.d/opea.sh
-        when: cloud_environment != 'intel_tiber'
         line: "{{ item }}"
         regexp: "^{{ item.split('=')[0] }}="
         create: yes
@@ -98,11 +97,11 @@
         - "export CLOUD_ENVIRONMENT={{ cloud_environment }}"
         - "export public_ip={{ public_ip }}"
         - "host_ip=$(hostname -I | awk '{print $1}')"
+      when: cloud_environment != 'intel_tiber'
 
     - name: Intel Tiber AI Cloud - Set environment variables on opea.sh for Intel Tiber AI Cloud 
       ansible.builtin.lineinfile:
         path: /etc/profile.d/opea.sh
-        when: cloud_environment == 'intel_tiber'
         line: "{{ item }}"
         regexp: "^{{ item.split('=')[0] }}="
         create: yes
@@ -112,7 +111,8 @@
         - "export CLOUD_ENVIRONMENT={{ cloud_environment }}"
         - "export host_ip=127.0.0.1"
         - "export public_ip=127.0.0.1"
-
+      when: cloud_environment == 'intel_tiber'
+      
     - name: Display detected cloud environment and public IP
       debug:
         msg: 
