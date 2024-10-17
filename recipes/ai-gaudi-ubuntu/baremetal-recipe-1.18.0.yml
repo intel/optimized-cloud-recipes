@@ -194,7 +194,7 @@
     - name: Display firmware check results
       debug:
         msg: >
-          {% if all_versions_match %}
+          {% if all_fw_versions_match %}
           All firmware versions match expected version {{ habana_spi_fw_version }}. No action needed.
           {% else %}
           Firmware version mismatch detected. Will proceed with driver operations.
