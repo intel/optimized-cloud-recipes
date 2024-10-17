@@ -210,7 +210,7 @@
           - "  - Version match check: {{ firmware_versions[0] == habana_spi_fw_version }}"
 
     - name: SPI Firmware Update
-      when: not all_versions_match
+      when: not all_fw_versions_match
       block:
         - name: Unload the Habana drivers in specified order
           modprobe:
