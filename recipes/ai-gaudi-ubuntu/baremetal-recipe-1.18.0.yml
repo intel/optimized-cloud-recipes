@@ -146,13 +146,13 @@
     - name: Tasks if packages are missing
       block:
         - name: Install Habana base
-          shell: {{ habana_installer }} install -t base -y
+          shell: "{{ habana_installer }} install -t base -y"
           register: install_result
         - name: Install Habana dependencies using script
-          shell: {{ habana_installer }} install -t dependencies -y
+          shell: "{{ habana_installer }} install -t dependencies -y"
           register: install_result
         - name: Install Habana pytorch
-          shell: {{ habana_installer }} install -t pytorch -y
+          shell: "{{ habana_installer }} install -t pytorch -y"
           register: install_result
         # Install the Habana Container Runtime by dowloading the habana artifactory key, adding the artifactory repository to the sources list, and installing the habanalabs-container-runtime package
         - name: Download Habana artifactory key
@@ -199,7 +199,7 @@
 
     # Update Habana Stack if already installed
     - name: Update packages if any are not up to date
-      shell: {{ habana_installer }} upgrade -t all
+      shell: "{{ habana_installer }} upgrade -t all"
       when: upgradable_packages | length > 0
       register: update_result
 
