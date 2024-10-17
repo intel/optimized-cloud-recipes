@@ -93,46 +93,7 @@
         missing_packages: "{{ package_status.results | selectattr('rc', 'ne', 0) | map(attribute='item') | list }}"
         upgradable_packages: "{{ upgrade_status.results | selectattr('stdout', 'search', 'upgradable') | map(attribute='item') | list }}"
   
-    # Check if the SPI firmware is up to date
-    - name: Check firmware version
-      shell: "hl-smi -L | grep SPI"
-      register: firmware_check
-      changed_when: false
-    - name: Display raw firmware check output
-      debug:
-        var: firmware_check.stdout_lines
 
-    - name: Analyze firmware versions
-      set_fact:
-        firmware_versions: "{{ firmware_check.stdout_lines | map('regex_search', '([0-9]+\\.[0-9]+\\.[0-9]+-fw-[0-9]+\\.[0-9]+\\.[0-9]+-sec-[0-9]+)') | select('string') | list }}"
-    - name: Display extracted firmware versions
-      debug:
-        msg:
-          - "Extracted versions: {{ firmware_versions | default([]) }}"
-          - "Expected version: {{ habana_spi_fw_version }}"
-          - "Number of versions found: {{ firmware_versions | default([]) | length }}"
-
-    - name: Check if all firmware versions match
-      set_fact:
-        all_fw_versions_match: "{{ true if (firmware_versions | unique | list | length == 1) and (firmware_versions[0] == habana_spi_fw_version) else false }}"
-
-    - name: Display firmware check results
-      debug:
-        msg: >
-          {% if all_versions_match %}
-          All firmware versions match expected version {{ habana_spi_fw_version }}. No action needed.
-          {% else %}
-          Firmware version mismatch detected. Will proceed with driver operations.
-          Found versions: {{ firmware_versions | join(', ') }}
-          {% endif %}
-
-    - name: Display match status
-      debug:
-        msg:
-          - "All versions match: {{ all_fw_versions_match }}"
-          - "Condition details:"
-          - "  - Unique versions check: {{ firmware_versions | unique | list | length == 1 }}"
-          - "  - Version match check: {{ firmware_versions[0] == habana_spi_fw_version }}"
     
     # # Unload the drivers before proceeding
     # - name: Unload the Habana drivers in specified order
@@ -207,8 +168,46 @@
     ## Future versions: Need to add check here to see if firmware needs to be updated
     ## Will unload the drivers, update the SPI firmware and then reload the drivers
 
+    # Check if the SPI firmware is up to date
+    - name: Check firmware version
+      shell: "hl-smi -L | grep SPI"
+      register: firmware_check
+      changed_when: false
+    - name: Display raw firmware check output
+      debug:
+        var: firmware_check.stdout_lines
 
+    - name: Analyze firmware versions
+      set_fact:
+        firmware_versions: "{{ firmware_check.stdout_lines | map('regex_search', '([0-9]+\\.[0-9]+\\.[0-9]+-fw-[0-9]+\\.[0-9]+\\.[0-9]+-sec-[0-9]+)') | select('string') | list }}"
+    - name: Display extracted firmware versions
+      debug:
+        msg:
+          - "Extracted versions: {{ firmware_versions | default([]) }}"
+          - "Expected version: {{ habana_spi_fw_version }}"
+          - "Number of versions found: {{ firmware_versions | default([]) | length }}"
 
+    - name: Check if all firmware versions match
+      set_fact:
+        all_fw_versions_match: "{{ true if (firmware_versions | unique | list | length == 1) and (firmware_versions[0] == habana_spi_fw_version) else false }}"
+
+    - name: Display firmware check results
+      debug:
+        msg: >
+          {% if all_versions_match %}
+          All firmware versions match expected version {{ habana_spi_fw_version }}. No action needed.
+          {% else %}
+          Firmware version mismatch detected. Will proceed with driver operations.
+          Found versions: {{ firmware_versions | join(', ') }}
+          {% endif %}
+
+    - name: Display match status
+      debug:
+        msg:
+          - "All versions match: {{ all_fw_versions_match }}"
+          - "Condition details:"
+          - "  - Unique versions check: {{ firmware_versions | unique | list | length == 1 }}"
+          - "  - Version match check: {{ firmware_versions[0] == habana_spi_fw_version }}"
 
     - name: SPI Firmware Update
       when: not all_versions_match
