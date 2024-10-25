@@ -1,12 +1,14 @@
 ##########################################################
 # Host configuration                                     #
 # Installs version: 1.18.1                               #
-# Installs SPI FW: 1.18.0-fw-53.1.1-sec-8                #
+# Installs SPI FW: 1.18.0-fw-53.1.1-sec-9                #
+#                                                        #
 ##########################################################
 ---
 - name: Handle pre-requisites
   hosts: localhost
   vars:
+    # These are the packages that will be checked. If any are missing, then it will install as if it's a clean install. If they are upgradable, then the upgrade will run instead.
     habana_packages:
       - habanalabs-container-runtime
       - habanalabs-dkms
@@ -15,7 +17,6 @@
       - habanalabs-firmware
       - habanalabs-graph
       - habanalabs-qual
-      - habanalabs-qual-workloads
       - habanalabs-rdma-core
       - habanalabs-thunk
     habana_drivers:
@@ -25,7 +26,7 @@
       - habanalabs
     habana_version: "1.18.0"  
     habana_installer: "/opt/habanalabs-installer-{{ habana_version }}.sh"
-    habana_spi_fw_version: "1.18.0-fw-53.1.1-sec-8"
+    habana_spi_fw_version: "1.18.0-fw-53.1.1-sec-9"
   tasks:
     - name: Install pre-requisite packages
       ansible.builtin.apt:
@@ -39,7 +40,7 @@
           - ethtool
         state: present
         update_cache: true
-    - name: Install Jupyterlab using pip 
+    - name: Install Jupyterlab using pip
       ansible.builtin.pip:
         name: jupyterlab
         state: present
@@ -76,7 +77,7 @@
     ##########################################################
 
     - name: Check if Habana packages are installed
-      command: dpkg-query -W -f='${Status}' {{ item }}
+      shell: dpkg-query -W -f='${Status}\n' {{ item }} | grep -q '^install ok installed$'
       register: package_status
       failed_when: false
       changed_when: false
@@ -92,17 +93,9 @@
       set_fact:
         missing_packages: "{{ package_status.results | selectattr('rc', 'ne', 0) | map(attribute='item') | list }}"
         upgradable_packages: "{{ upgrade_status.results | selectattr('stdout', 'search', 'upgradable') | map(attribute='item') | list }}"
-  
 
-    
-    # # Unload the drivers before proceeding
-    # - name: Unload the Habana drivers in specified order
-    #   modprobe:
-    #     name: "{{ item }}"
-    #     state: absent
-    #   loop: "{{ habana_drivers | reverse | list }}"  
 
-    # Install packages if any are missing or it's a clean install
+    #Install packages if any are missing or it's a clean install
 
     - name: Tasks if packages are missing
       block:
@@ -156,15 +149,26 @@
           register: install_result
       when: missing_packages | length > 0
 
-
-
     # Update Habana Stack if already installed
     - name: Update packages if any are not up to date
-      shell: "{{ habana_installer }} upgrade -t all"
-      when: upgradable_packages | length > 0
-      register: update_result
-
-    ## Will do the firmware update each time.
+      block:
+        - name: Unload the Habana drivers in specified order
+          modprobe:
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ habana_drivers | reverse | list }}"
+        - name: Run the upgrade
+          shell: "{{ habana_installer }} upgrade -t all"
+          register: update_result
+        - name: Update the Habana container Runtime
+          apt:
+            name: habanalabs-container-runtime
+            state: latest
+            update_cache: no
+      when: 
+        - upgradable_packages | length > 0
+        - missing_packages | length == 0
+  
     ## Future versions: Need to add check here to see if firmware needs to be updated
     ## Will unload the drivers, update the SPI firmware and then reload the drivers
 
