@@ -59,3 +59,5 @@
       shell: sudo ./trustauthority-client/tdx-cli/trustauthority-cli verify --config config.json --token $(cat ITA-Token.tok) > ITA-Verify.tok
       args:
         chdir: /trustauthority-client/tdx-cli
+
+     #NOTE: you can cat ITA-Token.tok to verify the token
