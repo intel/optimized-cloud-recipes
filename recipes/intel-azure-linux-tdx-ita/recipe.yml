@@ -40,7 +40,7 @@
 
     - name: Create config.json file
       ansible.builtin.copy:
-        dest: "/trustauthority-client/tdx-cli/config.json"
+        dest: /trustauthority-client/tdx-cli/config.json
         content: |
           {
           "trustauthority_url": "https://portal.trustauthority.intel.com",
