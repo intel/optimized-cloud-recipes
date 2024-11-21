@@ -37,10 +37,6 @@
       ansible.builtin.make:
         chdir: /trustauthority-client/tdx-cli
         target: cli
-      environment:
-        GOPATH: "/home/adminuser/go"
-        GOMODCACHE: "/home/adminuser/go/pkg/mod"
-        PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin:/home/adminuser/go/bin"
 
     - name: Create config.json file
       copy:
