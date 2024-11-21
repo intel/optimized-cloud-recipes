@@ -23,7 +23,7 @@
         classic: yes
 
     - name: Update and upgrade all packages
-      apt:
+      ansible.builtin.apt:
         update_cache: yes
         upgrade: yes
 
@@ -33,10 +33,19 @@
         version: azure-tdx-preview
         dest: /trustauthority-client
 
+- name: Build Intel trustauthority-cli
+  hosts: localhost
+  connection: local
+  become: yes
+  tasks:
     - name: Build Intel trustauthority-cli
-      make:
+      ansible.builtin.make:
         chdir: /trustauthority-client/tdx-cli
         target: cli
+      environment:
+        GOPATH: "/home/adminuser/go"
+        GOMODCACHE: "/home/adminuser/go/pkg/mod"
+        PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin:/home/adminuser/go/bin"
 
     - name: Create config.json file
       copy:
@@ -60,4 +69,4 @@
       args:
         chdir: /trustauthority-client/tdx-cli
 
-     #NOTE: you can cat ITA-Token.tok to verify the token
+    #NOTE: you can cat ITA-Token.tok to verify the token
