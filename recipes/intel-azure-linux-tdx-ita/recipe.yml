@@ -33,11 +33,6 @@
         version: azure-tdx-preview
         dest: /trustauthority-client
 
-- name: Build Intel trustauthority-cli
-  hosts: localhost
-  connection: local
-  become: yes
-  tasks:
     - name: Build Intel trustauthority-cli
       ansible.builtin.make:
         chdir: /trustauthority-client/tdx-cli
