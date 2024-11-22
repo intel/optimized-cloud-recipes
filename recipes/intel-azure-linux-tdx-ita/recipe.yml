@@ -39,14 +39,9 @@
         target: cli
 
     - name: Create config.json file
-      copy:
+      ansible.builtin.template:
+        src: config.json.j2
         dest: /trustauthority-client/tdx-cli/config.json
-        content: |
-          {
-          "trustauthority_url": "https://portal.trustauthority.intel.com",
-          "trustauthority_api_url": "https://api.trustauthority.intel.com",
-          "trustauthority_api_key": "{{ lookup('env', 'trustauthority_api_key') }}"
-          }
         mode: '0644'
       
     #Upon successful verification, the token will be decoded and displayed in key:value pairs
