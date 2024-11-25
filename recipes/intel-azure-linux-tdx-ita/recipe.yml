@@ -28,7 +28,7 @@
         upgrade: yes
 
     - name: Clone Intel trustauthority-client repository
-      git:
+      ansible.builtin.git:
         repo: https://github.com/intel/trustauthority-client
         version: azure-tdx-preview
         dest: /trustauthority-client
@@ -37,21 +37,15 @@
       ansible.builtin.make:
         chdir: /trustauthority-client/tdx-cli
         target: cli
-
-    - name: Create config.json file
-      ansible.builtin.template:
-        src: /tmp/optimized-cloud-recipes/recipes/intel-azure-linux-tdx-ita/config.json.j2
-        dest: /trustauthority-client/tdx-cli/config.json
-        mode: '0644'
       
     #Upon successful verification, the token will be decoded and displayed in key:value pairs
     - name: Perform ITA attestation
-      shell: sudo /trustauthority-client/tdx-cli/trustauthority-cli token --config config.json --no-eventlog > ITA-Token.tok
+      ansible.builtin.shell: sudo /trustauthority-client/tdx-cli/trustauthority-cli token --config config.json --no-eventlog > ITA-Token.tok
       args:
         chdir: /trustauthority-client/tdx-cli
 
     - name: Verify the ITA Token
-      shell: sudo /trustauthority-client/tdx-cli/trustauthority-cli verify --config config.json --token $(cat ITA-Token.tok) > ITA-Verify.tok
+      ansible.builtin.shell: sudo /trustauthority-client/tdx-cli/trustauthority-cli verify --config config.json --token $(cat ITA-Token.tok) > ITA-Verify.tok
       args:
         chdir: /trustauthority-client/tdx-cli
 
