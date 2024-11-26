@@ -33,7 +33,12 @@
         version: azure-tdx-preview
         dest: /trustauthority-client
 
-    - name: Build Intel trustauthority-cli
+    - name: Copy config.json to the target directory
+      ansible.builtin.copy:
+      src: /tmp/intel-ita/config.json
+      dest: /trustauthority-client/tdx-cli/config.json
+ 
+    - name: Build Intel trustauthority-cli     
       ansible.builtin.make:
         chdir: /trustauthority-client/tdx-cli
         target: cli
