@@ -40,10 +40,9 @@
       
     - name: Copy config.json to the target directory
       ansible.builtin.copy:
-      src: /tmp/intel-ita/config.json
-      dest: /trustauthority-client/tdx-cli/config.json
+        src: /tmp/intel-ita/config.json
+        dest: /trustauthority-client/tdx-cli/config.json
  
-
     #Upon successful verification, the token will be decoded and displayed in key:value pairs
     - name: Perform ITA attestation
       ansible.builtin.shell: sudo /trustauthority-client/tdx-cli/trustauthority-cli token --config config.json --no-eventlog > ITA-Token.tok
