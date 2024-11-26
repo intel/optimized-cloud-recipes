@@ -60,12 +60,18 @@
         GOPATH: "/home/adminuser/go"
         GOMODCACHE: "/home/adminuser/go/pkg/mod"
         PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin:/home/adminuser/go/bin"
+      become: yes
+      become_user: adminuser
+
 
     - name: Create config.json file
       ansible.builtin.template:
         src: /tmp/intel-ita/config.json
         dest: /trustauthority-client/tdx-cli/config.json
         mode: '0644'
+      become: yes
+      become_user: adminuser
+
 
     - name: Perform ITA attestation
       ansible.builtin.shell: /trustauthority-client/tdx-cli/trustauthority-cli token --config config.json --no-eventlog > ITA-Token.tok
