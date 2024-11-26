@@ -37,7 +37,11 @@
       ansible.builtin.make:
         chdir: /trustauthority-client/tdx-cli
         target: cli
-      
+    
+    - name: Pause for 5 minutes
+      ansible.builtin.pause:
+        minutes: 5
+
     - name: Copy config.json to the target directory
       ansible.builtin.copy:
         src: /tmp/intel-ita/config.json
