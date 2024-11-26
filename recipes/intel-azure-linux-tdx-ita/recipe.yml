@@ -1,11 +1,12 @@
 ###########################################################################
-# Azure Instance configuration for Intel Trust Authority (ITA)                                     #
+# Azure Instance configuration for Intel Trust Authority (ITA)            #
 ###########################################################################
 ---
 - name: Setup TDX with Intel Tiber Attestation (ITA) on Ubuntu on Azure Instance
   hosts: localhost
   connection: local
   become: yes
+  become_user: adminuser
   tasks:
     - name: Install pre-requisite packages for ITA
       ansible.builtin.apt:
@@ -32,10 +33,6 @@
         repo: https://github.com/intel/trustauthority-client
         version: azure-tdx-preview
         dest: /trustauthority-client
-    
-    # - name: Pause for 5 minutes
-    #   ansible.builtin.pause:
-    #     minutes: 5
 
     - name: Debug environment variables
       ansible.builtin.shell: printenv
@@ -55,39 +52,31 @@
       ansible.builtin.debug:
         var: pwd_output.stdout
 
-    # - name: Build Intel trustauthority-cli
-    #   ansible.builtin.make:
-    #     chdir: /trustauthority-client/tdx-cli
-    #     target: cli
-    #   environment:
-    #     GOPATH: "/home/adminuser/go"
-    #     GOMODCACHE: "/home/adminuser/go/pkg/mod"
-    #     PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin:/home/adminuser/go/bin"
-
-# use ansible.builtin.shell to run 'cd trustauthority-client/tdx-cli' and 'make cli'
-    
     - name: Build Intel trustauthority-cli
-      ansible.builtin.shell:
-        cmd: |
-          cd trustauthority-client/tdx-cli
-          make cli
+      ansible.builtin.make:
+        chdir: /trustauthority-client/tdx-cli
+        target: cli
+      environment:
+        GOPATH: "/home/adminuser/go"
+        GOMODCACHE: "/home/adminuser/go/pkg/mod"
+        PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin:/home/adminuser/go/bin"
 
     - name: Create config.json file
       ansible.builtin.template:
         src: /tmp/intel-ita/config.json
         dest: /trustauthority-client/tdx-cli/config.json
         mode: '0644'
- 
+
     - name: Perform ITA attestation
       ansible.builtin.shell: /trustauthority-client/tdx-cli/trustauthority-cli token --config config.json --no-eventlog > ITA-Token.tok
       args:
         chdir: /trustauthority-client/tdx-cli
       become: yes
+      become_user: adminuser
 
     - name: Verify the ITA Token
       ansible.builtin.shell: /trustauthority-client/tdx-cli/trustauthority-cli verify --config config.json --token $(cat ITA-Token.tok) > ITA-Verify.tok
       args:
         chdir: /trustauthority-client/tdx-cli
       become: yes
-
-    #NOTE: you can cat ITA-Token.tok to verify the token
+      become_user: adminuser
