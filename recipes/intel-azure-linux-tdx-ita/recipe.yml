@@ -33,19 +33,38 @@
         version: azure-tdx-preview
         dest: /trustauthority-client
 
-    - name: Build Intel trustauthority-cli     
+    - name: Debug environment variables
+      ansible.builtin.shell: printenv
+      register: env_output
+
+    - name: Print environment variables
+      ansible.builtin.debug:
+        var: env_output.stdout_lines
+
+    - name: Debug current directory
+      ansible.builtin.shell: pwd
+      args:
+        chdir: /trustauthority-client/tdx-cli
+      register: pwd_output
+
+    - name: Print current directory
+      ansible.builtin.debug:
+        var: pwd_output.stdout
+
+    - name: Build Intel trustauthority-cli
       ansible.builtin.make:
         chdir: /trustauthority-client/tdx-cli
         target: cli
-    
-    - name: Pause for 5 minutes
-      ansible.builtin.pause:
-        minutes: 5
+      environment:
+        GOPATH: "/home/adminuser/go"
+        GOMODCACHE: "/home/adminuser/go/pkg/mod"
+        PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin:/home/adminuser/go/bin"
 
-    - name: Copy config.json to the target directory
-      ansible.builtin.copy:
-        src: /tmp/intel-ita/config.json
+    - name: Create config.json file
+      ansible.builtin.template:
+        src: /tmp/config.json.j2
         dest: /trustauthority-client/tdx-cli/config.json
+        mode: '0644'
  
     #Upon successful verification, the token will be decoded and displayed in key:value pairs
     - name: Perform ITA attestation
