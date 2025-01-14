@@ -10,7 +10,7 @@
   hosts: localhost
   # Modify the TAG variable to the desired version of the OPEA containers: https://hub.docker.com/u/opea
   vars:
-    TAG: "v0.9"
+    TAG: "1.0"
   tasks:
     - name: Install pre-requisite packages
       ansible.builtin.apt:
