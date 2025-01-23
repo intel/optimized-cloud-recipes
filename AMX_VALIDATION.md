@@ -9,11 +9,13 @@
 
 ## Overview
 
-This document will showcase how to validate that Intel® AMX is enabled and being utilized by the application.
+This document showcases how to validate that Intel® AMX is enabled and being utilized by the application.
+
+**These instructions apply to Ubuntu 22.04 and later.**
 
 ## Accelerate AI Workloads with Intel® AMX
 
-Intel® AMX is built into Intel® Xeon 4th, 5th, and 6th Generation Scalable processors. It is a new built-in accelerator that improves the performance of deep-learning training and inference on the CPU. Intel® AMX is ideal for AI workloads.
+Intel® AMX is built into Intel® Xeon 4th, 5th, and 6th Generation Scalable processors. It is a new built-in accelerator that improves the performance of deep-learning training and inference on the CPU. Intel® AMX is ideal for AI workloads acceleration.
 
 Intel Xeon 4th generation and above are available in most cloud service providers, including AWS, Azure, and GCP.
 
@@ -35,7 +37,7 @@ fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush 
 
 ### Validate Intel® AMX is being utilized by the application
 
-#### 1.Install the processwatch tool
+#### 1.Install processwatch
 
 ```bash
 # Install processwatch 
@@ -48,7 +50,7 @@ sudo apt-get install libelf-dev cmake clang llvm llvm-dev libomp-dev build-essen
 sudo ln -sf `realpath processwatch` /usr/local/bin/
 ```
 
-#### 2.Start the processwatch tool
+#### 2.Start processwatch
 
 ```bash
 # Start the processwatch tool
@@ -62,7 +64,7 @@ sudo processwatch -f SSE -f AVX -f AVX2 -f AVX512 -f AMX_TILE
 
 <img src="https://github.com/intel/optimized-cloud-recipes/blob/main/images/amx.png?raw=true" alt="AMX" width="350"/>
 
-**Anything above 0.00, means that the application is utilizing Intel® AMX. The overall value is less important, but the change in the value is.**
+**Anything above 0.00, means that the application is utilizing Intel® AMX. The overall value is not very important, but the change in the value is.**
 
 ## References
 
