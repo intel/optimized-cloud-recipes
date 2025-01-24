@@ -1,0 +1,201 @@
+##########################################################
+# Host configuration                                     #
+# Installs version: 1.19.1                               #
+# Installs SPI FW: 1.19.0-fw-56.1.0-sec-9                #
+#                                                        #
+##########################################################
+---
+- name: Handle pre-requisites
+  hosts: localhost
+  vars:
+    habana_version: "1.19.1"
+    habana_spi_fw_version: "1.19.0-fw-56.1.0-sec-9"
+    ## These are the packages that will be checked. If any are missing, then it will install as if it's a clean install. If they are upgradable, then the upgrade will run instead
+    habana_packages:
+      - habanalabs-firmware-{{ habana_version }}*
+      - habanalabs-firmware-odm-{{ habana_version }}*
+      - habanalabs-{{ habana_version }}*
+      - habanalabs-thunk-{{ habana_version }}*
+      - habanalabs-firmware-tools-{{ habana_version }}*
+      - habanalabs-rdma-core-{{ habana_version }}*
+      - habanalabs-graph-{{ habana_version }}*
+      - habanalabs-container-runtime-{{ habana_version }}*
+      - habanalabs-qual-{{ habana_version }}*
+      - habanalabs-qual-workloads-{{ habana_version }}*
+    habana_drivers:
+      - habanalabs_en
+      - habanalabs_ib
+      - habanalabs_cn
+      - habanalabs
+  pre_tasks:
+    - name: Install community.general collection
+      command: ansible-galaxy collection install community.general
+  tasks:
+    - name: Install pre-requisite packages
+      yum:
+        name:
+          - python3
+          - python3-pip
+          - net-tools
+          - podman
+          - ethtool
+          - gnupg
+          # Other packages that may be needed: rdma-core libibverbs-utils infiniband-diags kernel-modules-extra perftest
+          # May need to update all the kernel packages so that they match: sudo dnf update kernel\* --best
+          # Verify by doing "uname -r" and then "rpm -qa | grep kernel" and making sure that there are packages for the running kernel version
+        state: present
+        update_cache: true
+    - name: Install Jupyterlab using pip
+      ansible.builtin.pip:
+        name: jupyterlab
+        state: present
+
+    #############################################################################################################################################
+    # Setup Habana Software Stack                                                                                                               #
+    #                                                                                                                                           #
+    # Following the instructions here: https://docs.habana.ai/en/v1.19.1/shared/SW_Install/RHEL9.4_Installation.html                             #
+    #                                                                                                                                           #
+    #############################################################################################################################################
+
+
+    - name: Add Habana artifactory repository to sources list
+      copy:
+        content: |
+          [vault]
+          name=Habana Vault
+          baseurl=https://vault.habana.ai/artifactory/rhel/9/9.4
+          enabled=1
+          gpgcheck=1
+          repo_gpgcheck=1
+          gpgkey=https://vault.habana.ai/artifactory/api/v2/repositories/rhel/keyPairs/primary/public https://vault.habana.ai/artifactory/api/v2/repositories/rhel/keyPairs/secondary/public
+        dest: /etc/yum.repos.d/Habana-Vault.repo
+      register: install_result
+
+    - name: Run dnf makecache
+      command: dnf makecache --nogpgcheck
+      register: install_result
+
+    - name: Install additional pre-requisite packages
+      yum:
+        name:
+          - libarchive*
+          - kernel-devel
+          - dnf-utils
+        state: present
+        update_cache: true
+
+    # Install or update Habana packages using repository
+
+    - name: Unload the Habana drivers in specified order if they are present, ignore errors
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ habana_drivers | reverse | list }}"
+      ignore_errors: true # Ignore errors if the drivers are not loaded
+    - name: Install Habana packages 
+      yum:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop: "{{ habana_packages }}"
+    - name: Load the Habana drivers in specified order
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ habana_drivers }}"
+    - name: Add Habana Container Runtime to the Podman container.json
+      copy:
+        content: |
+          [engine]
+          runtime = "crun"
+          additional_runtimes = ["habana"]
+
+          [[engine.runtime_config]]
+          runtime = "habana"
+          runtime_path = "/usr/bin/habana-container-runtime"
+        dest: /etc/containers/containers.conf
+    - name: Restart podman service
+      service:
+        name: podman
+        state: restarted
+
+    #############################################################################################################################################
+    # Check if the SPI firmware is up to date
+    # If the firmware is not up to date, then update it
+    #############################################################################################################################################
+    
+    - name: Check firmware version
+      shell: "hl-smi -L | grep SPI"
+      register: firmware_check
+      changed_when: false
+    - name: Display raw firmware check output
+      debug:
+        var: firmware_check.stdout_lines
+
+    - name: Analyze firmware versions
+      set_fact:
+        firmware_versions: "{{ firmware_check.stdout_lines | map('regex_search', '([0-9]+\\.[0-9]+\\.[0-9]+-fw-[0-9]+\\.[0-9]+\\.[0-9]+-sec-[0-9]+)') | select('string') | list }}"
+    - name: Display extracted firmware versions
+      debug:
+        msg:
+          - "Extracted versions: {{ firmware_versions | default([]) }}"
+          - "Expected version: {{ habana_spi_fw_version }}"
+          - "Number of versions found: {{ firmware_versions | default([]) | length }}"
+
+    - name: Check if all firmware versions match
+      set_fact:
+        all_fw_versions_match: "{{ true if (firmware_versions | unique | list | length == 1) and (firmware_versions[0] == habana_spi_fw_version) else false }}"
+
+    - name: Display firmware check results
+      debug:
+        msg: >
+          {% if all_fw_versions_match %}
+          All firmware versions match expected version {{ habana_spi_fw_version }}. No action needed.
+          {% else %}
+          Firmware version mismatch detected. Will proceed with driver operations.
+          Found versions: {{ firmware_versions | join(', ') }}
+          {% endif %}
+
+    - name: Display match status
+      debug:
+        msg:
+          - "All versions match: {{ all_fw_versions_match }}"
+          - "Condition details:"
+          - "  - Unique versions check: {{ firmware_versions | unique | list | length == 1 }}"
+          - "  - Version match check: {{ firmware_versions[0] == habana_spi_fw_version }}"
+
+    - name: SPI Firmware Update
+      when: not all_fw_versions_match
+      block:
+        - name: Unload the Habana drivers in specified order
+          modprobe:
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ habana_drivers | reverse | list }}"
+        - name: Upgrading Habana SPI Firmware
+          shell: /usr/sbin/hl-fw-loader -y
+          register: command_result
+        - name: Display command output
+          debug:
+            var: command_result.stdout_lines
+        - name: Reload Habana drivers
+          community.general.modprobe:
+            name: "{{ item }}"
+            state: present
+          loop: "{{ habana_drivers }}"
+
+    - name: Confirm Habana drivers are loaded
+      shell: "lsmod | grep {{ item }}"
+      register: lsmod_result
+      changed_when: false
+      loop: "{{ habana_drivers }}"
+
+    - name: Display loaded Habana drivers
+      debug:
+        msg: "{{ item.stdout }}"
+      loop: "{{ lsmod_result.results }}"
+      when: item.stdout != ""
+
+    # Always pull the latest Gaudi pytorch container from Habana Labs 
+    - name: Pull the latest Gaudi pytorch container
+      shell: podman pull vault.habana.ai/gaudi-docker/{{ habana_version }}/rhel9.4/habanalabs/pytorch-installer-2.5.1:latest
