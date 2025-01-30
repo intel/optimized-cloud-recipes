@@ -49,7 +49,6 @@ For example, on Ubuntu:
 sudo apt install git -y
 
 # Install Ansible Key
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
 sudo apt update
 sudo apt install software-properties-common
 sudo add-apt-repository --yes --update ppa:ansible/ansible
