@@ -106,13 +106,23 @@
     - name: Add Habana Container Runtime to the Podman container.json
       copy:
         content: |
+          [containers]
+          default_sysctls = [
+            "net.ipv4.ping_group_range=0 0",
+          ]
+          [secrets]
+          [secrets.opts]
+          [network]
           [engine]
           runtime = "crun"
-          additional_runtimes = ["habana"]
-
-          [[engine.runtime_config]]
-          runtime = "habana"
-          runtime_path = "/usr/bin/habana-container-runtime"
+          [engine.runtimes]
+          habana = [
+            "/usr/bin/habana-container-runtime"
+          ]
+          [engine.volume_plugins]
+          [machine]
+          [farms]
+          [podmansh]
         dest: /etc/containers/containers.conf
     - name: Restart podman service
       service:

@@ -59,7 +59,7 @@ sudo ansible-playbook optimized-cloud-recipes/recipes/ai-gaudi-rhel/rhel-baremet
 1. SSH into the host and run:
 
 ```bash
-sudo docker run -it --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --net=host --ipc=host vault.habana.ai/gaudi-docker/1.19.1/rhel9.4/habanalabs/pytorch-installer-2.5.1:latest
+sudo podman run -it --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --net=host --ipc=host vault.habana.ai/gaudi-docker/1.19.1/rhel9.4/habanalabs/pytorch-installer-2.5.1:latest
 ```
 
 2. This will launch the pytorch container where the Gaudi demos can be launched.
