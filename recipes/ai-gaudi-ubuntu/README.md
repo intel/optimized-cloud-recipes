@@ -60,7 +60,7 @@ sudo apt install ansible -y
 git clone https://github.com/intel/optimized-cloud-recipes.git 
 
 # Run the recipe, pick the recipe version for the Habana version you want
-sudo ansible-playbook optimized-cloud-recipes/recipes/ai-gaudi-ubuntu/baremetal-1.19.0.yml
+sudo ansible-playbook optimized-cloud-recipes/recipes/ai-gaudi-ubuntu/baremetal-recipe-1.19.0.yml
 
 # Logs at 'tail -f 10 /var/log/syslog'
 ```
