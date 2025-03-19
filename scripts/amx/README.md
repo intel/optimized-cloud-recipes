@@ -65,7 +65,7 @@ Once Visual Studio is installed click on the Tools tab and navigate to the "Get 
 ```bash
 gcc -o amx_detection amx_detection.c amx_os_linux.c
 ```
-4. Compiling these files should output the executable amx_detection to the Downloads folder.
+4. Compiling these files should output the executable amx_detection to the Downloads folder
 5. Run the script
 ```bash
 python3 amx-detect-linux.py
@@ -97,13 +97,13 @@ You can manually run this command to see the raw CPUID information that the scri
 ### Windows
 1. Launch Windows instance and RDP into instance
 2. Download and store amx-detect-windows.py, amx_detection.c, amx_detection.h, and amx_os_windows.c to Downloads folder
-3. Open Microsoft Visual Studio and navigate to the downloads directory.
+3. Open Microsoft Visual Studio and navigate to the downloads directory
 4. Compile the source files by running the following command 
 ```bash
 cl amx_detection.c amx_os_windows.c
 ``` 
-5. Once finished compiling, an amx_detection.exe file should be outputted to the downloads folder. Exit out of visual studio. 
-7. Open command prompt and navigate to the Downloads directory. 
+5. Once finished compiling, an amx_detection.exe file should be outputted to the downloads folder. Exit out of visual studio
+7. Open command prompt and navigate to the Downloads directory
 8. Run the script by running 
 ```bash
 py amx-detext-windows.py
