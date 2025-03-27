@@ -8,9 +8,9 @@
 © Copyright 2025, Intel Corporation
 
 ## Overview
-This Python script detects the presence of Intel AMX features on your CPU as well as OS by using the cpuid instruction to query processor capabilities. 
+This Python script detects the presence of Intel AMX features on your CPU as well as OS by using the cpuid instruction to query processor capabilities on Linux and Windows.
 
-AMX (Advanced Matrix Extensions) is a set of instructions introduced in Intel's 4th Generation Xeon Scalable processors (codenamed "Sapphire Rapids") that significantly accelerates AI workloads, deep learning, and matrix multiplication operations.
+AMX (Advanced Matrix Extensions) is a set of instructions introduced in Intel's 4th Generation Xeon Scalable processors ("Sapphire Rapids") that significantly accelerates AI workloads, deep learning, and matrix multiplication operations.
 
 The CPUID instruction is a processor supplementary instruction allowing software to discover details of the processor. By examining the CPUID output and checking the relevant bits, you can determine if the CPU supports certain instruction sets or features. The cpuid -1 command queries the CPU's feature set. When AMX is enabled, it should show a specific bit set in the ECX register. It checks for three specific AMX features:
  
@@ -23,16 +23,29 @@ This script detects AMX (Advanced Matrix Extensions) support by working with a c
 ### AMX Enablement in the CPU
 For CPU support detection:
 
-The script runs an external program called amx_detection which presumably queries CPU information via CPUID instruction
+The script runs an external program called **amx_detection** which queries CPU information via CPUID instruction.
 It parses the output looking for specific CPU feature flags:
 
-CPUID.07H.00H:EDX[22] indicates AMX-BF16 support
-CPUID.07H.00H:EDX[24] indicates AMX-TILE support
-CPUID.07H.00H:EDX[25] indicates AMX-INT8 support
+CPUID.07H.00H:EDX[22] indicates AMX-BF16 support. <br />
+CPUID.07H.00H:EDX[24] indicates AMX-TILE support. <br />
+CPUID.07H.00H:EDX[25] indicates AMX-INT8 support. <br />
 ### AMX Enablement in the OS
 For OS detection:
 
 The script uses XGETBV instruction to read XCR0 register which is a control register that indicates which processor states the operating system is configured to manage using the XSAVE feature set. 
+
+The OS detection is done in the **amx_os_windows.c** and **amx_os_linux.c** files where it provides platform-specific implementations for detecting CPU features, specifically related to Intel's AMX technology.
+The main functionality of these files:
+
+1. **Reading CPU Information:** Both files implement functions to read CPUID information, which allows the software to query what features the CPU supports. <br />
+2. **Reading Extended Control Registers:** The code uses XGETBV instruction to read the XCR0 register, which indicates which state components are enabled by the operating system. <br />
+3. **Platform-Specific Implementations:** The implementation differs between Windows and Linux:
+
+Windows uses intrinsic functions (__cpuidex and __xgetbv) while
+Linux uses inline assembly to directly execute the CPUID and XGETBV instructions.
+
+The Linux version also includes syscall definitions for requesting permission to use certain CPU extended features, which is needed for AMX functionality.
+
 
 ### Why Check for AMX Support?
 AMX can provide significant performance improvements for:
@@ -114,4 +127,4 @@ If AMX is enabled on the CPU and OS the script should output the following
 ![alt text](image-7.png)
 
 ## More Information
-For more information regarding AMX please visit the following developer guide: https://www.intel.com/content/www/us/en/content-details/671488/intel-64-and-ia-32-architectures-optimization-reference-manual-volume-1.html
+For more information regarding AMX and AMX specific implementation please visit the following developer guide: https://www.intel.com/content/www/us/en/content-details/671488/intel-64-and-ia-32-architectures-optimization-reference-manual-volume-1.html
