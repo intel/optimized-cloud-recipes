@@ -1,0 +1,389 @@
+##########################################################
+# Host configuration                                     #
+# Generic                                                #
+# Installs version:  1.20.0                              #
+# Installs Gaudi3 SPI FW: 1.20.0-fw-58.1.1-sec-2        #
+# Installs Gaudi2 SPI FW: 1.20.0-fw-58.1.1-sec-2       #
+##########################################################
+---
+- name: baremetal-recipe-1.20.0 via apt
+  hosts: localhost
+  become: true
+  vars:
+    habana_version: "1.20.0"
+    spi_version: "1.20.0-fw-58.1.1-sec-2"
+    pillow_simd_version: "9.5.x"
+    pytorch_version: "2.6.0"
+    py_sub_ver: "_1.20.0_543"
+    habana_packages:
+      - habanalabs-container-runtime
+      - habanalabs-dkms
+      - habanalabs-firmware-odm
+      - habanalabs-firmware-tools
+      - habanalabs-firmware
+      - habanalabs-graph
+      - habanalabs-qual
+      - habanalabs-qual-workloads
+      - habanalabs-rdma-core
+      - habanalabs-thunk
+    habana_drivers:
+      - habanalabs_en
+      - habanalabs_ib
+      - habanalabs_cn
+      - habanalabs
+
+  tasks:
+    # Ensure multiverse repository is enabled for libmkl package availability
+    - name: Ensure multiverse repository is enabled
+      apt_repository:
+        repo: "deb http://archive.ubuntu.com/ubuntu jammy multiverse"
+        state: present
+        filename: "multiverse"
+      become: true
+
+    - name: Update APT cache
+      apt:
+        update_cache: yes
+      become: true
+
+    - name: Install required packages
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+          - python-is-python3
+          - net-tools
+          - libmkl-dev
+          - ethtool
+          - linux-headers-5.15.0-131-generic
+          - libelf-dev
+          - libbz2-dev
+          - liblzma-dev
+          - libibverbs-dev
+          - librdmacm-dev
+          - dkms
+          - linux-modules-extra-5.15.0-131-generic
+          - gcc
+          - cmake
+          - lsof
+          - pciutils
+          - libfabric1
+          - curl
+          - wget
+          - file
+          - docker.io
+          - ethtool
+          - libjpeg-dev
+          - zlib1g-dev
+          - libfreetype6-dev
+          - liblcms2-dev
+          - libopenjp2-7-dev
+          - libtiff5-dev
+          - libwebp-dev
+          - tcl8.6-dev
+          - tk8.6-dev
+          - python3-tk
+          - libmkl-dev
+          - libmpich-dev     # For MPICH
+          - libopenmpi-dev   # For Open MPI
+        state: present
+        update_cache: yes
+  
+##major and minor versions to assist with URL handling  
+    - name: Get full Ubuntu version
+      shell: "lsb_release -sr"
+      register: ubuntu_full_version
+      changed_when: false
+
+    - name: Extract Ubuntu major version
+      set_fact:
+        ubuntu_major_version: "{{ ubuntu_full_version.stdout.split('.')[0] }}"
+
+    - name: Extract Ubuntu minor version
+      set_fact:
+        ubuntu_minor_version: "{{ ubuntu_full_version.stdout.split('.')[1] }}"
+
+    - name: Debug Ubuntu major version
+      debug:
+        msg: "Ubuntu Major Version: {{ ubuntu_major_version }}"
+
+    - name: Debug Ubuntu minor version
+      debug:
+        msg: "Ubuntu Minor Version: {{ ubuntu_minor_version }}"
+
+
+    #############################################################################################################################################
+    # Setup Habana Software Stack                                                                                                               #
+    #                                                                                                                                           #
+    #############################################################################################################################################
+    - name: Install Jupyterlab using pip
+      ansible.builtin.pip:
+        name: jupyterlab
+        state: present
+    
+    - name: Remove old Habana GPG key if it exists
+      file:
+        path: /etc/apt/keyrings/habana.gpg
+        state: absent
+
+    - name: Ensure keyrings directory exists
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download Habana GPG key and dearmor it
+      shell: |
+        curl -fsSL https://vault.habana.ai/artifactory/api/gpg/key/public | gpg --dearmor | tee /etc/apt/keyrings/habana.gpg >/dev/null
+      args:
+        executable: /bin/bash
+
+    - name: Set correct permissions for GPG key
+      file:
+        path: /etc/apt/keyrings/habana.gpg
+        mode: '0644'
+   
+    - name: Add Habana repository if not present
+      ansible.builtin.copy:
+        dest: "/etc/apt/sources.list.d/habana.list"
+        content: "deb [signed-by=/etc/apt/keyrings/habana.gpg] https://vault.habana.ai/artifactory/debian jammy main"
+        mode: '0644'
+
+    - name: Clear APT cache
+      command: apt clean
+      changed_when: false
+
+    - name: Run APT update
+      ansible.builtin.apt:
+        update_cache: yes
+      register: apt_update_result
+      ignore_errors: yes
+
+    - name: Ensure no duplicate Habana repository entries
+      shell: "grep -Rl 'vault.habana.ai' /etc/apt/sources.list.d/ || true"
+      register: habana_repo_files
+      changed_when: false
+
+    - name: Remove duplicate Habana repository files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ habana_repo_files.stdout_lines }}"
+      when: habana_repo_files.stdout_lines | length > 1    
+    
+    - name: Install Habana packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ habana_packages }}"
+
+    - name: Load Habana drivers after installation
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ habana_drivers }}"
+
+    - name: Verify Habana driver is loaded
+      shell: lsmod | grep habanalabs
+      register: driver_check
+      changed_when: false
+      failed_when: driver_check.stdout == ""
+
+
+    # Install the Habana Container Runtime
+#Install Habana Container Runtime
+    - name: Install Habana Container Runtime
+      apt:
+        name: habanalabs-container-runtime
+        state: present
+        update_cache: true
+      register: install_result
+   
+    - name: Add Habana Container Runtime to the docker daemon.json
+      copy:
+        content: |
+          {
+          "runtimes": {
+            "habana": {
+                "path": "/usr/bin/habana-container-runtime",
+                "runtimeArgs": []
+              }
+            }
+          }
+        dest: /etc/docker/daemon.json
+      register: install_result
+    
+    - name: Configure hugepages for Habana
+      sysctl:
+        name: vm.nr_hugepages
+        value: "8000"
+        state: present
+      
+    - name: Restart docker service
+      service:
+        name: docker
+        state: restarted
+      register: install_result
+
+
+
+#add handler to check for each system 'Gaudi2, 3 etc' This will have to take place after installing drvers but before FW section.
+    - name: Query Gaudi Product Name
+      shell: "hl-smi -L | grep 'Product Name' | head -1 | awk -F ': ' '{print $2}'"
+      register: gaudi_product_name
+      changed_when: false
+      ignore_errors: false  # Ensures failure stops execution if command fails
+
+    - name: Debug Gaudi Product Name
+      debug:
+        msg: "Detected Gaudi Product Name: {{ gaudi_product_name.stdout | default('NONE') | trim }}"
+
+    - name: Fail if Product Name is not detected
+      fail:
+        msg: "Gaudi Product Name could not be detected!"
+      when: gaudi_product_name.stdout | trim == ""
+
+    - name: Set Gaudi version based on Product Name
+      set_fact:
+        gaudi_version: "{{ 'Gaudi3' if 'HL-325' in (gaudi_product_name.stdout | trim) else 'Gaudi2' if 'HL-225' in (gaudi_product_name.stdout | trim) else 'Unknown' }}"
+
+    - name: Debug Gaudi Version
+      debug:
+        msg: "Detected Gaudi Version: {{ gaudi_version }}"
+
+    - name: Fail if Gaudi version is unknown
+      fail:
+        msg: "Unknown Gaudi version detected! Cannot proceed."
+      when: gaudi_version == "Unknown"
+
+    - name: Set target Habana SPI firmware version
+      set_fact:
+        habana_spi_fw_version: "{{spi_version if gaudi_version == 'Gaudi3' else '1.20.0-fw-58.1.1-sec-2' }}"
+
+    - name: Debug Target Firmware Version
+      debug:
+        msg: "Target Firmware Version: {{ habana_spi_fw_version }}"
+
+    - name: Check firmware version
+      shell: "hl-smi -L | grep SPI"
+      register: firmware_check
+      changed_when: false
+
+    - name: Extract firmware versions
+      set_fact:
+        firmware_versions: "{{ firmware_check.stdout_lines | map('regex_search', '([0-9]+\\.[0-9]+\\.[0-9]+-fw-[0-9]+\\.[0-9]+\\.[0-9]+-sec-[0-9]+)') | select('string') | list }}"
+
+    - name: Debug current firmware version
+      debug:
+        msg: "Current firmware version(s): {{ firmware_versions | join(', ') }}"
+
+    - name: Set firmware directory based on Gaudi version
+      set_fact:
+        firmware_dir: "/lib/firmware/habanalabs/{{ gaudi_version | lower }}"
+
+    - name: Set firmware directory based on Gaudi version
+      set_fact:
+        firmware_dir: "/lib/firmware/habanalabs/{{ gaudi_version | lower }}"
+
+    - name: Determine correct firmware file for upgrade
+      set_fact:
+        target_firmware_file: "{{ firmware_dir }}/{{gaudi_version|lower}}-agent-fw_loader-fit.itb"
+    - name: Debug firmware file path
+      debug:
+        msg: "Using firmware file: {{ target_firmware_file }}"
+
+    - name: Compare firmware versions
+      set_fact:
+        all_fw_versions_match: "{{ firmware_versions | unique | list | length == 1 and firmware_versions[0] == habana_spi_fw_version }}"
+
+    - name: Update SPI firmware if necessary
+      when: not all_fw_versions_match and habana_spi_fw_version != 'unknown'
+      block:
+        - name: Unload Habana drivers before firmware update
+          modprobe:
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ habana_drivers | reverse | list }}"
+
+        - name: Upgrade Habana SPI Firmware
+          shell: "/usr/sbin/hl-fw-loader -y --file {{ target_firmware_file }}"
+          register: fw_upgrade
+          changed_when: fw_upgrade.rc == 0
+
+        - name: Reload Habana drivers after firmware update
+          community.general.modprobe:
+            name: "{{ item }}"
+            state: present
+          loop: "{{ habana_drivers }}"
+
+
+   
+#1.19.1-fw-57.2.2-sec-2
+  
+
+    ################################################################################################
+    # Install PyTorch and AI Frameworks                                                           #
+    ################################################################################################
+    - name: Install required PyTorch packages
+      ansible.builtin.pip:
+        name:
+          - mpi4py
+          - habana-pyhlml
+          - "git+https://github.com/aostrowski-hbn/pillow-simd.git@simd/{{ pillow_simd_version }}"
+          - setuptools
+        state: latest
+
+    # Check if PyTorch module archive already exists
+    - name: Check if PyTorch module archive exists
+      stat:
+        path: "/tmp/pytorch_modules-{{ pytorch_version }}{{py_sub_ver}}.tgz"
+      register: pytorch_archive
+
+    # Download PyTorch modules only if not already present
+    - name: Download Habana PyTorch modules archive if not present
+      get_url:
+        url: "https://vault.habana.ai/artifactory/gaudi-pt-modules/{{habana_version}}/543/pytorch/ubuntu{{ ubuntu_major_version }}{{ ubuntu_minor_version }}/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}.tgz"
+        dest: "/tmp/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}.tgz"
+        mode: '0644'
+      when: not pytorch_archive.stat.exists
+
+    # Extract PyTorch modules only if not already extracted
+    - name: Check if PyTorch modules are already extracted
+      stat:
+        path: "/tmp/requirements-pytorch.txt"
+      register: pytorch_extracted
+
+    - name: Extract Habana PyTorch modules if not extracted
+      unarchive:
+        src: "/tmp/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}.tgz"
+        dest: "/tmp/"
+        remote_src: yes
+      when: not pytorch_extracted.stat.exists
+
+    - name: Install Habana PyTorch dependencies
+      pip:
+        requirements: "/tmp/requirements-pytorch.txt"
+        state: present
+
+    - name: Install extracted Habana PyTorch wheel files
+      shell: "pip install /tmp/*.whl"
+
+    - name: Pull latest Gaudi PyTorch container
+      shell: docker pull vault.habana.ai/gaudi-docker/{{ habana_version }}/ubuntu{{ ubuntu_major_version }}.{{ ubuntu_minor_version }}/habanalabs/pytorch-installer-{{pytorch_version}}:latest
+
+    - name: Clean up temporary files
+      file:
+        path: "/tmp/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}.tgz"
+        state: absent
+    - name: Ensure /tmp has correct ownership
+      file:
+        path: /tmp
+        owner: root
+        group: root
+
+    - name: Set /tmp permissions to 1777
+      file:
+        path: /tmp
+        mode: '1777'
+
