@@ -41,6 +41,8 @@ Pick the recipe file based on the version of the Intel® Gaudi® drivers
 Firmware needs to be upgraded. | 
 | 1.19.0         | [baremetal-recipe-1.19.0.yml](baremetal-recipe-1.19.0.yml)| For clean installs or upgrades. Checks to see if the SPI 
 Firmware needs to be upgraded. | 
+| 1.20.0         | [baremetal-recipe-1.20.0.yml](baremetal-recipe-1.20.0.yml)| For clean installs or upgrades. Checks to see if the SPI 
+Firmware needs to be upgraded. | 
 
 For example, on Ubuntu:
 
@@ -60,7 +62,7 @@ sudo apt install ansible -y
 git clone https://github.com/intel/optimized-cloud-recipes.git 
 
 # Run the recipe, pick the recipe version for the Habana version you want
-sudo ansible-playbook optimized-cloud-recipes/recipes/ai-gaudi-ubuntu/baremetal-recipe-1.19.0.yml
+sudo ansible-playbook optimized-cloud-recipes/recipes/ai-gaudi-ubuntu/baremetal-recipe-1.20.0.yml
 
 # Logs at 'tail -f 10 /var/log/syslog'
 ```
