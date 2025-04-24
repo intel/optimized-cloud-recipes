@@ -146,6 +146,37 @@
       when: upgradable_packages | length > 0
       register: update_result
 
+    ## Firmware Update Block
+    - name: Check firmware version
+      shell: "hl-smi -L | grep SPI"
+      register: firmware_check
+      changed_when: false
+
+    - name: Analyze firmware versions
+      set_fact:
+        firmware_versions: "{{ firmware_check.stdout_lines | map('regex_search', '([0-9]+\\.[0-9]+\\.[0-9]+-fw-[0-9]+\\.[0-9]+\\.[0-9]+-sec-[0-9]+)') | select('string') | list }}"
+
+    - name: Check if all firmware versions match
+      set_fact:
+        all_fw_versions_match: "{{ true if (firmware_versions | unique | list | length == 1) and (firmware_versions[0] == habana_spi_fw_version) else false }}"
+
+    - name: SPI Firmware Update
+      when: not all_fw_versions_match
+      block:
+        - name: Unload the Habana drivers in specified order
+          modprobe:
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ habana_drivers | reverse | list }}"
+        - name: Upgrading Habana SPI Firmware
+          shell: /usr/sbin/hl-fw-loader -y
+          register: command_result
+        - name: Reload Habana drivers
+          modprobe:
+            name: "{{ item }}"
+            state: present
+          loop: "{{ habana_drivers }}"
+
     # Always pull the latest Gaudi pytorch container from Habana Labs 
     - name: Pull the latest Gaudi pytorch container
       shell: docker pull vault.habana.ai/gaudi-docker/{{ habana_version }}/ubuntu22.04/habanalabs/pytorch-installer-2.5.1:latest
