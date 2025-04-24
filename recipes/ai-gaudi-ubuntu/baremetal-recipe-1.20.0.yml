@@ -112,7 +112,7 @@
         state: present
         update_cache: yes
   
- ## install log
+   # install log
     - name: Ensure log directory exists
       file:
         path: "{{ log_base }}"
@@ -133,7 +133,6 @@
       set_fact:
         habana_log_path: "{{ log_file }}"
  
-##major and minor versions to assist with URL handling  
     - name: Get full Ubuntu version
       shell: "lsb_release -sr"
       register: ubuntu_full_version
@@ -233,8 +232,6 @@
       changed_when: false
       failed_when: driver_check.stdout == ""
 
-
-    # Install the Habana Container Runtime
 #Install Habana Container Runtime
     - name: Install Habana Container Runtime
       apt:
@@ -360,11 +357,6 @@
             state: present
           loop: "{{ habana_drivers }}"
 
-
-   
-#1.19.1-fw-57.2.2-sec-2
-  
-
     ################################################################################################
     # Install PyTorch and AI Frameworks                                                           #
     ################################################################################################
@@ -391,47 +383,7 @@
         mode: '0644'
       when: not pytorch_archive.stat.exists
 
-    # Extract PyTorch modules only if not already extracted
-    # - name: Check if PyTorch modules are already extracted
-    #   stat:
-    #     path: "/tmp/requirements-pytorch.txt"
-    #   register: pytorch_extracted
-
-    # - name: Extract Habana PyTorch modules if not extracted
-    #   unarchive:
-    #     src: "/tmp/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}.tgz"
-    #     dest: "/tmp/"
-    #     remote_src: yes
-    #   when: not pytorch_extracted.stat.exists
-
-    # - name: Install Habana PyTorch dependencies
-    #   pip:
-    #     requirements: "/tmp/requirements-pytorch.txt"
-    #     state: present
-
-    # - name: Install extracted Habana PyTorch wheel files
-    #   shell: "pip install /tmp/*.whl"
-
-    # - name: Pull latest Gaudi PyTorch container
-    #   shell: docker pull vault.habana.ai/gaudi-docker/{{ habana_version }}/ubuntu{{ ubuntu_major_version }}.{{ ubuntu_minor_version }}/habanalabs/pytorch-installer-{{pytorch_version}}:latest
-
-    # - name: Clean up temporary files
-    #   file:
-    #     path: "/tmp/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}.tgz"
-    #     state: absent
-
-    # - name: Ensure /tmp has correct ownership
-    #   file:
-    #     path: /tmp
-    #     owner: root
-    #     group: root
-
-    # - name: Set /tmp permissions to 1777
-    #   file:
-    #     path: /tmp
-    #     mode: '1777'
-
-##Pytorch-venv setup
+    ##Pytorch-venv setup
 
     - name: Create Python virtual environment
       command: python3 -m venv {{ venv_path }}
