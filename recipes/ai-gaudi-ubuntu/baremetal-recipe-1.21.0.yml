@@ -1,20 +1,27 @@
 ##########################################################
 # Host configuration                                     #
 # Generic                                                #
-# Installs version:  1.19.1                              #
-# Installs Gaudi3 SPI FW: 1.19.1-fw-57.2.2-sec-2         #
-# Installs Gaudi2 SPI FW: 1.19.0-fw-56.1.0-sec-9         #
+# Installs version:  1.21.0                              #
+# Installs Gaudi3 SPI FW: 1.21.0-fw-59.2.1-sec-2         #
+# Installs Gaudi2 SPI FW: 1.21.0-fw-59.2.1-sec-2         #
 ##########################################################
 ---
-- name: baremetal-recipe-1.19.1 via apt
+- name: baremetal-recipe-1.21.0 via apt
   hosts: localhost
   become: true
   vars:
-    habana_version: "1.19.1"
-    spi_version: "1.19.1-fw-57.2.2-sec-2"
+    habana_version: "1.21.0"
+    log_base: "/var/log"
+    log_file: "{{ log_base }}/baremetal-{{ habana_version }}.log"
+    spi_version: "1.21.0-fw-59.2.1-sec-2"
+    gaudi2spi: "1.21.0-fw-59.2.1-sec-2"
+    erom_version: "1.21.0-fw-59.2.1"
     pillow_simd_version: "9.5.x"
-    pytorch_version: "2.5.1"
-    py_sub_ver: "_19.1.1_26"
+    pytorch_version: "2.6.0"
+    py_sub_ver: "_1.21.0_"
+    py_build_num: "555"
+    venv_path: "/opt/habana-venv-{{ habana_version }}"
+    extra_index_url: "https://vault.habana.ai/artifactory/api/pypi/gaudi-python/simple"
     habana_packages:
       - habanalabs-container-runtime
       - habanalabs-dkms
@@ -27,10 +34,16 @@
       - habanalabs-rdma-core
       - habanalabs-thunk
     habana_drivers:
-      - habanalabs_en
-      - habanalabs_ib
+      - habanalabs_compat #new in 1.21.0, wrapped in habanalabs_DKMS
       - habanalabs_cn
+      - habanalabs_ib
+      - habanalabs_en
       - habanalabs
+    pip_packages:
+      - name: "pip==22.2.2"
+      - name: "setuptools==67.3.3"
+      - name: "packaging"  # Fixes missing module error
+      - name: "habana_media_loader=={{ py_sub_ver[1:] | replace('_', '.', 1)}}{{py_build_num}}"
 
   tasks:
     # Ensure multiverse repository is enabled for libmkl package availability
@@ -74,12 +87,25 @@
           - file
           - docker.io
           - ethtool
-          - libjpeg-dev
+          - libjpeg-dev  #added for pytorch-venv  
+          - liblapack-dev  #added for pytorch-venv
           - zlib1g-dev
           - libfreetype6-dev
           - liblcms2-dev
           - libopenjp2-7-dev
+          - libnuma-dev  #added for pytorch-venv
           - libtiff5-dev
+          - jq
+          - unzip
+          - moreutils
+          - libcairo2-dev
+          - libglib2.0-dev 
+          - libselinux1-dev 
+          - libpcre2-dev 
+          - libatlas-base-dev 
+          - google-perftools
+          - numactl
+          - libopenblas-dev
           - libwebp-dev
           - tcl8.6-dev
           - tk8.6-dev
@@ -90,7 +116,27 @@
         state: present
         update_cache: yes
   
-##major and minor versions to assist with URL handling  
+   # install log
+    - name: Ensure log directory exists
+      file:
+        path: "{{ log_base }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Create or touch the version-specific log file
+      file:
+        path: "{{ log_file }}"
+        state: touch
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Set a fact with the log path (optional for reuse)
+      set_fact:
+        habana_log_path: "{{ log_file }}"
+ 
     - name: Get full Ubuntu version
       shell: "lsb_release -sr"
       register: ubuntu_full_version
@@ -114,8 +160,7 @@
 
 
     #############################################################################################################################################
-    # Setup Habana Software Stack                                                                                                               #
-    #                                                                                                                                           #
+    # Setup Habana Software Stack                                                                                                               #                                                                                                                                        
     #############################################################################################################################################
     - name: Install Jupyterlab using pip
       ansible.builtin.pip:
@@ -190,8 +235,6 @@
       changed_when: false
       failed_when: driver_check.stdout == ""
 
-
-    # Install the Habana Container Runtime
 #Install Habana Container Runtime
     - name: Install Habana Container Runtime
       apt:
@@ -242,53 +285,110 @@
     # Check if PyTorch module archive already exists
     - name: Check if PyTorch module archive exists
       stat:
-        path: "/tmp/pytorch_modules-{{ pytorch_version }}{{py_sub_ver}}.tgz"
+        path: "/tmp/pytorch_modules-{{ pytorch_version }}{{py_sub_ver}}{{py_build_num}}.tgz"
       register: pytorch_archive
 
     # Download PyTorch modules only if not already present
     - name: Download Habana PyTorch modules archive if not present
       get_url:
-        url: "https://vault.habana.ai/artifactory/gaudi-pt-modules/{{habana_version}}/26/pytorch/ubuntu{{ ubuntu_major_version }}{{ ubuntu_minor_version }}/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}.tgz"
-        dest: "/tmp/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}.tgz"
+        url: "https://vault.habana.ai/artifactory/gaudi-pt-modules/{{habana_version}}/{{py_build_num}}/pytorch/ubuntu{{ ubuntu_major_version }}{{ ubuntu_minor_version }}/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}{{py_build_num}}.tgz"
+        dest: "/tmp/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}{{py_build_num}}.tgz"
         mode: '0644'
       when: not pytorch_archive.stat.exists
 
-    # Extract PyTorch modules only if not already extracted
-    - name: Check if PyTorch modules are already extracted
-      stat:
-        path: "/tmp/requirements-pytorch.txt"
-      register: pytorch_extracted
+    ##Pytorch-venv setup
 
-    - name: Extract Habana PyTorch modules if not extracted
-      unarchive:
-        src: "/tmp/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}.tgz"
-        dest: "/tmp/"
-        remote_src: yes
-      when: not pytorch_extracted.stat.exists
+    - name: Create Python virtual environment
+      command: python3 -m venv {{ venv_path }}
+      args:
+        creates: "{{ venv_path }}/bin/activate"
 
-    - name: Install Habana PyTorch dependencies
+    - name: Upgrade pip in venv
+      command: "{{ venv_path }}/bin/pip install --upgrade pip"
+
+    - name: Install base Python packages in venv
       pip:
-        requirements: "/tmp/requirements-pytorch.txt"
-        state: present
+        name: "{{ item.name }}"
+        executable: "{{ venv_path }}/bin/pip"
+        extra_args: "--extra-index-url {{ extra_index_url }}"
+      loop: "{{ pip_packages }}"
 
-    - name: Install extracted Habana PyTorch wheel files
-      shell: "pip install /tmp/*.whl"
+    - name: Download Habana PyTorch modules tarball
+      get_url:
+        url: "https://vault.habana.ai/artifactory/gaudi-pt-modules/{{habana_version}}/{{py_build_num}}/pytorch/ubuntu{{ ubuntu_major_version }}{{ ubuntu_minor_version }}/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}{{py_build_num}}.tgz"
+        dest: "/tmp/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}{{py_build_num}}.tgz"
+        dest: "/tmp/pytorch_modules-{{ habana_version }}.tgz"
+        mode: '0644'
 
+    - name: Ensure /tmp/pytorch_modules exists
+      file:
+        path: /tmp/pytorch_modules
+        state: directory
+        mode: '0755'
+
+    - name: Extract Habana PyTorch modules
+      unarchive:
+        src: "/tmp/pytorch_modules-{{ habana_version }}.tgz"
+        dest: "/tmp/pytorch_modules"
+        remote_src: yes
+    
+
+    # https://vault.habana.ai/artifactory/gaudi-docker/1.20.1/ubuntu22.04/habanalabs/pytorch-installer-2.6.0/1.20.1-97/
+        # https://vault.habana.ai/artifactory/gaudi-docker/1.20.1/ubuntu22.04/habanalabs/pytorch-installer-2.6.0/latest/
     - name: Pull latest Gaudi PyTorch container
-      shell: docker pull vault.habana.ai/gaudi-docker/{{ habana_version }}/ubuntu{{ ubuntu_major_version }}.{{ ubuntu_minor_version }}/habanalabs/pytorch-installer-{{pytorch_version}}:latest
+      shell: docker pull vault.habana.ai/gaudi-docker/{{ habana_version }}/ubuntu{{ ubuntu_major_version }}.{{ ubuntu_minor_version }}/habanalabs/pytorch-installer-{{ pytorch_version }}:latest
 
-    - name: Clean up temporary files
-      file:
-        path: "/tmp/pytorch_modules-v{{ pytorch_version }}{{py_sub_ver}}.tgz"
-        state: absent
-    - name: Ensure /tmp has correct ownership
-      file:
-        path: /tmp
-        owner: root
-        group: root
+    - name: Install all Habana PyTorch .whl files from extracted directory
+      shell: |
+        find /tmp/pytorch_modules -name "*.whl" -exec {{ venv_path }}/bin/pip install --extra-index-url {{ extra_index_url }} {} +
 
-    - name: Set /tmp permissions to 1777
-      file:
-        path: /tmp
-        mode: '1777'
+    - name: Display activation instructions
+      debug:
+        msg: "Activate Habana venv: source {{ venv_path }}/bin/activate"
+    
+    - name: Set environment variables persistently
+      copy:
+        dest: /etc/profile.d/habana_env.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          export PATH=/opt/habanalabs/bin:$PATH
+          export PYTHONPATH={{ venv_path }}/lib/python3.10/site-packages:$PYTHONPATH
+          export ENABLE_HABANA_LOGS=1
+          export LOG_LEVEL_ALL=3
+          export GC_KERNEL_PATH=/usr/lib/habanalabs/libtpc_kernels.so
+
+    - name: Ensure Habana bin directory is on PATH for current session
+      ansible.builtin.shell: |
+        export PATH=/opt/habanalabs/bin:$PATH
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Ensure PYTHONPATH includes Habana venv for current session
+      ansible.builtin.shell: |
+        export PYTHONPATH={{ venv_path }}/lib/python3.10/site-packages:$PYTHONPATH
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Display PyTorch activation and logging instructions
+      debug:
+        msg: |
+          To activate the Habana PyTorch venv, run:
+          source {{ venv_path }}/bin/activate
+
+          Logs are being written to:
+          {{ habana_log_path }}
+
+          Congratulations on your successful installation of the Habana Software Stack!
+          The system will now reboot in 60 seconds to apply the changes. Please refer to the log file for any errors or warnings. 
+          run ' sudo pkill -f 'sleep 60 && reboot ' to cancel the reboot. or reboot now with ' sudo reboot now '
+  
+    # reboot handler
+    - name: Schedule reboot in 60 seconds
+      ansible.builtin.shell: |
+        nohup bash -c "sleep 60 && reboot" >/dev/null 2>&1 &
+      async: 1
+      poll: 0
 
