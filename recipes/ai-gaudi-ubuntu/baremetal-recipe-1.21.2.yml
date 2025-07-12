@@ -1,7 +1,7 @@
 ##########################################################
 # Host configuration                                     #
 # Generic                                                #
-# Installs version:  1.21.1                              #
+# Installs version:  1.21.2                              #
 # Installs Gaudi3 SPI FW: 1.21.2-fw-60.1.0-sec-2         #
 # Installs Gaudi2 SPI FW: 1.21.2-fw-61.0.0-sec-11        #
 ##########################################################
@@ -44,6 +44,26 @@
       - name: "setuptools==67.3.3"
       - name: "packaging"  # Fixes missing module error
       - name: "habana_media_loader=={{ py_sub_ver[1:] | replace('_', '.', 1)}}{{py_build_num}}"
+
+    handlers:
+      - name: set_cpu_governor_performance
+        shell: echo performance | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+
+      - name: apply_epb_gaudi2
+        shell: wrmsr -a 0x1b0 0x0
+
+      - name: apply_epb_gaudi3
+        shell: wrmsr -a 0x1b0 0x1
+
+      - name: set_core_freq_hwp
+        shell: wrmsr -a 0x774 0x2708
+
+      - name: disable_c6_states
+        shell: |
+          echo 1 | tee /sys/devices/system/cpu/cpu*/cpuidle/state3/disable
+          if [ -d /sys/devices/system/cpu/cpu0/cpuidle/state4 ]; then
+            echo 1 | tee /sys/devices/system/cpu/cpu*/cpuidle/state4/disable
+          fi
 
   tasks:
     # Ensure multiverse repository is enabled for libmkl package availability
@@ -113,6 +133,7 @@
           - libmkl-dev
           - libmpich-dev     # For MPICH
           - libopenmpi-dev   # For Open MPI
+          - msr-tools
         state: present
         update_cache: yes
   
@@ -268,6 +289,108 @@
         name: docker
         state: restarted
       register: install_result
+
+# ------------------------------------------------------------------------#
+# Habana “Optimizing Training Platform” with OAM-based detection          #
+# ------------------------------------------------------------------------#
+    - name: Query Gaudi Product Name
+      shell: |
+        hl-smi -L \
+          | grep 'Product Name' \
+          | head -1 \
+          | awk -F ': ' '{print $2}'
+      register: gaudi_product_name
+      changed_when: false
+
+    - name: Debug Gaudi Product Name
+      debug:
+        msg: "Detected Gaudi Product Name: {{ gaudi_product_name.stdout | default('NONE') | trim }}"
+
+    - name: Fail if Product Name is not detected
+      fail:
+        msg: "Gaudi Product Name could not be detected!"
+      when: gaudi_product_name.stdout | trim == ""
+
+    - name: Set Gaudi version based on Product Name
+      set_fact:
+        gaudi_version: >-
+          {{ 'Gaudi3' if 'HL-325' in (gaudi_product_name.stdout | trim)
+             else ('Gaudi2' if 'HL-225' in (gaudi_product_name.stdout | trim)
+             else 'Unknown') }}
+
+    - name: Debug Gaudi Version
+      debug:
+        msg: "Detected Gaudi Version: {{ gaudi_version }}"
+
+    - name: Fail if Gaudi version is unknown
+      fail:
+        msg: "Unknown Gaudi version detected! Cannot proceed."
+      when: gaudi_version == "Unknown"
+
+    - name: Check current Energy Performance Bias MSR (0x1b0)
+      command: rdmsr 0x1b0
+      register: epb_val
+      changed_when: false
+      failed_when: false
+
+    - name: Apply EPB on Gaudi2 if needed
+      when:
+        - gaudi_version == "Gaudi2"
+        - epb_val.stdout != "0"
+      debug:
+        msg: "EPB is 0x{{ epb_val.stdout }} on {{ gaudi_version }}; setting to 0x0"
+      notify: apply_epb_gaudi2
+
+    - name: Apply EPB on Gaudi3 if needed
+      when:
+        - gaudi_version == "Gaudi3"
+        - epb_val.stdout != "1"
+      debug:
+        msg: "EPB is 0x{{ epb_val.stdout }} on {{ gaudi_version }}; setting to 0x1"
+      notify: apply_epb_gaudi3
+
+    - name: Check current CPU governor
+      command: cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+      register: cpu_gov
+      changed_when: false
+
+    - name: Apply performance governor if not already set
+      when: cpu_gov.stdout != "performance"
+      debug:
+        msg: "Governor is {{ cpu_gov.stdout }}; switching to performance"
+      notify: set_cpu_governor_performance
+
+    - name: Check current Core Frequency HWP MSR (0x774)
+      command: rdmsr 0x774
+      register: hwp_val
+      changed_when: false
+      failed_when: false
+
+    - name: Apply Core Frequency HWP if not already set
+      when: hwp_val.stdout | default("") != "2708"
+      debug:
+        msg: "HWP MSR is 0x{{ hwp_val.stdout }}; setting to 0x2708"
+      notify: set_core_freq_hwp
+
+    - name: Check if C6 disable file exists
+      stat:
+        path: /sys/devices/system/cpu/cpu0/cpuidle/state3/disable
+      register: c6_file
+
+    - name: Read C6 disable flag
+      command: cat /sys/devices/system/cpu/cpu0/cpuidle/state3/disable
+      register: c6_val
+      when: c6_file.stat.exists
+      changed_when: false
+      failed_when: false
+
+    - name: Disable C6/C6P if not already disabled
+      when:
+        - c6_file.stat.exists
+        - c6_val.stdout != "1"
+      debug:
+        msg: "C6 disable flag is {{ c6_val.stdout }}; disabling C6/C6P"
+      notify: disable_c6_states
 
 
     ################################################################################################
