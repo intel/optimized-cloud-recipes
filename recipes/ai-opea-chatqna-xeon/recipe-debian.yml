@@ -1,0 +1,105 @@
+---
+# OPEA ChatQnA deploy (Debian/Ubuntu-safe)
+
+- name: Import base playbook to update opea.sh with private and public IP
+  ansible.builtin.import_playbook: ../utility/get-ip.yaml
+
+- name: OPEA ChatQnA
+  hosts: localhost
+  become: yes
+  gather_facts: yes
+  vars:
+    TAG: "1.0"   # https://hub.docker.com/u/opea
+
+  tasks:
+    # 0) Remove any prior wrong Docker repo before any apt update
+    - name: Ensure any old docker.list is absent
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/docker.list
+        state: absent
+
+    # 1) Base packages
+    - name: Install pre-requisite packages
+      ansible.builtin.apt:
+        pkg:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - software-properties-common
+        state: present
+        update_cache: true
+
+    # 2) Pick correct Docker repo (Debian vs Ubuntu)
+    - name: Decide Docker OS path (debian or ubuntu)
+      ansible.builtin.set_fact:
+        docker_os_id: "{{ 'debian' if (ansible_facts.distribution | lower) == 'debian' else 'ubuntu' }}"
+
+    - name: Decide Docker codename (bookworm for Debian, lsb_release for Ubuntu)
+      ansible.builtin.set_fact:
+        docker_codename: >-
+          {{
+            'bookworm' if docker_os_id == 'debian'
+            else lookup('pipe', 'lsb_release -cs')
+          }}
+
+    # 3) Install Docker repo/key
+    - name: Ensure APT keyring directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Add Docker's GPG key to system
+      ansible.builtin.shell: |
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/{{ docker_os_id }}/gpg -o /etc/apt/keyrings/docker.asc
+        chmod a+r /etc/apt/keyrings/docker.asc
+
+    - name: Add Docker repository to apt sources
+      ansible.builtin.shell: |
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/{{ docker_os_id }} {{ docker_codename }} stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    - name: Update apt cache after adding Docker repo
+      ansible.builtin.apt:
+        update_cache: yes
+
+    # 4) Install Docker
+    - name: Install Docker
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    # 5) Clone repos
+    - name: Clone the GenAIComps repo
+      ansible.builtin.git:
+        repo: https://github.com/opea-project/GenAIComps.git
+        dest: /opt/GenAIComps
+
+    - name: Clone the GenAIExamples repo
+      ansible.builtin.git:
+        repo: https://github.com/lucasmelogithub/GenAIExamples.git  # keep Lucas fork if needed
+        dest: /opt/GenAIExamples
+
+    # 6) Launch the OPEA containers (minimal fix: disable nounset while sourcing opea.sh)
+    - name: Launch the OPEA containers
+      ansible.builtin.shell: |
+        set -eo pipefail
+        if [ -f /etc/profile.d/opea.sh ]; then
+          set +u
+          . /etc/profile.d/opea.sh
+          set -u
+        fi
+
+        cd /opt/GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon
+        docker compose -f compose.yaml up -d
+      args:
+        executable: /bin/bash
+      environment:
+        TAG: "{{ TAG }}"
+
