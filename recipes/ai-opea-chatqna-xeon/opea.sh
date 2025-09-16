@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export public_ip={insert public ip here}
+export host_ip={insert public ip here}
 export no_proxy=
 export http_proxy=
 export https_proxy=
@@ -21,4 +23,4 @@ export BACKEND_SERVICE_ENDPOINT="http://${public_ip}:8888/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${public_ip}:6007/v1/dataprep"
 export DATAPREP_GET_FILE_ENDPOINT="http://${public_ip}:6007/v1/dataprep/get_file"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${public_ip}:6007/v1/dataprep/delete_file"
-#export HUGGINGFACEHUB_API_TOKEN="YourHuggingfaceToken"
+#export HF_TOKEN="YourHuggingfaceToken"
