@@ -20,7 +20,7 @@
     expected_erom_version: "{{ erom_version }}"
     pillow_simd_version: "9.5.x"
     pytorch_version: "2.7.1"
-    py_sub_ver: "_1.22.0_"
+    py_sub_ver: "_1.22.1_"
     py_build_num: "6"
     venv_path: "/opt/habana-venv-{{ habana_version }}"
     extra_index_url: "https://vault.habana.ai/artifactory/api/pypi/gaudi-python/simple"
