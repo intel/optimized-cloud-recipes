@@ -15,7 +15,7 @@
     log_base: "/var/log"
     log_file: "{{ log_base }}/baremetal-{{ habana_version }}.log"
     spi_version: "1.1.22.0-fw-61.3.2-sec-3"
-    gaudi2spi: "1.22.0-fw-61.3.2-sec-3"
+    gaudi2spi: "1.22.0-fw-61.3.1-sec-11"
     erom_version: "1.22.0-fw-61.3.2"
     expected_erom_version: "{{ erom_version }}"
     pillow_simd_version: "9.5.x"
