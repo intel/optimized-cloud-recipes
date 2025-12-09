@@ -10,7 +10,7 @@
   hosts: localhost
   # Modify the TAG variable to the desired version of the OPEA containers: https://hub.docker.com/u/opea
   vars:
-    TAG: "1.0"
+    TAG: "1.4"
   tasks:
     - name: Install pre-requisite packages
       ansible.builtin.apt:
@@ -48,8 +48,9 @@
         dest: /opt/GenAIComps
     - name: Clone the GenAIExamples repo
       git:
-        repo: https://github.com/lucasmelogithub/GenAIExamples.git #To be updated to 'opea-project' org later per Lucas Melo. Required to use new React UI on compose.yaml
-        dest: /opt/GenAIExamples       
+        repo: https://github.com/opea-project/GenAIExamples.git
+        dest: /opt/GenAIExamples
+        version: v1.4
     - name: Launch the OPEA containers
       ansible.builtin.shell:
         cmd: |
