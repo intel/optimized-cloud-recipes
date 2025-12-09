@@ -1,28 +1,35 @@
 ##########################################################
 # Host configuration                                     #
 # Generic                                                #
-# Installs version:  1.21.2                              #
-# Installs Gaudi3 SPI FW: 1.21.2-fw-60.1.0-sec-2         #
-# Installs Gaudi2 SPI FW: 1.21.2-fw-61.0.0-sec-11        #
+# Installs version:  1.22.0                              #
+# Installs Gaudi3 SPI FW: 1.22.0-fw-61.3.2.0             #
+# Installs Gaudi2 SPI FW: 1.22.0-fw-61.3.1-sec-11        #
 ##########################################################
 ---
-- name: baremetal-recipe-1.21.2 via apt
+- name: baremetal-recipe-1.22.0 via apt
   hosts: localhost
   become: true
   vars:
-    habana_version: "1.21.2"
-    sub_habana_version: "1.21.2-76"
+    habana_version: "1.22.0"
+    sub_habana_version: "1.22.0-740"
     log_base: "/var/log"
     log_file: "{{ log_base }}/baremetal-{{ habana_version }}.log"
-    spi_version: "1.21.2-fw-60.1.0-sec-2"
-    gaudi2spi: "1.21.2-fw-61.0.0-sec-11"
-    erom_version: "1.21.2-fw-61.0.0"
+    spi_version: "1.22.0-fw-61.3.2-sec-3 "
+    gaudi2spi: "1.22.0-fw-61.3.1-sec-11"
+    erom_version: "1.22.0-fw-61.3.2"
+    expected_erom_version: "{{ erom_version }}"
     pillow_simd_version: "9.5.x"
-    pytorch_version: "2.6.0"
-    py_sub_ver: "_1.21.2_"
-    py_build_num: "76"
+    pytorch_version: "2.7.1"
+    py_sub_ver: "_1.22.0_"
+    py_build_num: "740"
     venv_path: "/opt/habana-venv-{{ habana_version }}"
     extra_index_url: "https://vault.habana.ai/artifactory/api/pypi/gaudi-python/simple"
+    libfabric_version: "1.20.0"
+    libfabric_prefix: "/opt/habanalabs/libfabric"
+    openmpi_version: "4.1.6"
+    openmpi_prefix: "/opt/habanalabs/openmpi"
+    habana_profile_path: "/etc/profile.d/habanalabs-pt-deps.sh"
+    hl_custom_hugepage: ""
     habana_packages:
       - "habanalabs-container-runtime={{ sub_habana_version }}"
       - "habanalabs-dkms={{ sub_habana_version }}"
@@ -44,28 +51,8 @@
     pip_packages:
       - name: "pip==22.2.2"
       - name: "setuptools==67.3.3"
-      - name: "packaging"  # Fixes missing module error
+      - name: "packaging"  
       - name: "habana_media_loader=={{ py_sub_ver[1:] | replace('_', '.', 1)}}{{py_build_num}}"
-
-    handlers:
-      - name: set_cpu_governor_performance
-        shell: echo performance | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
-
-      - name: apply_epb_gaudi2
-        shell: wrmsr -a 0x1b0 0x0
-
-      - name: apply_epb_gaudi3
-        shell: wrmsr -a 0x1b0 0x1
-
-      - name: set_core_freq_hwp
-        shell: wrmsr -a 0x774 0x2708
-
-      - name: disable_c6_states
-        shell: |
-          echo 1 | tee /sys/devices/system/cpu/cpu*/cpuidle/state3/disable
-          if [ -d /sys/devices/system/cpu/cpu0/cpuidle/state4 ]; then
-            echo 1 | tee /sys/devices/system/cpu/cpu*/cpuidle/state4/disable
-          fi
 
   tasks:
     # Ensure multiverse repository is enabled for libmkl package availability
@@ -80,6 +67,18 @@
       apt:
         update_cache: yes
       become: true
+     #Pin SW version for Habana to prevent drift to newer releases
+
+    - name: APT pin Habana packages to {{ sub_habana_version }}
+      copy:
+        dest: /etc/apt/preferences.d/habana.pref
+        mode: "0644"
+        content: |
+          Package: habanalabs-*
+          Pin: version {{ sub_habana_version | regex_replace('-.*$','-*') }}*
+          Pin-Priority: 1001
+      become: yes
+
 
     # --- Define kernel header/modules packages BEFORE installing other packages ---
     - name: Ensure facts are gathered (gives us ansible_kernel)
@@ -122,14 +121,13 @@
     - name: Install required packages
       apt:
         name:
-          - python3
+          - python3.10-dev
           - python3-pip
-          - python3-venv
+          - python3.10-venv
           - python-is-python3
           - net-tools
           - libmkl-dev
           - ethtool
-          - linux-headers-5.15.0-131-generic
           - libelf-dev
           - libbz2-dev
           - liblzma-dev
@@ -158,7 +156,6 @@
           - libnuma-dev  #added for pytorch-venv
           - libtiff5-dev
           - jq
-          - unzip
           - moreutils
           - libcairo2-dev
           - libglib2.0-dev 
@@ -176,8 +173,23 @@
           - libmpich-dev     # For MPICH
           - libopenmpi-dev   # For Open MPI
           - msr-tools
+          - build-essential #install libfabric from source support packs...
+          - bzip2 
+          - m4
+          - libevent-dev
+          - libhwloc-dev
+          - libibverbs-dev
+          - git
+          - unzip
+          - autoconf
+          - automake
+          - libtool # libfabric end
+          - libatlas-base-dev #dependacies installer
+          - libcurl4 
+          - protobuf-compiler
         state: present
         update_cache: yes
+
   
    # install log
     - name: Ensure log directory exists
@@ -322,11 +334,119 @@
         dest: /etc/docker/daemon.json
       register: install_result
     
-    - name: Configure hugepages for Habana
+    # - name: Configure hugepages for Habana
+    #   sysctl:
+    #     name: vm.nr_hugepages
+    #     value: "8000"
+    #     state: present
+    - name: Compute hugepages (110MB per core × 2)
+    # Uses hl_custom_hugepage if you set it; otherwise auto-calculates
+      shell: |
+        set -e
+        if [ -n "{{ hl_custom_hugepage | default('') }}" ]; then
+          echo "{{ hl_custom_hugepage }}"
+        else
+          size_kb=$(awk '/^Hugepagesize:/{print $2}' /proc/meminfo)
+          per_core_kb=$((110*1024))
+          cores=$(lscpu | awk '/^CPU\(s\):/{print $2}')
+          total_kb=$((per_core_kb * cores * 2))
+          echo $(( total_kb / size_kb + 1 ))
+        fi
+      args:
+        executable: /bin/bash
+      register: hugepages_calc
+      changed_when: false
+
+    - name: Apply hugepage setting (runtime)
       sysctl:
         name: vm.nr_hugepages
-        value: "8000"
+        value: "{{ hugepages_calc.stdout }}"
         state: present
+
+    - name: Ensure hugepages are persistent
+      lineinfile:
+        path: /etc/sysctl.conf
+        regexp: '^vm.nr_hugepages='
+        line: "vm.nr_hugepages={{ hugepages_calc.stdout }}"
+        state: present
+
+    
+  # Create libfabric
+    - name: Create libfabric prefix
+      file:
+        path: "{{ libfabric_prefix }}"
+        state: directory
+        mode: '0755'
+
+    - name: Build & install libfabric {{ libfabric_version }}
+      shell: |
+        set -e
+        tmp=$(mktemp -d)
+        pushd "$tmp"
+        wget -q -O libfabric-{{ libfabric_version }}.tar.bz2 "https://github.com/ofiwg/libfabric/releases/download/v{{ libfabric_version }}/libfabric-{{ libfabric_version }}.tar.bz2"
+        tar xf libfabric-{{ libfabric_version }}.tar.bz2
+        cd libfabric-{{ libfabric_version }}
+        ./configure --prefix={{ libfabric_prefix }} --with-synapseai=/usr
+        make -j"$(nproc)"
+        make install
+      args:
+        executable: /bin/bash
+        creates: "{{ libfabric_prefix }}/lib/libfabric.so"
+    
+        # (8) OpenMPI — your snippet goes HERE
+    - name: Create OpenMPI prefix
+      file:
+        path: "{{ openmpi_prefix }}"
+        state: directory
+        mode: '0755'
+      become: yes
+
+    - name: Build & install OpenMPI {{ openmpi_version }}
+      shell: |
+        set -e
+        tmp=$(mktemp -d)
+        pushd "$tmp"
+        base="v{{ openmpi_version.split('.')[0] }}.{{ openmpi_version.split('.')[1] }}"
+        wget -q "https://download.open-mpi.org/release/open-mpi/${base}/openmpi-{{ openmpi_version }}.tar.gz"
+        tar xf openmpi-{{ openmpi_version }}.tar.gz
+        cd openmpi-{{ openmpi_version }}
+        ./configure --prefix={{ openmpi_prefix }}
+        make -j"$(nproc)"
+        make install
+      args:
+        executable: /bin/bash
+        creates: "{{ openmpi_prefix }}/bin/mpirun"
+      become: yes
+
+    # (9) HCCL OFI wrapper — your snippet goes NEXT
+    - name: Build & install HCCL OFI wrapper
+      shell: |
+        set -e
+        tmp=$(mktemp -d)
+        pushd "$tmp"
+        wget -q -O main.zip "https://github.com/HabanaAI/hccl_ofi_wrapper/archive/refs/heads/main.zip"
+        unzip -q main.zip
+        cd hccl_ofi_wrapper-main
+        make
+        cp -f libhccl_ofi_wrapper.so /usr/lib/habanalabs/libhccl_ofi_wrapper.so
+      args:
+        executable: /bin/bash
+        creates: "/usr/lib/habanalabs/libhccl_ofi_wrapper.so"
+      become: yes
+
+    # (10) Persist env — put this AFTER both builds
+    - name: Drop Habanalabs deps profile
+      copy:
+        dest: "{{ habana_profile_path }}"
+        mode: '0644'
+        content: |
+          # Autogenerated by Ansible
+          export LIBFABRIC_ROOT={{ libfabric_prefix }}
+          export MPI_ROOT={{ openmpi_prefix }}
+          export PATH={{ openmpi_prefix }}/bin:$PATH
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{{ libfabric_prefix }}/lib:{{ openmpi_prefix }}/lib
+          export OPAL_PREFIX={{ openmpi_prefix }}
+      become: yes    
       
     - name: Restart docker service
       service:
@@ -334,17 +454,38 @@
         state: restarted
       register: install_result
 
-# ------------------------------------------------------------------------#
-# Habana “Optimizing Training Platform” with OAM-based detection          #
-# ------------------------------------------------------------------------#
+  ## validate packagaes are present and accurate
+    - name: Validate HL-Thunk is present
+      stat:
+        path: /usr/lib/habanalabs/libhl-thunk.so
+      register: hl_thunk
+
+    - name: Fail if HL-Thunk is missing
+      fail:
+        msg: "libhl-thunk.so is missing after install."
+      when: not hl_thunk.stat.exists
+
+    - name: Validate Graph compiler lib is present
+      stat:
+        path: /usr/lib/habanalabs/libSynapse.so
+      register: synapse_lib
+
+    - name: Fail if Graph compiler lib is missing
+      fail:
+        msg: "libSynapse.so is missing after install."
+      when: not synapse_lib.stat.exists
+
+
+
+
+    ################################################################################################
+    # Determine Gaudi platform and Upgrade SPI Firmware if required                                #
+    ################################################################################################
     - name: Query Gaudi Product Name
-      shell: |
-        hl-smi -L \
-          | grep 'Product Name' \
-          | head -1 \
-          | awk -F ': ' '{print $2}'
+      shell: "hl-smi -L | grep 'Product Name' | head -1 | awk -F ': ' '{print $2}'"
       register: gaudi_product_name
       changed_when: false
+      ignore_errors: false  # Ensures failure stops execution if command fails
 
     - name: Debug Gaudi Product Name
       debug:
@@ -355,12 +496,42 @@
         msg: "Gaudi Product Name could not be detected!"
       when: gaudi_product_name.stdout | trim == ""
 
+    # - name: Set Gaudi version based on Product Name
+    #   set_fact:
+    #     gaudi_version: "{{ 'Gaudi3' if 'HL-325' in (gaudi_product_name.stdout | trim) else 'Gaudi2' if 'HL-225' in (gaudi_product_name.stdout | trim) else 'Unknown' }}"
+
+### ADDING HL-338
     - name: Set Gaudi version based on Product Name
       set_fact:
+    # Treat HL-325 and HL-338 as Gaudi3; HL-225 as Gaudi2
         gaudi_version: >-
-          {{ 'Gaudi3' if 'HL-325' in (gaudi_product_name.stdout | trim)
-             else ('Gaudi2' if 'HL-225' in (gaudi_product_name.stdout | trim)
-             else 'Unknown') }}
+          {{ 'Gaudi3'
+              if ('HL-325' in (gaudi_product_name.stdout | trim))
+                or ('HL-338' in (gaudi_product_name.stdout | trim))
+              else 'Gaudi2'
+              if ('HL-225' in (gaudi_product_name.stdout | trim))
+              else 'Unknown' }}
+    
+    - name: Detect exact Gaudi model (HL-225 / HL-325 / HL-338) via hl-smi (fallback lspci)
+      shell: |
+        if hl-smi 2>/dev/null | grep -Eo 'HL-[0-9]{3}' | head -1; then
+          hl-smi | grep -Eo 'HL-[0-9]{3}' | head -1
+        else
+          # Fallback: lspci shows Gaudi3 PCIe (HL-338) as 1da3:1063 on current releases
+          if lspci -nn | grep -qi '1da3:1063'; then echo HL-338; fi
+        fi
+      args: { executable: /bin/bash }
+      register: gaudi_model_guess
+      changed_when: false
+
+    - name: Normalize gaudi_model
+      set_fact:
+        gaudi_model: "{{ (gaudi_model_guess.stdout | trim) | default('UNKNOWN', true) }}"
+
+    - name: Debug Gaudi model
+      debug:
+        msg: "Detected Gaudi model: {{ gaudi_model }}"
+
 
     - name: Debug Gaudi Version
       debug:
@@ -468,70 +639,7 @@
         state: present
       loop: "{{ habana_drivers }}"
 
-    - name: Check current Energy Performance Bias MSR (0x1b0)
-      command: rdmsr 0x1b0
-      register: epb_val
-      changed_when: false
-      failed_when: false
 
-    - name: Apply EPB on Gaudi2 if needed
-      when:
-        - gaudi_version == "Gaudi2"
-        - epb_val.stdout != "0"
-      debug:
-        msg: "EPB is 0x{{ epb_val.stdout }} on {{ gaudi_version }}; setting to 0x0"
-      notify: apply_epb_gaudi2
-
-    - name: Apply EPB on Gaudi3 if needed
-      when:
-        - gaudi_version == "Gaudi3"
-        - epb_val.stdout != "1"
-      debug:
-        msg: "EPB is 0x{{ epb_val.stdout }} on {{ gaudi_version }}; setting to 0x1"
-      notify: apply_epb_gaudi3
-
-    - name: Check current CPU governor
-      command: cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-      register: cpu_gov
-      changed_when: false
-
-    - name: Apply performance governor if not already set
-      when: cpu_gov.stdout != "performance"
-      debug:
-        msg: "Governor is {{ cpu_gov.stdout }}; switching to performance"
-      notify: set_cpu_governor_performance
-
-    - name: Check current Core Frequency HWP MSR (0x774)
-      command: rdmsr 0x774
-      register: hwp_val
-      changed_when: false
-      failed_when: false
-
-    - name: Apply Core Frequency HWP if not already set
-      when: hwp_val.stdout | default("") != "2708"
-      debug:
-        msg: "HWP MSR is 0x{{ hwp_val.stdout }}; setting to 0x2708"
-      notify: set_core_freq_hwp
-
-    - name: Check if C6 disable file exists
-      stat:
-        path: /sys/devices/system/cpu/cpu0/cpuidle/state3/disable
-      register: c6_file
-
-    - name: Read C6 disable flag
-      command: cat /sys/devices/system/cpu/cpu0/cpuidle/state3/disable
-      register: c6_val
-      when: c6_file.stat.exists
-      changed_when: false
-      failed_when: false
-
-    - name: Disable C6/C6P if not already disabled
-      when:
-        - c6_file.stat.exists
-        - c6_val.stdout != "1"
-      debug:
-        msg: "C6 disable flag is {{ c6_val.stdout }}; disabling C6/C6P"
-      notify: disable_c6_states
 
 
     ################################################################################################

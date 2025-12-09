@@ -41,6 +41,20 @@ Pick the recipe file based on the version of the Intel® Gaudi® drivers
 Firmware needs to be upgraded. | 
 | 1.19.0         | [baremetal-recipe-1.19.0.yml](baremetal-recipe-1.19.0.yml)| For clean installs or upgrades. Checks to see if the SPI 
 Firmware needs to be upgraded. | 
+| 1.20.0         | [baremetal-recipe-1.20.0.yml](baremetal-recipe-1.19.0.yml)| For clean installs or upgrades. Checks to see if the SPI 
+Firmware needs to be upgraded. | 
+| 1.20.1         | [baremetal-recipe-1.20.1.yml](baremetal-recipe-1.19.0.yml)| For clean installs or upgrades. Checks to see if the SPI 
+Firmware needs to be upgraded. | 
+| 1.21.0         | [baremetal-recipe-1.21.0.yml](baremetal-recipe-1.19.0.yml)| For clean installs or upgrades. Checks to see if the SPI 
+Firmware needs to be upgraded. | 
+| 1.21.1         | [baremetal-recipe-1.21.1.yml](baremetal-recipe-1.19.0.yml)| For clean installs or upgrades. Checks to see if the SPI 
+Firmware needs to be upgraded. | 
+| 1.21.2         | [baremetal-recipe-1.21.2.yml](baremetal-recipe-1.19.0.yml)| For clean installs or upgrades. Checks to see if the SPI 
+Firmware needs to be upgraded. | 
+| 1.21.3         | [baremetal-recipe-1.21.3.yml](baremetal-recipe-1.19.0.yml)| For clean installs or upgrades. Checks to see if the SPI 
+Firmware needs to be upgraded. | 
+| 1.21.4         | [baremetal-recipe-1.21.4.yml](baremetal-recipe-1.19.0.yml)| For clean installs or upgrades. Checks to see if the SPI 
+Firmware needs to be upgraded. | 
 
 For example, on Ubuntu:
 

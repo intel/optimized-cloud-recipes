@@ -1,0 +1,520 @@
+##########################################################
+# Host configuration                                     #
+# RHEL9.x                                                #
+# **FOR OEM CONFIRM FW VERSION BEFORE RUNNING            #
+# Installs version:  1.22.0                              #
+# Installs Gaudi3 SPI FW: 1.22.0-fw-61.3.2.0             #
+# Installs Gaudi2 SPI FW: 1.22.0-fw-61.3.1-sec-11        #
+##########################################################
+---
+- name: rhel-baremetal-recipe-1.22.0 
+  hosts: localhost
+  become: true
+
+  vars:
+    habana_version: "1.22.0"
+    sub_habana_version: "1.22.0-740"
+    log_base: "/var/log"
+    log_file: "{{ log_base }}/baremetal-{{ habana_version }}.log"
+
+    # Firmware targets 
+    spi_version: "1.22.0-fw-61.3.2-sec-3 "
+    gaudi2spi: "1.22.0-fw-61.3.1-sec-11"
+    erom_version: "1.22.0-fw-61.3.2"
+    expected_erom_version: "{{ erom_version }}"
+
+    # PyTorch bundle info 
+    pillow_simd_version: "9.5.x"
+    pytorch_version: "2.7.1"
+    py_sub_ver: "_1.22.0_"
+    py_build_num: "740"
+    venv_path: "/opt/habana-venv-{{ habana_version }}"
+    extra_index_url: "https://vault.habana.ai/artifactory/api/pypi/gaudi-python/simple"
+
+    # For PT module download path
+    rhel_major: "{{ ansible_distribution_major_version | default('9') }}"
+    habana_os_id: "rhel{{ rhel_major | int }}"   
+
+    # Base Habana package set you asked to include
+    habana_packages_base:
+      - habanalabs-container-runtime-{{ sub_habana_version }}*
+      - habanalabs-{{ sub_habana_version }}*
+      - habanalabs-firmware-{{ sub_habana_version }}*
+      - habanalabs-firmware-odm-{{ sub_habana_version }}*
+      - habanalabs-firmware-tools-{{ sub_habana_version }}*
+      - habanalabs-graph-{{ sub_habana_version }}*
+      - habanalabs-qual-{{ sub_habana_version }}*
+      - habanalabs-qual-workloads-{{ sub_habana_version }}*
+      - habanalabs-rdma-core-{{ sub_habana_version }}*
+      - habanalabs-thunk-{{ sub_habana_version }}*
+
+    # Kernel drivers we load
+    habana_drivers:
+      - habanalabs_compat
+      - habanalabs_cn
+      - habanalabs_ib
+      - habanalabs_en
+      - habanalabs
+
+    # venv pip extras
+    pip_packages:
+      - name: "pip==22.2.2"
+      - name: "setuptools==67.3.3"
+      - name: "packaging"
+      - name: "habana_media_loader=={{ py_sub_ver[1:] | replace('_', '.', 1)}}{{py_build_num}}"
+
+  tasks:
+    ###########################################################################
+    # Enable base OS repos + CRB + EPEL 
+    ###########################################################################
+    - name: Check if subscription-manager is available
+      ansible.builtin.shell: command -v subscription-manager >/dev/null 2>&1 && echo yes || echo no
+      register: sm_check
+      changed_when: false
+
+    - name: Enable BaseOS & AppStream via subscription-manager (RHEL)
+      ansible.builtin.shell: >
+        subscription-manager repos
+        --enable=rhel-9-for-{{ ansible_architecture }}-baseos-rpms
+        --enable=rhel-9-for-{{ ansible_architecture }}-appstream-rpms
+      when:
+        - ansible_distribution == "RedHat"
+        - sm_check.stdout == "yes"
+      register: enable_ba
+      changed_when: "'Enabled' in (enable_ba.stdout | default('')) or enable_ba.rc == 0"
+      failed_when: enable_ba.rc not in [0,1]
+
+    - name: Enable CRB (CodeReady) via subscription-manager (RHEL)
+      ansible.builtin.shell: >
+        subscription-manager repos
+        --enable=codeready-builder-for-rhel-9-{{ ansible_architecture }}-rpms
+      when:
+        - ansible_distribution == "RedHat"
+        - sm_check.stdout == "yes"
+      register: enable_crb
+      changed_when: "'Enabled' in (enable_crb.stdout | default('')) or enable_crb.rc == 0"
+      failed_when: enable_crb.rc not in [0,1]
+
+
+    - name: Install EPEL release
+      dnf:
+        name: epel-release
+        state: present
+
+    ###########################################################################
+    # Tools 
+    ###########################################################################
+    - name: Install base tools, dev toolchain, and IB utilities
+      dnf:
+        name:
+          # core tools
+          - sudo
+          - dnf-plugins-core 
+          - yum-utils 
+          - which
+          - gcc
+          - gcc-c++
+          - cmake
+          - lsof
+          - curl
+          - wget
+          - file
+          - jq
+          - libarchive*
+          # IB support set
+          - rdma-core
+          - infiniband-diags
+          - perftest
+          - kernel-modules-extra
+        state: present
+        update_cache: yes
+
+    ###########################################################################
+    # Kernel headers/devel for the CURRENT running kernel
+    ###########################################################################
+    - name: Ensure facts gathered for ansible_kernel
+      setup:
+
+    - name: Install exact kernel headers/devel for running kernel
+      block:
+        - dnf:
+            name:
+              - "kernel-headers-{{ ansible_kernel }}"
+              - "kernel-devel-{{ ansible_kernel }}"
+            state: present
+            update_cache: yes
+          register: k_exact
+          ignore_errors: yes
+
+        - dnf:
+            name:
+              - kernel-headers
+              - kernel-devel
+            state: present
+          when: k_exact is failed
+
+    ###########################################################################
+    # Bootstrap Ansible tooling 
+    ###########################################################################
+    - name: Install Python libs for Ansible bootstrap
+      dnf:
+        name:
+          - python3-pip
+          - python3-requests
+          - python3-docker
+        state: present
+
+    - name: Install ansible via pip3 (if not present)
+      shell: |
+        set -e
+        if ! command -v ansible-playbook >/dev/null 2>&1; then
+          pip3 install --upgrade pip
+          pip3 install 'ansible-core' 'ansible'
+        fi
+      args: { executable: /bin/bash }
+      changed_when: false
+
+    ###########################################################################
+    # Docker CE repo + install 
+    ###########################################################################
+    - name: Ensure DNF plugins (config-manager)
+      dnf:
+        name: dnf-plugins-core
+        state: present
+
+    - name: Add Docker CE repo (RHEL 9)
+      ansible.builtin.yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Stable - $basearch
+        baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable
+        gpgcheck: yes
+        gpgkey: https://download.docker.com/linux/centos/gpg
+        enabled: yes
+
+    - name: Install Docker Engine stack
+      ansible.builtin.dnf:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    - name: Enable & start Docker
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Configure docker daemon for Habana runtime
+      copy:
+        dest: /etc/docker/daemon.json
+        mode: '0644'
+        content: |
+          {
+            "runtimes": {
+              "habana": {
+                "path": "/usr/bin/habana-container-runtime",
+                "runtimeArgs": []
+              }
+            }
+          }
+      notify: Restart docker
+
+    ###########################################################################
+    # Logging
+    ###########################################################################
+    - name: Ensure log dir and file
+      file: { path: "{{ log_base }}", state: directory, mode: "0755" }
+    - file:
+        path: "{{ log_file }}"
+        state: touch
+        mode: "0644"
+
+    ###########################################################################
+    # Habana repo + key (auto-pick exact RHEL minor)
+    ###########################################################################
+    - name: Compute exact RHEL 9 minor 
+      set_fact:
+        rhel_minor_exact: "{{ ansible_distribution_version | regex_search('^9\\.[0-9]+') }}"
+
+    - name: Fail if not on RHEL 9.x
+      fail:
+        msg: "This play expects RHEL 9.x (found {{ ansible_distribution }} {{ ansible_distribution_version }})"
+      when: rhel_minor_exact is not defined
+
+    - name: Ensure Habana GPG key present
+      get_url:
+        url: https://vault.habana.ai/artifactory/api/gpg/key/public
+        dest: /etc/pki/rpm-gpg/HABANA-GPG-KEY
+        mode: '0644'
+
+    - name: Add Habana yum repository 
+      yum_repository:
+        name: habanalabs
+        description: "Habana Labs RPMs (RHEL {{ rhel_minor_exact }})"
+        baseurl: "https://vault.habana.ai/artifactory/rhel/9/{{ rhel_minor_exact }}"
+        gpgcheck: yes
+        gpgkey: file:///etc/pki/rpm-gpg/HABANA-GPG-KEY
+        enabled: yes
+
+    - name: Makecache 
+      shell: |
+        dnf -y clean all
+        dnf -y makecache --disablerepo='*' --enablerepo='habanalabs'
+      args: { executable: /bin/bash }
+      changed_when: false
+
+    ###########################################################################
+    # Install the Habana packages you listed
+    ###########################################################################
+    - name: Install Habana packages
+      ansible.builtin.dnf:
+        name: "{{ habana_packages_base }}"
+        state: present
+        enablerepo: "habanalabs"        
+        allowerasing: yes
+        # nobest: no    # optional; only add if you truly want to allow lower EVR than the best candidate
+
+    # Build DKMS for the running kernel explicitly
+    - name: Ensure dkms builds for current kernel
+      ansible.builtin.shell: |
+        set -e
+        if ! dkms status | grep -qi 'habanalabs.*{{ ansible_kernel }}'; then
+          dkms autoinstall -k {{ ansible_kernel }}
+        fi
+        depmod -a {{ ansible_kernel }}
+      args: { executable: /bin/bash }
+      register: dkms_build
+      changed_when: "'DKMS' in (dkms_build.stdout | default('') ~ dkms_build.stderr | default(''))"
+      failed_when: false
+
+    - name: Load Habana drivers
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ habana_drivers }}"
+
+    ###########################################################################
+    # Hugepages 
+    ###########################################################################
+    - name: Configure hugepages
+      sysctl:
+        name: vm.nr_hugepages
+        value: "8000"
+        state: present
+
+    ###########################################################################
+    # Firmware detection & SPI update 
+    ###########################################################################
+    - name: Query Gaudi product name
+      shell: "hl-smi -L | grep 'Product Name' | head -1 | awk -F ': ' '{print $2}'"
+      register: gaudi_product_name
+      changed_when: false
+
+    - name: Fail if no Gaudi detected
+      fail:
+        msg: "Gaudi Product Name could not be detected!"
+      when: gaudi_product_name.stdout|trim == ""
+
+    # - name: Set Gaudi version fact
+    #   set_fact:
+    #     gaudi_version: >-
+    #       {{ 'Gaudi3' if 'HL-325' in gaudi_product_name.stdout
+    #          else 'Gaudi2' if 'HL-225' in gaudi_product_name.stdout
+    #          else 'Unknown' }}
+
+### ADDING HL-338
+    - name: Set Gaudi version based on Product Name
+      set_fact:
+    # Treat HL-325 and HL-338 as Gaudi3; HL-225 as Gaudi2
+        gaudi_version: >-
+          {{ 'Gaudi3'
+              if ('HL-325' in (gaudi_product_name.stdout | trim))
+                or ('HL-338' in (gaudi_product_name.stdout | trim))
+              else 'Gaudi2'
+              if ('HL-225' in (gaudi_product_name.stdout | trim))
+              else 'Unknown' }}
+    
+    - name: Detect exact Gaudi model (HL-225 / HL-325 / HL-338) via hl-smi (fallback lspci)
+      shell: |
+        if hl-smi 2>/dev/null | grep -Eo 'HL-[0-9]{3}' | head -1; then
+          hl-smi | grep -Eo 'HL-[0-9]{3}' | head -1
+        else
+          # Fallback: lspci shows Gaudi3 PCIe (HL-338) as 1da3:1063 on current releases
+          if lspci -nn | grep -qi '1da3:1063'; then echo HL-338; fi
+        fi
+      args: { executable: /bin/bash }
+      register: gaudi_model_guess
+      changed_when: false
+
+    - name: Normalize gaudi_model
+      set_fact:
+        gaudi_model: "{{ (gaudi_model_guess.stdout | trim) | default('UNKNOWN', true) }}"
+
+
+    - name: Fail if unknown Gaudi
+      fail:
+        msg: "Unknown Gaudi version detected! Cannot proceed."
+      when: gaudi_version == "Unknown"
+
+    - name: Determine target SPI firmware
+      set_fact:
+        habana_spi_fw_version: "{{ spi_version if gaudi_version=='Gaudi3' else gaudi2spi }}"
+
+    - name: Check current SPI firmware
+      shell: "hl-smi -L | grep SPI"
+      register: firmware_check
+      changed_when: false
+
+    - name: Parse firmware versions
+      set_fact:
+        firmware_versions: >-
+          {{ firmware_check.stdout_lines
+             | map('regex_search','([0-9]+\\.[0-9]+\\.[0-9]+-fw-[0-9]+\\.[0-9]+\\.[0-9]+-sec-[0-9]+)')
+             | select('string') | list }}
+
+    - name: Skip SPI update if already up-to-date
+      debug:
+        msg: "SPI firmware is current: {{ firmware_versions[0] }}"
+      when: firmware_versions | length > 0 and firmware_versions[0] == habana_spi_fw_version
+
+    - name: Update SPI firmware
+      when: firmware_versions | length == 0 or firmware_versions[0] != habana_spi_fw_version
+      block:
+        - name: Unload drivers
+          community.general.modprobe:
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ habana_drivers | reverse }}"
+
+        - name: Run SPI fw-loader
+          shell: "/usr/sbin/hl-fw-loader -y --file /lib/firmware/habanalabs/{{ gaudi_version|lower }}/{{ gaudi_version|lower }}-agent-fw_loader-fit.itb"
+
+        - name: Reload drivers
+          community.general.modprobe:
+            name: "{{ item }}"
+            state: present
+          loop: "{{ habana_drivers }}"
+
+    ###########################################################################
+    # PyTorch & venv setup (with extra dev deps you listed)
+    ###########################################################################
+    - name: Install extra dev/build deps for PyTorch installer
+      dnf:
+        name:
+          - python3.11-devel
+          - python3.11-pip
+          - python3.11-tkinter
+          - sqlite-devel
+          - readline-devel
+          - xz-devel
+          - bzip2
+          - bzip2-devel
+          - cairo-devel
+          - git
+          - gperftools
+          - jemalloc
+          - lapack
+          - lapack-devel
+          - libffi-devel
+          - libjpeg-turbo-devel
+          - numactl
+          - numactl-devel
+          - openblas-devel
+          - openmpi-devel
+          - unzip
+          - wget
+          - which
+          - zlib-devel
+        state: present
+        # some python3.11 packages may not exist on minimal images; that's fine
+      ignore_errors: true
+
+    - name: Install Python AI packages via pip (system)
+      pip:
+        name:
+          - mpi4py
+          - habana-pyhlml
+          - "git+https://github.com/aostrowski-hbn/pillow-simd.git@simd/{{ pillow_simd_version }}"
+          - setuptools
+        state: latest
+
+    - name: Create Python venv
+      command: python3 -m venv {{ venv_path }}
+      args:
+        creates: "{{ venv_path }}/bin/activate"
+
+    - name: Upgrade pip in venv
+      command: "{{ venv_path }}/bin/pip install --upgrade pip"
+
+    - name: Install pip packages in venv
+      pip:
+        name: "{{ item.name }}"
+        executable: "{{ venv_path }}/bin/pip"
+        extra_args: "--extra-index-url {{ extra_index_url }}"
+      loop: "{{ pip_packages }}"
+    
+    # derive rhel96 / rhel94 style dirname
+    - name: Compute PT OS dir (rhel96/rhel94 style)
+      set_fact:
+        rhel_minor_exact: "{{ ansible_distribution_version | regex_search('^9\\.[0-9]+') }}"
+        pt_os_dir: "rhel{{ rhel_minor_exact | regex_replace('\\.', '') }}"
+
+    - name: Download Habana PyTorch modules tarball (RHEL 9.x minor-aware)
+      get_url:
+        url: "https://vault.habana.ai/artifactory/gaudi-pt-modules/{{ habana_version }}/{{ py_build_num }}/pytorch/{{ pt_os_dir }}/pytorch_modules-v{{ pytorch_version }}{{ py_sub_ver }}{{ py_build_num }}.tgz"
+        dest: "/tmp/pytorch_modules-{{ habana_version }}.tgz"
+        mode: '0644'
+
+    - name: Ensure /tmp/pytorch_modules exists
+      file: { path: /tmp/pytorch_modules, state: directory, mode: "0755" }
+
+    - name: Extract Habana PyTorch modules
+      unarchive:
+        src: "/tmp/pytorch_modules-{{ habana_version }}.tgz"
+        dest: "/tmp/pytorch_modules"
+        remote_src: yes
+
+    - name: Install all Habana PyTorch .whl files into venv
+      shell: |
+        find /tmp/pytorch_modules -name "*.whl" -exec {{ venv_path }}/bin/pip install --extra-index-url {{ extra_index_url }} {} +
+      args: { executable: /bin/bash }
+
+    - name: Persist your requested environment variables
+      copy:
+        dest: /etc/profile.d/habana_env.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          export HABANALABS_HLTHUNK_TESTS_BIN_PATH=/opt/habanalabs/src/hl-thunk/tests/
+          export HABANA_LOGS=/var/log/habana_logs/
+          export RDMA_CORE_ROOT=/opt/habanalabs/rdma-core/src
+          export HABANA_PLUGINS_LIB_PATH=/usr/lib/habanatools/habana_plugins
+          export GC_KERNEL_PATH=/usr/lib/habanalabs/libtpc_kernels.so
+          export RDMA_CORE_LIB=/opt/habanalabs/rdma-core/src/build/lib
+          export HABANA_SCAL_BIN_PATH=/opt/habanalabs/engines_fw
+          export DATA_LOADER_AEON_LIB_PATH=/usr/lib/habanalabs/libaeon.so
+          export __python_cmd=python3
+
+    - name: Show venv activation hint
+      debug:
+        msg: |
+          Activate the Habana venv:
+            source {{ venv_path }}/bin/activate
+          Logs: {{ log_file }}
+
+    ###########################################################################
+    # Reboot after install (same as your script)
+    ###########################################################################
+    - name: Schedule reboot in 60s
+      shell: nohup bash -c "sleep 60 && reboot" >/dev/null 2>&1 &
+      async: 1
+      poll: 0
+
+  handlers:
+    - name: Restart docker
+      service:
+        name: docker
+        state: restarted
