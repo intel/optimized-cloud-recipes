@@ -17,6 +17,7 @@
     spi_version: "1.21.2-fw-60.1.0-sec-2"
     gaudi2spi: "1.21.2-fw-61.0.0-sec-11"
     erom_version: "1.21.2-fw-61.0.0"
+    expected_erom_version: "{{ erom_version }}"
     pillow_simd_version: "9.5.x"
     pytorch_version: "2.6.0"
     py_sub_ver: "_1.21.2_"
@@ -46,26 +47,6 @@
       - name: "setuptools==67.3.3"
       - name: "packaging"  # Fixes missing module error
       - name: "habana_media_loader=={{ py_sub_ver[1:] | replace('_', '.', 1)}}{{py_build_num}}"
-
-    handlers:
-      - name: set_cpu_governor_performance
-        shell: echo performance | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
-
-      - name: apply_epb_gaudi2
-        shell: wrmsr -a 0x1b0 0x0
-
-      - name: apply_epb_gaudi3
-        shell: wrmsr -a 0x1b0 0x1
-
-      - name: set_core_freq_hwp
-        shell: wrmsr -a 0x774 0x2708
-
-      - name: disable_c6_states
-        shell: |
-          echo 1 | tee /sys/devices/system/cpu/cpu*/cpuidle/state3/disable
-          if [ -d /sys/devices/system/cpu/cpu0/cpuidle/state4 ]; then
-            echo 1 | tee /sys/devices/system/cpu/cpu*/cpuidle/state4/disable
-          fi
 
   tasks:
     # Ensure multiverse repository is enabled for libmkl package availability
@@ -334,17 +315,16 @@
         state: restarted
       register: install_result
 
-# ------------------------------------------------------------------------#
-# Habana “Optimizing Training Platform” with OAM-based detection          #
-# ------------------------------------------------------------------------#
+
+
+    ################################################################################################
+    # Determine Gaudi platform and Upgrade SPI Firmware if required                                #
+    ################################################################################################
     - name: Query Gaudi Product Name
-      shell: |
-        hl-smi -L \
-          | grep 'Product Name' \
-          | head -1 \
-          | awk -F ': ' '{print $2}'
+      shell: "hl-smi -L | grep 'Product Name' | head -1 | awk -F ': ' '{print $2}'"
       register: gaudi_product_name
       changed_when: false
+      ignore_errors: false  # Ensures failure stops execution if command fails
 
     - name: Debug Gaudi Product Name
       debug:
@@ -357,10 +337,7 @@
 
     - name: Set Gaudi version based on Product Name
       set_fact:
-        gaudi_version: >-
-          {{ 'Gaudi3' if 'HL-325' in (gaudi_product_name.stdout | trim)
-             else ('Gaudi2' if 'HL-225' in (gaudi_product_name.stdout | trim)
-             else 'Unknown') }}
+        gaudi_version: "{{ 'Gaudi3' if 'HL-325' in (gaudi_product_name.stdout | trim) else 'Gaudi2' if 'HL-225' in (gaudi_product_name.stdout | trim) else 'Unknown' }}"
 
     - name: Debug Gaudi Version
       debug:
@@ -482,56 +459,99 @@
         msg: "EPB is 0x{{ epb_val.stdout }} on {{ gaudi_version }}; setting to 0x0"
       notify: apply_epb_gaudi2
 
-    - name: Apply EPB on Gaudi3 if needed
+    - name: Debug Target Firmware Version
+      debug:
+        msg: "Target Firmware Version: {{ habana_spi_fw_version }}"
+
+    - name: Check firmware version
+      shell: "hl-smi -L | grep SPI"
+      register: firmware_check
+      changed_when: false
+
+    - name: Extract firmware versions
+      set_fact:
+        firmware_versions: "{{ firmware_check.stdout_lines | map('regex_search', '([0-9]+\\.[0-9]+\\.[0-9]+-fw-[0-9]+\\.[0-9]+\\.[0-9]+-sec-[0-9]+)') | select('string') | list }}"
+
+    - name: Debug current firmware version
+      debug:
+        msg: "Current firmware version(s): {{ firmware_versions | join(', ') }}"
+
+    - name: Set firmware directory based on Gaudi version
+      set_fact:
+        firmware_dir: "/lib/firmware/habanalabs/{{ gaudi_version | lower }}"
+
+    - name: Set firmware directory based on Gaudi version
+      set_fact:
+        firmware_dir: "/lib/firmware/habanalabs/{{ gaudi_version | lower }}"
+
+    - name: Determine correct firmware file for upgrade
+      set_fact:
+        target_firmware_file: "{{ firmware_dir }}/{{gaudi_version|lower}}-agent-fw_loader-fit.itb"
+    - name: Debug firmware file path
+      debug:
+        msg: "Using firmware file: {{ target_firmware_file }}"
+
+    - name: Compare firmware versions
+      set_fact:
+        all_fw_versions_match: "{{ firmware_versions | unique | list | length == 1 and firmware_versions[0] == habana_spi_fw_version }}"
+
+    - name: Determine if drivers need to be unloaded
+      set_fact:
+        drivers_need_unload: "{{ (not all_fw_versions_match and habana_spi_fw_version != 'unknown') or
+                             (gaudi_version == 'Gaudi3' and erom_version != '' and erom_version != expected_erom_version) }}"
+
+    - name: Update SPI firmware if necessary
+      when: not all_fw_versions_match and habana_spi_fw_version != 'unknown'
+      block:
+        - name: Unload Habana drivers before firmware update
+          modprobe:
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ habana_drivers | reverse | list }}"
+          when: drivers_need_unload
+
+        - name: Upgrade Habana SPI Firmware
+          shell: "/usr/sbin/hl-fw-loader -y --file {{ target_firmware_file }}"
+          register: fw_upgrade
+          changed_when: fw_upgrade.rc == 0
+
+    ################################################################################################
+    # Determine and Upgrade eROM if required                                                       #
+    ################################################################################################
+
+    - name: Get current eROM version (Gaudi3 only)
+      shell: "hl-smi --fw-versions | grep erom -A 2 | grep component | awk -F ':' '{print $2}' | xargs"
+      register: erom_version_raw
+      changed_when: false
+      when: gaudi_version == "Gaudi3"
+
+    - name: Set eROM version fact
+      set_fact:
+        erom_version: "{{ erom_version_raw.stdout | trim }}"
+      when: gaudi_version == "Gaudi3"
+
+    - name: Skip eROM update if no version detected (assume Gaudi2)
+      debug:
+        msg: "No eROM detected. Assuming Gaudi2. Skipping eROM update."
       when:
         - gaudi_version == "Gaudi3"
-        - epb_val.stdout != "1"
-      debug:
-        msg: "EPB is 0x{{ epb_val.stdout }} on {{ gaudi_version }}; setting to 0x1"
-      notify: apply_epb_gaudi3
+        - erom_version == ""
 
-    - name: Check current CPU governor
-      command: cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-      register: cpu_gov
-      changed_when: false
-
-    - name: Apply performance governor if not already set
-      when: cpu_gov.stdout != "performance"
-      debug:
-        msg: "Governor is {{ cpu_gov.stdout }}; switching to performance"
-      notify: set_cpu_governor_performance
-
-    - name: Check current Core Frequency HWP MSR (0x774)
-      command: rdmsr 0x774
-      register: hwp_val
-      changed_when: false
-      failed_when: false
-
-    - name: Apply Core Frequency HWP if not already set
-      when: hwp_val.stdout | default("") != "2708"
-      debug:
-        msg: "HWP MSR is 0x{{ hwp_val.stdout }}; setting to 0x2708"
-      notify: set_core_freq_hwp
-
-    - name: Check if C6 disable file exists
-      stat:
-        path: /sys/devices/system/cpu/cpu0/cpuidle/state3/disable
-      register: c6_file
-
-    - name: Read C6 disable flag
-      command: cat /sys/devices/system/cpu/cpu0/cpuidle/state3/disable
-      register: c6_val
-      when: c6_file.stat.exists
-      changed_when: false
-      failed_when: false
-
-    - name: Disable C6/C6P if not already disabled
+    - name: Update Gaudi3 eROM with hl-fw-loader if system is Gaudi3
+      shell: |
+        cd /opt/habanalabs/qual/gaudi3/bin && \
+        hl-fw-loader -f /lib/firmware/habanalabs/{{gaudi_version|lower}}/{{gaudi_version|lower}}-agent-fw_loader-fit_erom.itb
       when:
-        - c6_file.stat.exists
-        - c6_val.stdout != "1"
-      debug:
-        msg: "C6 disable flag is {{ c6_val.stdout }}; disabling C6/C6P"
-      notify: disable_c6_states
+        - gaudi_version == "Gaudi3"
+        - erom_version != ""
+        - erom_version != expected_erom_version
+
+    - name: Reload Habana drivers after firmware update
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ habana_drivers }}"
+
 
 
     ################################################################################################
