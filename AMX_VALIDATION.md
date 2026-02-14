@@ -40,10 +40,13 @@ fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush 
 #### 1.Install processwatch
 
 ```bash
-# Install processwatch 
 cd ~
+# Install Git
+sudo apt-get install git -y
+
+# Install Processwatch
 mkdir simd_experiment && cd $_
-git clone --recursive https://github.com/intel/processwatch.git -b v1.1
+git clone --recursive https://github.com/intel/processwatch.git
 cd processwatch/
 sudo apt-get install libelf-dev cmake clang llvm llvm-dev libomp-dev build-essential binutils-dev libcapstone-dev libbpf-dev -y
 ./build.sh
